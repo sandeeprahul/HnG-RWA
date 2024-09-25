@@ -1,0 +1,5 @@
+enum StoreVisitEnum {
+  visited,
+  notVisited,
+
+}
