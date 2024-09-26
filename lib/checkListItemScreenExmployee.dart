@@ -575,29 +575,36 @@ class _checkListItemScreenEmployeeState
   }
 
   Future<void> submitAllDilo() async {
+    print("submitAllDilo");
     try {
       setState(() {
         loading = true;
       });
+      final prefs = await SharedPreferences.getInstance();
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Employee/WorkFlowStatus',
-      );
+      var userId = prefs.getString("userCode");
+
+      var url = Uri.parse("https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Employee/WorkFlowStatusEmp");
+
+      Map<String, String> headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+      };
+
+      Map<String, dynamic> body = {
+        'emp_checklist_assign_id': widget.activeCheckList.empChecklistAssignId,
+        'employee_code': userId,
+      };
+      String jsonBody = jsonEncode(body);
+
 
       var response = await http.post(
         url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({
-          "emp_checklist_assign_id": widget.activeCheckList.empChecklistAssignId
-        }),
+        headers: headers,
+        body: jsonBody,
       );
 
-      print(url);
-      print({
-        "emp_checklist_assign_id": widget.activeCheckList.empChecklistAssignId
-      });
+
+
       var respo = jsonDecode(response.body);
       if (response.statusCode == 200) {
         if (respo["statusCode"] == "201") {
@@ -616,10 +623,14 @@ class _checkListItemScreenEmployeeState
           loading = false;
         });
         _showAlert(
-            'Something went wrong\n${response.statusCode}\nPlease contact IT suport');
+            'Something went wrong\n${response.statusCode}\nPlease contact IT support');
       }
     } catch (e) {
-      _showAlert('Something went wrong\n$e\nPlease contact IT suport');
+      setState(() {
+        loading = false;
+      });
+      print(e);
+      _showAlert('Something went wrong\n$e\nPlease contact IT support');
     }
   }
 

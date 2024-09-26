@@ -131,7 +131,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
             await availableCameras(); //get list of available cameras
         final frontCam = cameras[1];
 
-        Camcontroller = CameraController(frontCam, ResolutionPreset.max);
+        Camcontroller = CameraController(frontCam, ResolutionPreset.medium);
         Camcontroller?.initialize().then((_) {
           if (!mounted) {
             return;
@@ -149,9 +149,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           preferredCameraDevice: CameraDevice.front);
       _cropImage(photo, firstTime);
     }
-    /* String? deviceId = await PlatformDeviceId.getDeviceId;
-    print("DeviceID");
-    print(deviceId);*/
+
   }
 
   var timeMin = "";
@@ -234,13 +232,11 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       print(distanceInMeters);
       var mts = distanceInMeters.toString().split('.');
       var meters = mts[0];
-      if (double.parse(meters) <= 100) {
+      if (double.parse(meters) <= 150) {
         setState(() {
           loading = false;
           takePhoto = true;
         });
-        print('inside$meters');
-        // alertGetPhoto('You are near to store\n$meters meters ', firstime);
         alertGetPhoto(
             'You are tagged to Store ${widget.activeCheckList.locationName}. Click Proceed to continue ',
             firstime);
@@ -989,7 +985,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           }
         });
 
-        print('imageEncoded');
         croppedFile.readAsBytes().then((value) {
           imageEncoded = base64.encode(value);
         });
@@ -1071,12 +1066,11 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       String empCode = "EMP$userId$dateForEmpCode_";
       var deviceid = prefs.getString("deviceid");
 
-     /* String url =
-          "${Constants.apiHttpsUrl}/Employee/$type/${widget.activeCheckList.empChecklistAssignId}";
-    */  var url = Uri.https(
-        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWASTAFFMOVEMENT_TEST/api/Employee/Emp_CheckIn', //
-      );
+      String url =
+          "${Constants.apiHttpsUrl}/Employee/Emp_CheckIn";
+     /* var url = Uri.https(
+        '${Constants.apiHttpsUrl}/Employee/Emp_CheckIn', //
+      );*/
 
       var locationCode;
       locationCode = prefs.getString('locationCode');
@@ -1096,41 +1090,12 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           "imageFormat": "jpg",
           "imagebase64": ""
         },
-        /*     "attendance_date": "$date_",
-        //remove in production
-        "attendance_store_code": "$locationCode",
-        // "attendance_store_code": '106',
-        "attendance_sto_geo_lat": lat,
-        "attendance_sto_geo_long": lng,
-        "employee_code": prefs.getString('userCode') ?? '105060',
-        "check_date_time_in": "$datetime_",
-        "check_in_selfie_url": "",
-        "check_date_time_out": "$datetime_",
-        "check_out_selfie_url": "",
-        "check_in_store_geo_lat": lat,
-        "check_in_store_geo_long": lng,
-        "check_out_store_geo_long": 0,
-        "check_out_exception_status": 0,
-        "created_by": "string",
-        "created_datetime": "$datetime_",
-        "attendance_current_status": "Present",
-        "roaster_id": "10",
-        "check_out_store_geo_lat": "10",
-        "check_in_exception_status": "10",
-        "modiified_datetime": "2023-02-20",
-        "modified_by": "",
-        "check_in_Image": "",
-        // "check_in_Image_FileName": "EMPCD106" + datetime_,
-        "check_in_Image_FileName": "$empCode",
-        "check_in_Image_FileName_Format": "jpg",
-        "check_out_image": "",
-        "check_out_image_FileName": "",
-        "check_out_Image_FileName_Format": "",*/
+
       };
 
       var response = await http
           .post(
-            url,
+           Uri.parse( url),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -1217,7 +1182,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
             Container(
               padding: const EdgeInsets.all(15),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+                  BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();

@@ -115,7 +115,7 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
   Future<void> openCameraForAndroid() async {
     final cameras = await availableCameras();
 
-    controller = CameraController(cameras[0], ResolutionPreset.max);
+    controller = CameraController(cameras[0], ResolutionPreset.medium);
     controller.initialize().then((_) {
       if (!mounted) {
         return;
@@ -148,7 +148,7 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
             await availableCameras(); //get list of available cameras
         final frontCam = cameras[1];
 
-        camController = CameraController(frontCam, ResolutionPreset.max);
+        camController = CameraController(frontCam, ResolutionPreset.medium);
         camController?.initialize().then((_) {
           if (!mounted) {
             return;

@@ -651,7 +651,7 @@ class _submitCheckListScreen_StoreAuditState
               await availableCameras(); //get list of available cameras
           final frontCam = cameras[0];
 
-          Camcontroller = CameraController(frontCam, ResolutionPreset.max);
+          Camcontroller = CameraController(frontCam, ResolutionPreset.medium);
           Camcontroller?.initialize().then((_) {
             if (!mounted) {
               return;

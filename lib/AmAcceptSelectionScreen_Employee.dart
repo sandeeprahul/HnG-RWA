@@ -1141,7 +1141,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       submitCheckListScreenEmployee(
-                                                          headerQuestion[0],
+                                                          headerQuestion[index_],
                                                           widget
                                                               .activeCheckList,
                                                           1,

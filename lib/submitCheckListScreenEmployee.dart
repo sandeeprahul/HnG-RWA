@@ -582,7 +582,7 @@ class _submitCheckListScreenEmployeeState
               await availableCameras(); //get list of available cameras
           final frontCam = cameras[0];
 
-          Camcontroller = CameraController(frontCam, ResolutionPreset.max);
+          Camcontroller = CameraController(frontCam, ResolutionPreset.medium);
           Camcontroller?.initialize().then((_) {
             if (!mounted) {
               return;
@@ -1202,7 +1202,8 @@ class _submitCheckListScreenEmployeeState
         "questionstatus": "Completed",
         "imagename": ""
       });
-    } else {
+    }
+    else {
       for (int i = 0; i < quesAnsList[0].questions.length; i++) {
         if (quesAnsList[0].questions[i].answerTypeId == 4) {
           sendJson.add({
@@ -1308,21 +1309,13 @@ class _submitCheckListScreenEmployeeState
             "checklist_progress_status": "",
             "checklist_edit_status": "C",
             "questionstatus": "Completed",
-            "imagename": ""
+            "imagename": "$empCode.jpg"
           });
         }
       }
     }
 
-    /* for (int i = 0; i < quesAnsList[0].questions.length; i++) {
-      */ /* for(int j=0;j<quesAnsList[i].xquestions.length;j++){
 
-      }*/ /*
-
-    }*/
-
-    print('AddanswerParams=>$sendJson');
-    print('AddanswerParams=>' + sendJson.length.toString());
 
     var response = await http.post(
       url,
