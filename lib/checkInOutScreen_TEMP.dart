@@ -931,8 +931,9 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
 
       cloudstorageRef(imageEncoded, empCode);
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Attendance/AttendanceAdd',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Attendance/AttendanceAdd',
       );
 
       var params;

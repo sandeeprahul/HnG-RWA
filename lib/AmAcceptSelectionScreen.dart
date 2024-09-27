@@ -1592,8 +1592,9 @@ class _AmAcceptSelectionScreenState extends State<AmAcceptSelectionScreen> {
 
       var userId = prefs.getString('userCode');
       // String url = staticUrlString + "Login/validateLogin";
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/CheckList/QuestionUpdate',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/CheckList/QuestionUpdate',
       );
 
       var params = [];
@@ -1843,8 +1844,9 @@ class _AmAcceptSelectionScreenState extends State<AmAcceptSelectionScreen> {
     final payload =
         '{"checklist_assign_id":${widget.activeCheckList.checklistAssignId}}';
 
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/CheckList/WorkFlowStatus',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/CheckList/WorkFlowStatus',
     );
 
     var response = await http.post(

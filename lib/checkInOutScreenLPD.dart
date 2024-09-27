@@ -1092,8 +1092,9 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
       var userId = prefs.getString("userCode");
       String empCode = "EMP$userId$dateForEmpCode_";
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/lpdaudit/Lpd_CheckIn', //lpdaudit/AddCheckinHeader
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/Lpd_CheckIn', //lpdaudit/AddCheckinHeader
       );
 
       var locationCode;

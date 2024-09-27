@@ -1101,8 +1101,9 @@ class _checkInOutScreenStoreAuditState
       String empCode = "EMP$userId$dateForEmpCode_";
       var deviceid = prefs.getString("deviceid");
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/StoreAudit/Store_CheckIn', //
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/Store_CheckIn', //
       );
 
       var locationCode;

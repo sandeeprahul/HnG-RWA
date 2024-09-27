@@ -1003,8 +1003,9 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
       setState(() {
         loading = true;
       });
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/CheckList/QuestionCancel',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/CheckList/QuestionCancel',
       );
       var sendJson = {
         "checklist_assign_id": widget.checkList.checklistAssignId,
@@ -1070,8 +1071,9 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
 
       final prefs = await SharedPreferences.getInstance();
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/CheckList/AddQuestionAnswer',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/CheckList/AddQuestionAnswer',
       );
 
       var locationCode = prefs.getString('locationCode');
@@ -1319,8 +1321,9 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
       final prefs = await SharedPreferences.getInstance();
 
       // String url = staticUrlString + "Login/validateLogin";
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/CheckList/ImageUpload',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/CheckList/ImageUpload',
       );
 
       var image = [];

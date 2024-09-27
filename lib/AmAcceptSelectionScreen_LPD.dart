@@ -1865,8 +1865,9 @@ class _AmAcceptSelectionScreen_LPDState
 
       var userId = prefs.getString('userCode');
       // String url = staticUrlString + "Login/validateLogin";
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/lpdaudit/QuestionUpdate',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/QuestionUpdate',
       );
 
       var params = [];
@@ -2279,8 +2280,9 @@ class _AmAcceptSelectionScreen_LPDState
     final payload =
         '{"checklist_assign_id":${widget.activeCheckList.lpdChecklistAssignId}}';
 
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/lpdaudit/WorkFlowStatus',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/WorkFlowStatus',
     );
 
     var response = await http.post(

@@ -1012,8 +1012,9 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
       setState(() {
         loading = true;
       });
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/CheckList/QuestionCancel',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/CheckList/QuestionCancel',
       );
       var sendJson = {
         "vm_assign_id": widget.checkList.vm_assign_id,
@@ -1343,8 +1344,9 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
       final prefs = await SharedPreferences.getInstance();
 
       // String url = staticUrlString + "Login/validateLogin";
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/CheckList/ImageUpload',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/CheckList/ImageUpload',
       );
 
       var image = [];

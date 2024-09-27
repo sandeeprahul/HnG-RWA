@@ -948,8 +948,9 @@ class _ViewProfileState extends State<ViewProfile> {
       loading = true;
     });
     try {
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Login/ProfilePhotoUpdate', //
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Login/ProfilePhotoUpdate', //
       );
       print("=>");
       print(url);
@@ -1020,8 +1021,9 @@ class _ViewProfileState extends State<ViewProfile> {
         "password": "${_passwordController.text.toString()}",
       };
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Login/changepassword', //
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Login/changepassword', //
       );
 
       var response = await http

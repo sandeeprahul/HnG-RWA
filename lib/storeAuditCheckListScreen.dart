@@ -343,8 +343,9 @@ class _storeAuditCheckListScreenState extends State<storeAuditCheckListScreen>
         '{"store_checklist_assign_id":${widget.activeCheckList.store_checklist_assign_id}}';
     print(payload);
 
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/StoreAudit/WorkFlowStatus',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/WorkFlowStatus',
     );
 
     var response = await http.post(

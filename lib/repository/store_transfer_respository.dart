@@ -37,8 +37,9 @@ class StoreTransferRepository {
 
   Future<void> transferEmployee(
       List<WeekoffEntity> selectedDates, String empCode) async {
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/Login/weekoff',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff',
     );
 
     try {
@@ -99,8 +100,9 @@ class StoreTransferRepository {
 
     try
     {
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Login/TrasnferUpdate',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Login/TrasnferUpdate',
       );
       print(url);
 

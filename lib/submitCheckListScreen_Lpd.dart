@@ -1028,8 +1028,9 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
       setState(() {
         loading = true;
       });
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/lpdaudit/QuestionCancel',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/QuestionCancel',
       );
       var sendJson = {
         "checklist_assign_id": widget.checkList.lpdChecklistAssignId,
@@ -1094,8 +1095,9 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
 
       final prefs = await SharedPreferences.getInstance();
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/lpdaudit/AddQuestionAnswer',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/AddQuestionAnswer',
       );
 
       var locationCode = prefs.getString('locationCode');

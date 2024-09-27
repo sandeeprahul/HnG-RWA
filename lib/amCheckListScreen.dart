@@ -475,8 +475,9 @@ class _amCheckListScreenState extends State<amCheckListScreen>
         '{"am_checklist_assign_id":${widget.activeCheckList.amChecklistAssignId}}';
     print(payload);
 
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/AreaManager/WorkFlowStatus',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/WorkFlowStatus',
     );
 
     var response = await http.post(

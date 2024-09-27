@@ -523,9 +523,8 @@ class _AmAcceptSelectionScreen_EmployeeState
                             padding: const EdgeInsets.only(
                                 left: 10, bottom: 15, top: 10),
                             child: Text(
-                              mAmHeaderQuestion.isEmpty
-                                  ? ""
-                                  : mAmHeaderQuestion[0].itemName,
+                              mAmHeaderQuestion.isEmpty ? "" : "",
+                              // : mAmHeaderQuestion[0].itemName,
                               style: const TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
@@ -606,13 +605,15 @@ class _AmAcceptSelectionScreen_EmployeeState
                                   // var time_ = 'timw';
                                   return InkWell(
                                     onTap: () {
-                                      setData(pos);
-
                                       setState(() {
                                         index_ = pos;
 
                                         showCheckListDetails = true;
+                                        selectedAmHeaderQuestion =
+                                            mAmHeaderQuestion[pos];
                                       });
+
+                                      setData(pos);
                                     },
                                     child: Stack(
                                       children: [
@@ -718,9 +719,11 @@ class _AmAcceptSelectionScreen_EmployeeState
                                                             ),
                                                             Expanded(
                                                               child: Text(
-                                                                  // '${headerQuestion[pos].updatedName} - ${headerQuestion[pos].updated_by}',
-
-                                                                  '${mAmHeaderQuestion[pos].updatedBy} - ${mAmHeaderQuestion[pos].employeeName}',
+                                                                  maxLines: 1,
+                                                                  mAmHeaderQuestion[
+                                                                          pos]
+                                                                      .itemName,
+                                                                  // '${mAmHeaderQuestion[pos].updatedBy} - ${mAmHeaderQuestion[pos].employeeName}',
                                                                   // $time_
                                                                   style: const TextStyle(
                                                                       fontSize:
@@ -733,6 +736,21 @@ class _AmAcceptSelectionScreen_EmployeeState
                                                             ),
                                                           ],
                                                         ),
+                                                        const SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Text(
+                                                            maxLines: 1,
+                                                            // mAmHeaderQuestion[pos].itemName,
+                                                            '${mAmHeaderQuestion[pos].updatedBy} - ${mAmHeaderQuestion[pos].employeeName}',
+                                                            // $time_
+                                                            style: const TextStyle(
+                                                                fontSize: 14,
+                                                                color: Colors
+                                                                    .black,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
                                                         const SizedBox(
                                                           height: 10,
                                                         ),
@@ -1049,6 +1067,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                             ],
                                           ),
                                         )),
+
                                     Visibility(
                                         visible: attachProof, //answer_type_id
                                         child: Container(
@@ -1058,9 +1077,9 @@ class _AmAcceptSelectionScreen_EmployeeState
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              const Text(
-                                                'ATTACH PROOF',
-                                                style: TextStyle(
+                                               Text(
+                                                 attachProofTitle,
+                                                style: const TextStyle(
                                                   fontSize: 16,
                                                 ), //fontWeight: FontWeight.bold
                                               ),
@@ -1093,6 +1112,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                           ),
                                         )),
                                     const Divider(),
+
                                     Visibility(
                                         visible: answer_TypeId,
                                         //answer_type_id
@@ -1141,7 +1161,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       submitCheckListScreenEmployee(
-                                                          headerQuestion[index_],
+                                                          headerQuestion[0],
                                                           widget
                                                               .activeCheckList,
                                                           1,
@@ -1151,7 +1171,8 @@ class _AmAcceptSelectionScreen_EmployeeState
                                                               .mGetActvityTypes,
                                                           widget.checkList,
                                                           sendingToEditAmHeaderQuestion
-                                                              .updatedBy)),
+                                                              .updatedBy,
+                                                          "${selectedAmHeaderQuestion!.checklisTItemMstId}")),
                                             ).then((value) {
                                               getData();
                                               getDataCheckList();
@@ -1507,6 +1528,7 @@ class _AmAcceptSelectionScreen_EmployeeState
 
   // List<HeaderQuestion> headerQuestion = [];
   List<AmHeaderQuestionEmployee> mAmHeaderQuestion = [];
+  AmHeaderQuestionEmployee? selectedAmHeaderQuestion;
   late AmHeaderQuestionEmployee sendingToEditAmHeaderQuestion;
   List mAmHeaderQuestion_notSelected = [];
   List<HeaderQuestionEmployee> headerQuestionSelected = [];
@@ -1669,7 +1691,7 @@ class _AmAcceptSelectionScreen_EmployeeState
   }
 
   bool loading = false;
-
+ String  attachProofTitle='';
   setData(int pos) async {
     attachProofImg = '';
     answer_TypeId_answer = '';
@@ -1684,7 +1706,7 @@ class _AmAcceptSelectionScreen_EmployeeState
     checklistProgressStatus = '';
 
     int i = pos;
-    if (mAmHeaderQuestion.length != 0) {
+    if (mAmHeaderQuestion.isNotEmpty) {
       sendingToEditAmHeaderQuestion = mAmHeaderQuestion[i];
 
       // for (int i = 0; i < mAmHeaderQuestion.length; i++) {
@@ -1717,10 +1739,17 @@ class _AmAcceptSelectionScreen_EmployeeState
 
           var locationCode = widget.activeCheckList.locationCode;
 
+          setState(() {
+
+            attachProofTitle = mAmHeaderQuestion[i].checkListDetails[j].question;
+
+          });
           try {
             final storageRef = FirebaseStorage.instanceFor(
                     bucket: "gs://hng-offline-marketing.appspot.com")
                 .ref();
+            //gs://loghng-942e6.appspot.com
+            //gs://hng-offline-marketing.appspot.com //original
 
             final imageUrl = await storageRef
                 .child(
@@ -1768,8 +1797,9 @@ class _AmAcceptSelectionScreen_EmployeeState
 
       var userId = prefs.getString('userCode');
       // String url = staticUrlString + "Login/validateLogin";
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Employee/QuestionUpdate',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionUpdate',
       );
 
       var params = [];
@@ -1912,16 +1942,17 @@ class _AmAcceptSelectionScreen_EmployeeState
             });
           }
         }
-
       }
 
-      var response = await http.post(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(params),
-      ).timeout(const Duration(seconds: 10));
+      var response = await http
+          .post(
+            url,
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(params),
+          )
+          .timeout(const Duration(seconds: 10));
       print(response.statusCode);
       print(response.request);
       print(response.body);
@@ -1933,7 +1964,8 @@ class _AmAcceptSelectionScreen_EmployeeState
         // Get.off();
         sendData();
       } else {
-        _showRetryAlert('Something went wrong\nStatusCode${response.statusCode}');
+        _showRetryAlert(
+            'Something went wrong\nStatusCode${response.statusCode}');
 
         setState(() {
           showProgress = false;
@@ -1964,7 +1996,7 @@ class _AmAcceptSelectionScreen_EmployeeState
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content:  Text(msg),
+          content: Text(msg),
           actions: <Widget>[
             Container(
               padding: const EdgeInsets.all(16),
@@ -2007,8 +2039,9 @@ class _AmAcceptSelectionScreen_EmployeeState
     final payload =
         '{"emp_checklist_assign_id":${widget.activeCheckList.empChecklistAssignId}}';
 
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/Employee/WorkFlowStatus',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/Employee/WorkFlowStatusEmp',
     );
 
     var response = await http.post(
@@ -2053,7 +2086,7 @@ class _AmAcceptSelectionScreen_EmployeeState
       builder: (BuildContext contextt) {
         return AlertDialog(
           title: const Text('Info'),
-          content: Text('$msg'),
+          content: Text(msg),
           actions: <Widget>[
             InkWell(
               onTap: () {
@@ -2093,7 +2126,7 @@ class _AmAcceptSelectionScreen_EmployeeState
       builder: (BuildContext contextt) {
         return AlertDialog(
           title: const Text('Info'),
-          content: Text('$msg'),
+          content: Text(msg),
           actions: <Widget>[
             InkWell(
               onTap: () {

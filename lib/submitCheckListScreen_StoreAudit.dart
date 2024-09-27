@@ -1136,8 +1136,9 @@ class _submitCheckListScreen_StoreAuditState
       setState(() {
         loading = true;
       });
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/StoreAudit/QuestionCancel',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/QuestionCancel',
       );
       var sendJson = {
         "checklist_assign_id": widget.checkList.store_checklist_assign_id,
@@ -1202,8 +1203,9 @@ class _submitCheckListScreen_StoreAuditState
 
       final prefs = await SharedPreferences.getInstance();
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/StoreAudit/AddQuestionAnswer',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/AddQuestionAnswer',
       );
 
       var locationCode = prefs.getString('locationCode');
@@ -1541,8 +1543,9 @@ class _submitCheckListScreen_StoreAuditState
       final prefs = await SharedPreferences.getInstance();
 
       // String url = staticUrlString + "Login/validateLogin";
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/StoreAudit/ImageUpload',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/ImageUpload',
       );
 
       var image = [];

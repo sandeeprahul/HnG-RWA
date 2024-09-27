@@ -1068,8 +1068,9 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
 
       String url =
           "${Constants.apiHttpsUrl}/Employee/Emp_CheckIn";
-     /* var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Employee/Emp_CheckIn', //
+     /*  var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Employee/Emp_CheckIn', //
       );*/
 
       var locationCode;

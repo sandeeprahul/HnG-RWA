@@ -1041,8 +1041,9 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
 
       var userId = prefs.getString("userCode");
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Login/StoreVisit',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Login/StoreVisit',
       );
 
       List<Map<String, String>> jsonParamsList = [];
@@ -1137,8 +1138,9 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
       final prefs = await SharedPreferences.getInstance();
       var userId = prefs.getString("userCode");
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Login/StoreVisitcheckin',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Login/StoreVisitcheckin',
       );
 
       var response = await http

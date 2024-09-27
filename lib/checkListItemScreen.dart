@@ -578,8 +578,9 @@ class _checkListItemScreenState extends State<checkListItemScreen>
       final payload =
           '{"checklist_assign_id":${widget.activeCheckList.checklistAssignId}}';
 
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/CheckList/WorkFlowStatus',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/CheckList/WorkFlowStatus',
       );
 
       var response = await http

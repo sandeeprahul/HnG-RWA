@@ -49,8 +49,9 @@ class WeekOffRepository {
 
   Future<void> applyWeekOff( String empCode, List<dynamic> params) async {
 
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/Login/weekoff',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff',
     );
 
     try {

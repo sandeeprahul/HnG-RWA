@@ -1578,8 +1578,9 @@ class _AmAcceptSelectionScreen_AMState
 
       var userId = prefs.getString('userCode');
       // String url = staticUrlString + "Login/validateLogin";
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/AreaManager/QuestionUpdate',
+       var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/AreaManager/QuestionUpdate',
       );
 
       var params = [];
@@ -1994,8 +1995,9 @@ class _AmAcceptSelectionScreen_AMState
     final payload =
         '{"checklist_assign_id":${widget.activeCheckList.amChecklistAssignId}}';
 
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/AreaManager/WorkFlowStatus',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/WorkFlowStatus',
     );
 
     var response = await http.post(

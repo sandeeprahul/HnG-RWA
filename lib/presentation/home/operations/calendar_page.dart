@@ -250,8 +250,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     setState(() {
       showProgress = true;
     });
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/Login/weekoff',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff',
     );
 
     try {

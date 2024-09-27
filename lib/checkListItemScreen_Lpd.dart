@@ -565,8 +565,9 @@ class _checkListItemScreen_LpdState extends State<checkListItemScreen_Lpd>
     final payload =
         '{"lpd_checklist_assign_id":${widget.activeCheckList.lpdChecklistAssignId}}';
 
-    var url = Uri.https(
-      '${Constants.apiHttpsUrl}/lpdaudit/WorkFlowStatus',
+     var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/WorkFlowStatus',
     );
 
     var response = await http.post(

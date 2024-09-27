@@ -234,7 +234,7 @@ class _checkListItemScreenEmployeeState
                                                       widget.locationsList,
                                                       widget.mGetActvityTypes,
                                                       widget.checkList,
-                                                      0)), ////for non edit
+                                                      0,'')), ////for non edit
                                         ).then((value) {
                                           getData();
                                         });
@@ -518,14 +518,8 @@ class _checkListItemScreenEmployeeState
     }catch (e) {
       setState(() {
         loading = false;
-        i = 0;
       });
-      if (i == 0) {
-        _showRetryAlert();
-        setState(() {
-          i = i + 1;
-        });
-      }
+      _showRetryAlert();
     }
     return null;
   }
@@ -545,7 +539,7 @@ class _checkListItemScreenEmployeeState
             Container(
               padding: const EdgeInsets.all(10),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -557,7 +551,7 @@ class _checkListItemScreenEmployeeState
             Container(
               padding: const EdgeInsets.all(10),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();

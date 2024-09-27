@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/AmAcceptSelectionScreen.dart';
@@ -36,6 +37,7 @@ class submitCheckListScreenEmployee extends StatefulWidget {
   final GetActvityTypes mGetActvityTypes;
   final GetChecklist getChecklist;
   final int sendingToEditAmHeaderQuestion;
+  final String  checklisTItemMstId;
 
   const submitCheckListScreenEmployee(
       this.checkList,
@@ -44,7 +46,8 @@ class submitCheckListScreenEmployee extends StatefulWidget {
       this.locationsList,
       this.mGetActvityTypes,
       this.getChecklist,
-      this.sendingToEditAmHeaderQuestion,
+      this.sendingToEditAmHeaderQuestion, this. checklisTItemMstId
+      ,
       {super.key});
 
   // submitCheckListScreen({Key? key}) : super(key: key);
@@ -57,7 +60,7 @@ class submitCheckListScreenEmployee extends StatefulWidget {
           this.isEdit,
           this.locationsList,
           this.mGetActvityTypes,
-          this.getChecklist);
+          this.getChecklist,this.checklisTItemMstId);
 }
 
 List<QuestionAnswers>? list;
@@ -97,9 +100,10 @@ class _submitCheckListScreenEmployeeState
   int i;
   GetActvityTypes mGetActvityTypes;
   GetChecklist getChecklist;
+  String checklisTItemMstId;
 
   _submitCheckListScreenEmployeeState(this.checkList, this.activeCheckList,
-      this.i, this.locationsList, this.mGetActvityTypes, this.getChecklist);
+      this.i, this.locationsList, this.mGetActvityTypes, this.getChecklist,this.checklisTItemMstId);
 
   var mandy;
   TextEditingController sealnoCntrl = TextEditingController();
@@ -533,7 +537,6 @@ class _submitCheckListScreenEmployeeState
                               padding: EdgeInsets.all(15.0),
                               child: CircleAvatar(
                                 backgroundColor: Colors.white,
-
                                 radius: 35,
                                 child: Icon(Icons.camera),
                               ),
@@ -724,13 +727,20 @@ class _submitCheckListScreenEmployeeState
       final prefs = await SharedPreferences.getInstance();
       var userId = prefs.getString('userCode') ?? '0';
 
+      String mstId = '';
+      if(widget.isEdit==1){
+        mstId = widget.checklisTItemMstId;
+      }else{
+      mstId=  "${widget.checkList.checklisTItemMstId}";
+      }
       //remove in prodcution
       String url =
-          "${Constants.apiHttpsUrl}/Employee/QuestionAnswers/${widget.checkList.empChecklistAssignId}/${widget.checkList.checklisTItemMstId}/InProcess/$userId/$userId"; //
+          "${Constants.apiHttpsUrl}/Employee/QuestionAnswers/${widget.checkList.empChecklistAssignId}/$mstId/InProcess/$userId/$userId"; //
 
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
+      print(url);
       // var responseData = json.decode(response.body);
       final decodedJson = jsonDecode(response.body); // dynamic
 
@@ -841,7 +851,7 @@ class _submitCheckListScreenEmployeeState
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content: const Text('Network issue\nPlease retry'),
+          content: const Text('Something went wrong\nPlease retry'),
 // Please retry?'),
           actions: <Widget>[
             Container(
@@ -919,7 +929,6 @@ class _submitCheckListScreenEmployeeState
                   onTap: () {
                     Navigator.of(context).pop();
                     submitCheckList();
-
 
                   },
                   child: Container(
@@ -1012,10 +1021,8 @@ class _submitCheckListScreenEmployeeState
               // margin: EdgeInsets.all(10),
               padding: const EdgeInsets.all(10),
               decoration: const BoxDecoration(
-                color: CupertinoColors.activeBlue,
-        borderRadius: BorderRadius.all(Radius.circular(30))
-
-        ),
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.all(Radius.circular(30))),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -1043,11 +1050,9 @@ class _submitCheckListScreenEmployeeState
           actions: <Widget>[
             Container(
               padding: const EdgeInsets.all(10),
-              decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue,
-                      borderRadius: BorderRadius.all(Radius.circular(30))
-
-                  ),
+              decoration: const BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.all(Radius.circular(30))),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -1064,7 +1069,6 @@ class _submitCheckListScreenEmployeeState
 
   int tried = 0;
 
-
   Future<bool> questionCancel() async {
     // bool goBack ;
     try {
@@ -1073,10 +1077,14 @@ class _submitCheckListScreenEmployeeState
       });
       final pref = await SharedPreferences.getInstance();
       var empCode = pref.getString("userCode");
-
       var url = Uri.https(
-        '${Constants.apiHttpsUrl}/Employee/QuestionCancel',
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionCancel',
       );
+     /*  var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionCancel',
+      );*/
       var sendJson = {
         "checklist_assign_id": widget.checkList.empChecklistAssignId,
         "checklist_mst_item_id": widget.checkList.checklisTItemMstId,
@@ -1130,8 +1138,7 @@ class _submitCheckListScreenEmployeeState
       _showRetryAlert__(1);
       // return false;
     }
-    print('goBack');
-    print(goBack);
+
     return goBack;
   }
 
@@ -1169,10 +1176,10 @@ class _submitCheckListScreenEmployeeState
     if (option_mandatory_Flag == "-1") {
       sendJson.add({
         "emp_checklist_assign_id": widget.checkList.empChecklistAssignId,
-        "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
+        "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checklisTItemMstId,
         "checklist_Id": widget.checkList.checklistId,
         "empcode": widget.isEdit == 1
-            ? widget.sendingToEditAmHeaderQuestion
+            ? usercode
             : usercode,
         "item_name": quesAnsList[0].itemName,
         "checkList_Answer_Id": quesAnsList[0].questions[0].checkListAnswerId,
@@ -1191,7 +1198,7 @@ class _submitCheckListScreenEmployeeState
         "created_datetime": "$datetime",
         // "updated_by": usercode,
         "updated_by": widget.isEdit == 1
-            ? widget.sendingToEditAmHeaderQuestion
+            ? usercode
             : usercode,
 
         "updated_by_datetime": "$datetime",
@@ -1202,16 +1209,15 @@ class _submitCheckListScreenEmployeeState
         "questionstatus": "Completed",
         "imagename": ""
       });
-    }
-    else {
+    } else {
       for (int i = 0; i < quesAnsList[0].questions.length; i++) {
         if (quesAnsList[0].questions[i].answerTypeId == 4) {
           sendJson.add({
             "emp_checklist_assign_id": widget.checkList.empChecklistAssignId,
-            "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
+            "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checklisTItemMstId,
             "checklist_Id": widget.checkList.checklistId,
             "empcode": widget.isEdit == 1
-                ? widget.sendingToEditAmHeaderQuestion
+                ? usercode
                 : usercode,
             "item_name": quesAnsList[i].itemName,
             "checkList_Answer_Id":
@@ -1230,7 +1236,7 @@ class _submitCheckListScreenEmployeeState
             "created_by": usercode,
             "created_datetime": "$datetime",
             "updated_by": widget.isEdit == 1
-                ? widget.sendingToEditAmHeaderQuestion
+                ? usercode
                 : usercode,
             "updated_by_datetime": "$datetime",
             "checklist_applicable_type":
@@ -1243,10 +1249,10 @@ class _submitCheckListScreenEmployeeState
         } else if (quesAnsList[0].questions[i].answerTypeId == 1) {
           sendJson.add({
             "emp_checklist_assign_id": widget.checkList.empChecklistAssignId,
-            "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
+            "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checklisTItemMstId,
             "checklist_Id": widget.checkList.checklistId,
             "empcode": widget.isEdit == 1
-                ? widget.sendingToEditAmHeaderQuestion
+                ? usercode
                 : usercode,
             "item_name": quesAnsList[0].itemName,
             "checkList_Answer_Id":
@@ -1266,7 +1272,7 @@ class _submitCheckListScreenEmployeeState
             "created_by": usercode,
             "created_datetime": "$datetime",
             "updated_by": widget.isEdit == 1
-                ? widget.sendingToEditAmHeaderQuestion
+                ? usercode
                 : usercode,
             "updated_by_datetime": "$datetime",
             "checklist_applicable_type":
@@ -1279,10 +1285,10 @@ class _submitCheckListScreenEmployeeState
         } else if (quesAnsList[0].questions[i].answerTypeId == 3) {
           sendJson.add({
             "emp_checklist_assign_id": widget.checkList.empChecklistAssignId,
-            "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
+            "checkList_Item_Mst_Id":widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checklisTItemMstId,
             "checklist_Id": widget.checkList.checklistId,
             "empcode": widget.isEdit == 1
-                ? widget.sendingToEditAmHeaderQuestion
+                ? usercode
                 : usercode,
             "item_name": quesAnsList[i].itemName,
             "checkList_Answer_Id":
@@ -1315,8 +1321,6 @@ class _submitCheckListScreenEmployeeState
       }
     }
 
-
-
     var response = await http.post(
       url,
       headers: <String, String>{
@@ -1326,7 +1330,7 @@ class _submitCheckListScreenEmployeeState
     );
     print(response.body);
     print(response.request);
-    print(response.statusCode);
+    print("$sendJson");
     var respo = jsonDecode(response.body);
 
     print(respo['statusCode']);
@@ -1334,43 +1338,17 @@ class _submitCheckListScreenEmployeeState
       setState(() {
         loading = false;
       });
-      if (option_mandatory_Flag == "1" && subQues.contains(3)) {
-        print('subQues.contains(3)');
-        print(subQues.contains(3));
-        if (base64img_.isNotEmpty) {
-          print('imageList.length == 1');
 
-          // uploadImage(0, usercode);
-          cloudstorageRef(base64img_, empCode);
-        } else if (mandy == 1) {
-          if (imageList.length == 1) {
-            // uploadImage(0, usercode);
-            cloudstorageRef(base64img_, empCode);
-          } else {
-            _showAlertWithMSG("Please Upload photo");
-          }
-        }
-      } else {
-        Get.defaultDialog(
-            title: "Info",
-            middleText: respo['message'].toString(),
-            backgroundColor: Colors.white,
-            titleStyle: const TextStyle(color: Colors.black),
-            middleTextStyle: const TextStyle(color: Colors.black),
-            confirmTextColor: Colors.white,
-            onConfirm: () {
-              Get.back();
-              Navigator.pop(context);
-              // Navigator.pop(context);
-            },
-            radius: 15);
+      cloudstorageRef(base64img_, empCode,respo['message']);
+
+
 
         /*showSuccessAlert(respo['message'].toString());
         if(context.mounted){
           Navigator.pop(context);
 
         }*/
-      }
+
     } else {
       setState(() {
         loading = false;
@@ -1380,33 +1358,27 @@ class _submitCheckListScreenEmployeeState
     }
   }
 
-  Future<void> cloudstorageRef(var img, var empcode) async {
+  Future<void> cloudstorageRef(var img, var empcode, var respo) async {
+
     setState(() {
       loading = true;
     });
     final prefs = await SharedPreferences.getInstance();
-    String dateForEmpCode_ =
-        DateFormat("yyyyMMddhhmmssS").format(DateTime.now());
-    var userId = prefs.getString("userCode");
-    // String empCode = "EMP$userId$dateForEmpCode_";
+
     String empCode = empcode;
 
-    // final storageRef = FirebaseStorage.instance.ref();
     // FirebaseStorage storageRefd = FirebaseStorage.instanceFor(bucket: "gs://hgstores_rwa_dilo");
     final storageRef = FirebaseStorage.instanceFor(
             bucket: "gs://hng-offline-marketing.appspot.com")
         .ref();
+    //gs://loghng-942e6.appspot.com
+    //gs://hng-offline-marketing.appspot.com//original
 
     var locationCode = widget.activeCheckList.locationCode;
-    // var locationCode = prefs.getString('locationCode') ?? '106';
 
     final imagesRef = storageRef.child("$locationCode/QuesAns/$empCode.jpg");
 
-    // String dataUrl = base64img;
-// Create a reference to "mountains.jpg"
-    final mountainsRef = imagesRef.child("$empCode.jpg");
 
-// Create a reference to 'images/mountains.jpg'
     try {
       // await imagesRef.putString(img, format: PutStringFormat.dataUrl);
       await imagesRef
@@ -1414,25 +1386,15 @@ class _submitCheckListScreenEmployeeState
               format: PutStringFormat.base64,
               metadata: SettableMetadata(contentType: 'image/png'))
           .then((p0) {
-        print('uploaded to firebase storage successfully${p0}');
+        print('uploaded to firebase storage successfully$p0');
       });
 
-      // _showSuccessAlert("Item submitted successfully");
-      Get.defaultDialog(
-          title: "Info",
-          middleText: 'Item submitted successfully',
-          backgroundColor: Colors.white,
-          titleStyle: const TextStyle(color: Colors.black),
-          middleTextStyle: const TextStyle(color: Colors.black),
-          onConfirm: () {
-            Navigator.pop(context);
-          },
-          radius: 10);
 
-      Navigator.pop(context);
+
+      // Navigator.pop(context);
       // String downloadUrl = (await FirebaseStorage.instanceFor(bucket: "gs://hng-offline-marketing.appspot.com").ref().getDownloadURL()).toString();
       String downloadUrl = (await FirebaseStorage.instanceFor(
-                  bucket: "gs://hng-offline-marketing.appspot.com")
+                  bucket: "gs://loghng-942e6.appspot.com")
               .ref())
           .toString();
 
@@ -1440,126 +1402,30 @@ class _submitCheckListScreenEmployeeState
       setState(() {
         loading = false;
       });
+      Get.defaultDialog(
+          title: "Info",
+          middleText: respo.toString(),
+          backgroundColor: Colors.white,
+          titleStyle: const TextStyle(color: Colors.black),
+          middleTextStyle: const TextStyle(color: Colors.black),
+          confirmTextColor: Colors.white,
+          onConfirm: () {
+            Get.back();
+            Navigator.pop(context);
+            // Navigator.pop(context);
+          },
+          radius: 15);
     } on FirebaseException catch (e) {
-      print('FirebaseException');
-      print(e.message);
-      // _showAlert(e.message);
-      // ...
       setState(() {
         loading = false;
       });
+     if (kDebugMode) {
+       print(e);
+     }
     }
+
   }
 
-  //base64img_
-  Future<void> uploadImage(int imgs, var userCode) async {
-    try {
-      // cloudstorageRef(base64img_);
-      print('uploadImage');
-      setState(() {
-        loading = true;
-      });
-      String datetime_ = DateFormat("yyyyMMddhhmmssS").format(DateTime.now());
-      print('DATATIME $datetime_');
-
-      final prefs = await SharedPreferences.getInstance();
-
-      // String url = staticUrlString + "Login/validateLogin";
-      var url = Uri.https(
-        '${Constants.apiHttpsUrl}/CheckList/ImageUpload',
-      );
-
-      var image = [];
-      for (int i = 0; i < imageList.length; i++) {
-        image.add({
-          'id': i,
-          'imageFarmat': "jpg",
-          'fileName': "EMP$userCode$datetime_",
-          'imageBase64': "",
-          // 'imageBase64': base64Imgg.toString().replaceAll('+', ''),
-        });
-      }
-
-      var questionId = '', checklisT_ANSWER_OPTION_ID = '';
-      for (int i = 0; i < quesAnsList[0].questions.length; i++) {
-        if (quesAnsList[0].questions[i].answerTypeId == 3) {
-          questionId = quesAnsList[0].questions[i].checkListAnswerId;
-          checklisT_ANSWER_OPTION_ID = quesAnsList[0]
-              .questions[i]
-              .options[0]
-              .checkListAnswerOptionId
-              .toString();
-        }
-      }
-      print('questionId');
-      print(questionId);
-      print(checklisT_ANSWER_OPTION_ID);
-      // ?
-      var response = await http
-          .post(
-            url,
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
-            body: jsonEncode({
-              "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
-              "checklist_Id": checklist_id,
-              "CHECKLIST_ANSWER_OPTION_ID": checklisT_ANSWER_OPTION_ID,
-              "question": questionTitles[0],
-              "question_Id": questionId,
-              "answer_Type_Id": 3,
-              "emp_checklist_assign_id":
-                  widget.activeCheckList.empChecklistAssignId,
-              "getImages": image,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
-
-      var json = jsonEncode({
-        "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
-        "checklist_Id": checklist_id,
-        "CHECKLIST_ANSWER_OPTION_ID": checklisT_ANSWER_OPTION_ID,
-        "question": questionTitles[0],
-        "question_Id": questionId,
-        "answer_Type_Id": "3",
-        "emp_checklist_assign_id": widget.activeCheckList.empChecklistAssignId,
-        "getImages": image,
-      });
-      print(response.statusCode);
-      print(response.request);
-      print(json);
-      if (response.statusCode == 200) {
-        setState(() {
-          loading = false;
-        });
-        // Get.off(checkListItemScreen());
-
-        // _showSuccessAlert("CheckList Item submitted successfully");
-        Get.defaultDialog(
-            title: "Info",
-            middleText: 'CheckList Item submitted successfully"',
-            backgroundColor: Colors.white,
-            titleStyle: const TextStyle(color: Colors.black),
-            middleTextStyle: const TextStyle(color: Colors.black),
-            onConfirm: () {
-              Navigator.pop(context);
-            },
-            radius: 30);
-        Navigator.pop(context);
-      } else {
-        setState(() {
-          loading = false;
-        });
-        // _showProceedAlert();
-        _showAlert('ds');
-      }
-    } catch (e) {
-      setState(() {
-        loading = false;
-      });
-      _showRetryAlert(imgs, userCode);
-    }
-  }
 
   Future<void> _showMyDialog(String msg) async {
     return showDialog<void>(
@@ -1582,47 +1448,6 @@ class _submitCheckListScreenEmployeeState
                   Navigator.of(context).pop();
                 },
               ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showRetryAlert(int imgs, var userCode) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Alert!'),
-          content: const Text('Network issue\nPlease retry'),
-// Please retry?'),
-          actions: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    // submitCheckList();
-                  },
-                  child: const Text('Cancel',
-                      style: TextStyle(color: Colors.white))),
-            ),
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    uploadImage(imgs, userCode);
-                    // submitCheckList();
-                  },
-                  child: const Text('Retry',
-                      style: TextStyle(color: Colors.white))),
             ),
           ],
         );
