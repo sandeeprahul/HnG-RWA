@@ -39,19 +39,17 @@ class amCheckListScreen extends StatefulWidget {
 final  int type;
  final GetActvityTypes mGetActvityTypes;
  final String locationsList;
- final GetChecklist checkList;
 final  ActiveCheckListAm activeCheckList;
-// final GetChecklist checkList;
 
   //0=DILO,1=LPD,2=STORE AUDIT
   // ActiveCheckList activeCheckList;
 
   amCheckListScreen(
-      this.type, this.mGetActvityTypes, this.locationsList, this.checkList, this. activeCheckList);
+      this.type, this.mGetActvityTypes, this.locationsList, this. activeCheckList);
 
   @override
   State<amCheckListScreen> createState() => _amCheckListScreenState(
-      this.type, this.mGetActvityTypes, this.locationsList, this.checkList, this. activeCheckList);
+      this.type, this.mGetActvityTypes, this.locationsList, this. activeCheckList);
 }
 
 class _amCheckListScreenState extends State<amCheckListScreen>
@@ -59,14 +57,13 @@ class _amCheckListScreenState extends State<amCheckListScreen>
   int type;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
-  GetChecklist checkList;
   ActiveCheckListAm activeCheckList;
 
 
   // ActiveCheckList activeCheckList;
 
   _amCheckListScreenState(
-      this.type, this.mGetActvityTypes, this.locationsList, this.checkList, this. activeCheckList);
+      this.type, this.mGetActvityTypes, this.locationsList, this. activeCheckList);
 
   var isSelected = 0;
   var popupVisible = false;
@@ -110,7 +107,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                       1,
                       widget.mGetActvityTypes,
                       widget.locationsList,
-                      widget.checkList),
+                     ),
                 ));
             return Future.value(false
             );
@@ -134,7 +131,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                                     1,
                                     widget.mGetActvityTypes,
                                     widget.locationsList,
-                                    widget.checkList),
+                                   ),
                               ));
                         },
                         child: const Padding(

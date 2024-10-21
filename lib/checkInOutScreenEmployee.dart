@@ -9,6 +9,8 @@ import 'package:get/get.dart';
 import 'package:hng_flutter/data/ActiveCheckListEmployee.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/data/GetChecklist.dart';
+import 'package:hng_flutter/submitQesAnsCheckListScreenEmployee.dart';
+import 'package:hng_flutter/tem.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -30,29 +32,33 @@ class checkInOutScreenEmployee extends StatefulWidget {
   final ActiveCheckListEmployee activeCheckList;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
-  final GetChecklist checkList;
 
   // LPDSection mLpdChecklist;
 
-  checkInOutScreenEmployee(this.activeCheckList, this.mGetActvityTypes,
-      this.locationsList, this.checkList);
+  checkInOutScreenEmployee(
+    this.activeCheckList,
+    this.mGetActvityTypes,
+    this.locationsList,
+  );
 
   @override
   State<checkInOutScreenEmployee> createState() =>
-      _checkInOutScreenEmployeeState(this.activeCheckList,
-          this.mGetActvityTypes, this.locationsList, this.checkList);
+      _checkInOutScreenEmployeeState(
+          this.activeCheckList, this.mGetActvityTypes, this.locationsList);
 }
 
 class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
   ActiveCheckListEmployee activeCheckList;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
-  GetChecklist checkList;
 
   // LPDSection mLpdChecklist;
 
-  _checkInOutScreenEmployeeState(this.activeCheckList, this.mGetActvityTypes,
-      this.locationsList, this.checkList);
+  _checkInOutScreenEmployeeState(
+    this.activeCheckList,
+    this.mGetActvityTypes,
+    this.locationsList,
+  );
 
   XFile? photo;
   var _croppedFile;
@@ -60,7 +66,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
   var lat, lng;
 
   Geolocator geolocator = Geolocator();
-
 
   Timer? timer;
   var status_;
@@ -112,11 +117,11 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
     } else if (status.isPermanentlyDenied ||
         status.isDenied ||
         status.isRestricted) {
-      const dynamicMessage = 'Please allow location permission for Location Check process';
+      const dynamicMessage =
+          'Please allow location permission for Location Check process';
       PermissionHelper.showPermissionAlert(context, dynamicMessage);
     }
   }
-
 
   CameraController? Camcontroller;
   String imagePath = "";
@@ -149,7 +154,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           preferredCameraDevice: CameraDevice.front);
       _cropImage(photo, firstTime);
     }
-
   }
 
   var timeMin = "";
@@ -177,8 +181,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
   var lat_ = 0.0, lng_ = 0.0;
 
   Future<void> getLocation(var firstime) async {
-
-    try{
+    try {
       setState(() {
         loading = true;
       });
@@ -205,10 +208,9 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
         loading = false;
       });
       checkDistance_(lat, lng, lat_, lng_, firstime);
-    }catch(e){
+    } catch (e) {
       Navigator.pop(context);
     }
-
 
     // getLocationStatus(0);
   }
@@ -282,10 +284,10 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => checkListScreen_lpd(
-                            1,
-                            widget.mGetActvityTypes,
-                            widget.locationsList,
-                            widget.checkList),
+                          1,
+                          widget.mGetActvityTypes,
+                          widget.locationsList,
+                        ),
                       ));
                 },
               ),
@@ -298,10 +300,10 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => checkListScreen_lpd(
-                            1,
-                            widget.mGetActvityTypes,
-                            widget.locationsList,
-                            widget.checkList),
+                          1,
+                          widget.mGetActvityTypes,
+                          widget.locationsList,
+                        ),
                       ));
                   // getPhoto(0);
 
@@ -416,10 +418,10 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
               context,
               MaterialPageRoute(
                 builder: (context) => checkListScreen_lpd(
-                    1,
-                    widget.mGetActvityTypes,
-                    widget.locationsList,
-                    widget.checkList),
+                  1,
+                  widget.mGetActvityTypes,
+                  widget.locationsList,
+                ),
               ));
           return Future.value(false);
         },
@@ -428,8 +430,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
             children: [
               Column(
                 children: [
-
-
                   SizedBox(
                       height: 250,
                       child: Stack(
@@ -1066,9 +1066,8 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       String empCode = "EMP$userId$dateForEmpCode_";
       var deviceid = prefs.getString("deviceid");
 
-      String url =
-          "${Constants.apiHttpsUrl}/Employee/Emp_CheckIn";
-     /*  var url = Uri.https(
+      String url = "${Constants.apiHttpsUrl}/Employee/Emp_CheckIn";
+      /*  var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
       '/RWASTAFFMOVEMENT_TEST/api/Employee/Emp_CheckIn', //
       );*/
@@ -1091,12 +1090,11 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           "imageFormat": "jpg",
           "imagebase64": ""
         },
-
       };
 
       var response = await http
           .post(
-           Uri.parse( url),
+            Uri.parse(url),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -1126,16 +1124,30 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
         Future.delayed(const Duration(milliseconds: 1500), () {
           // Navigator.pop(context, 1);
 
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => checkListItemScreenEmployee(
-                    widget.activeCheckList,
-                    widget.mGetActvityTypes,
-                    widget.locationsList,
-                    widget.checkList,
-                    0),
-              ));
+          if (widget.activeCheckList.list_type == "Y") {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>  CheckListPage(
+                    activeCheckList: widget.activeCheckList,
+                    isEdit: 0,
+                    locationsList: widget.locationsList,
+                    mGetActivityTypes: widget.mGetActvityTypes,
+                    sendingToEditAmHeaderQuestion: 0,
+                    checkListItemMstId: "${widget.activeCheckList.checklisTId}",
+                  ),
+                ));
+          } else if (widget.activeCheckList.list_type == "N") {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => checkListItemScreenEmployee(
+                      widget.activeCheckList,
+                      widget.mGetActvityTypes,
+                      widget.locationsList,
+                      0),
+                ));
+          }
         });
       } else {
         setState(() {
@@ -1182,8 +1194,9 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
             // ),
             Container(
               padding: const EdgeInsets.all(15),
-              decoration:
-                  BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -1270,7 +1283,8 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       width: double.infinity,
       color: const Color(0x80000000),
       child: Container(
-        margin: const EdgeInsets.only(left: 30, right: 30, top: 100, bottom: 100),
+        margin:
+            const EdgeInsets.only(left: 30, right: 30, top: 100, bottom: 100),
         color: Colors.white,
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1364,7 +1378,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
 
     //remove in production
     // var json = jsonDecode(prefs.getString('loginResponse') ?? '');
-
 
     getPhoto(firstTime);
 

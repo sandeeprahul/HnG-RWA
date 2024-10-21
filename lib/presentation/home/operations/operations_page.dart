@@ -92,7 +92,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                           Center(
                             child: Image.asset(
                               'assets/weekoff_icon.png',
-                              color: Colors.white,
+                              // color: Colors.white,
                               scale: 2,
                             ),
                           )
@@ -100,28 +100,28 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                           const Center(
                               child: Icon(
                             Icons.headset_mic_outlined,
-                            color: Colors.white,
+                            // color: Colors.white,
                             size: 60,
                           ))
                         else if (audit.auditId == 103)
                           const Center(
                               child: Icon(
                             Icons.transfer_within_a_station,
-                            color: Colors.white,
+                            // color: Colors.white,
                             size: 60,
                           ))
                         else if (audit.auditId == 104)
                           const Center(
                               child: Icon(
                             Icons.transfer_within_a_station,
-                            color: Colors.white,
+                            // color: Colors.white,
                             size: 60,
                           ))
                         else if (audit.auditId == 105)
                           const Center(
                               child: Icon(
                             Icons.store,
-                            color: Colors.white,
+                            // color: Colors.white,
                             size: 60,
                           )),
                         const SizedBox(

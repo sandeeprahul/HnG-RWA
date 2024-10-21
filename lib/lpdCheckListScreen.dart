@@ -34,21 +34,19 @@ class lpdCheckListScreen extends StatefulWidget {
   final int type;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
-  final  GetChecklist checkList;
   final  ActiveCheckListLpd activeCheckList;
 
   //0=DILO,1=LPD,2=STORE AUDIT
   // ActiveCheckList activeCheckList;
 
   lpdCheckListScreen(this.type, this.mGetActvityTypes, this.locationsList,
-      this.checkList, this.activeCheckList);
+     this.activeCheckList);
 
   @override
   State<lpdCheckListScreen> createState() => _lpdCheckListScreenState(
       this.type,
       this.mGetActvityTypes,
       this.locationsList,
-      this.checkList,
       this.activeCheckList);
 }
 
@@ -57,13 +55,12 @@ class _lpdCheckListScreenState extends State<lpdCheckListScreen>
   int type;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
-  GetChecklist checkList;
   ActiveCheckListLpd activeCheckList;
 
   // ActiveCheckList activeCheckList;
 
   _lpdCheckListScreenState(this.type, this.mGetActvityTypes, this.locationsList,
-      this.checkList, this.activeCheckList);
+      this.activeCheckList);
 
   var isSelected = 0;
   var popupVisible = false;

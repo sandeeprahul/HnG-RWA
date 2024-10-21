@@ -39,17 +39,16 @@ class checkInOutScreenStoreAudit extends StatefulWidget {
   final ActiveCheckListStoreAudit activeCheckList;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
-  final GetChecklist checkList;
 
   // LPDSection mLpdChecklist;
 
   checkInOutScreenStoreAudit(this.activeCheckList, this.mGetActvityTypes,
-      this.locationsList, this.checkList);
+      this.locationsList);
 
   @override
   State<checkInOutScreenStoreAudit> createState() =>
       _checkInOutScreenStoreAuditState(this.activeCheckList,
-          this.mGetActvityTypes, this.locationsList, this.checkList);
+          this.mGetActvityTypes, this.locationsList,);
 }
 
 class _checkInOutScreenStoreAuditState
@@ -57,12 +56,11 @@ class _checkInOutScreenStoreAuditState
   ActiveCheckListStoreAudit activeCheckList;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
-  GetChecklist checkList;
 
   // LPDSection mLpdChecklist;
 
   _checkInOutScreenStoreAuditState(this.activeCheckList, this.mGetActvityTypes,
-      this.locationsList, this.checkList);
+      this.locationsList);
 
   XFile? photo;
   var _croppedFile;
@@ -282,7 +280,7 @@ class _checkInOutScreenStoreAuditState
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList),
+                        ),
                       ));
                 },
               ),
@@ -297,7 +295,7 @@ class _checkInOutScreenStoreAuditState
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList),
+                        ),
                       )); // getPhoto(0);
 
                   // getLocationStatus(f);
@@ -410,7 +408,7 @@ class _checkInOutScreenStoreAuditState
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
-                    widget.checkList),
+                    ),
               ));
 
           return Future.value(false);
@@ -437,7 +435,7 @@ class _checkInOutScreenStoreAuditState
                                         1,
                                         widget.mGetActvityTypes,
                                         widget.locationsList,
-                                        widget.checkList),
+                                        ),
                                   ));
                             },
                             child: Padding(
@@ -1195,7 +1193,6 @@ class _checkInOutScreenStoreAuditState
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
-                    widget.checkList,
                     widget.activeCheckList),
               ));
         });

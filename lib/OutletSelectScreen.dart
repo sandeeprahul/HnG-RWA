@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hng_flutter/checkListScreen_lpd.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/checkListScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -124,8 +125,8 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
 
                                         )),
                                   );
-                                } else if (widget.checkList.auditId == "2"||widget.checkList.auditId == "4"||widget.checkList.auditId == "6") {
-                                  //storeAudit
+                                } else if (widget.checkList.auditId == "2"||widget.checkList.auditId == "6") {
+                                  //storeAudit//||widget.checkList.auditId == "4"
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -134,7 +135,17 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                             widget.checkList,
                                             locationsList_Filter[pos].locationCode)),
                                   );
-                                } else {
+                                } else if(widget.checkList.auditId == "4"){
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => checkListScreen(
+                                            1,
+                                            widget.checkList,
+                                            locationsList_Filter[pos]
+                                                .locationCode)),
+                                  );
+                                }else {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -289,7 +300,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                             widget.checkList,
                                             locationsList[pos].locationCode,)),
                                   );
-                                } else if (widget.checkList.auditId == "2"||widget.checkList.auditId == "4") {
+                                } else if (widget.checkList.auditId == "2"||widget.checkList.auditId == "6") {
                                   //storeAudit
                                   Navigator.push(
                                     context,
@@ -299,7 +310,17 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                             widget.checkList,
                                             locationsList[pos].locationCode)),
                                   );
-                                } else {
+                                } else if(widget.checkList.auditId == "4"){
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => checkListScreen_lpd(
+                                            1,
+                                            widget.checkList,
+                                            locationsList[pos]
+                                                .locationCode)),
+                                  );
+                                }else {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(

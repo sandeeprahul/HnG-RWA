@@ -37,19 +37,18 @@ class storeAuditCheckListScreen extends StatefulWidget {
  final int type;
  final GetActvityTypes mGetActvityTypes;
  final String locationsList;
- final GetChecklist checkList;
  final ActiveCheckListStoreAudit activeCheckList;
 
   //0=DILO,1=LPD,2=STORE AUDIT
   // ActiveCheckList activeCheckList;
 
   storeAuditCheckListScreen(this.type, this.mGetActvityTypes,
-      this.locationsList, this.checkList, this.activeCheckList);
+      this.locationsList,  this.activeCheckList);
 
   @override
   State<storeAuditCheckListScreen> createState() =>
       _storeAuditCheckListScreenState(this.type, this.mGetActvityTypes,
-          this.locationsList, this.checkList, this.activeCheckList);
+          this.locationsList, this.activeCheckList);
 }
 
 class _storeAuditCheckListScreenState extends State<storeAuditCheckListScreen>
@@ -57,13 +56,12 @@ class _storeAuditCheckListScreenState extends State<storeAuditCheckListScreen>
   int type;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
-  GetChecklist checkList;
   ActiveCheckListStoreAudit activeCheckList;
 
   // ActiveCheckList activeCheckList;
 
   _storeAuditCheckListScreenState(this.type, this.mGetActvityTypes,
-      this.locationsList, this.checkList, this.activeCheckList);
+      this.locationsList, this.activeCheckList);
 
   var isSelected = 0;
   var popupVisible = false;

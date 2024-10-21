@@ -23,7 +23,7 @@ class CustomElevatedButton extends StatelessWidget {
       onPressed: onPressed,
       child:  Padding(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        child: Text(text,style: lightTheme.textTheme.labelSmall!.copyWith(color: Colors.white,fontSize: 12),),
+        child: Text(text,style: lightTheme.textTheme.labelSmall!.copyWith(color: Colors.black,fontSize: 12),),
       ),
     );
   }

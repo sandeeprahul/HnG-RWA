@@ -1,4 +1,3 @@
-
 class ActiveCheckListEmployee {
     int empChecklistAssignId;
     int regionCode;
@@ -37,6 +36,7 @@ class ActiveCheckListEmployee {
     String locationValidateFlag;
     String latitude;
     String longitude;
+    String list_type;
 
     ActiveCheckListEmployee({
         required this.empChecklistAssignId,
@@ -76,6 +76,7 @@ class ActiveCheckListEmployee {
         required this.locationValidateFlag,
         required this.latitude,
         required this.longitude,
+        required this.list_type,
     });
 
     factory ActiveCheckListEmployee.fromJson(Map<String, dynamic> json) => ActiveCheckListEmployee(
@@ -116,6 +117,7 @@ class ActiveCheckListEmployee {
         locationValidateFlag: json["location_Validate_flag"],
         latitude: json["latitude"],
         longitude: json["longitude"],
+        list_type: json["list_type"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -156,5 +158,6 @@ class ActiveCheckListEmployee {
         "location_Validate_flag": locationValidateFlag,
         "latitude": latitude,
         "longitude": longitude,
+        "list_type": list_type,
     };
 }

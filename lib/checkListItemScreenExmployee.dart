@@ -23,15 +23,14 @@ class checkListItemScreenEmployee extends StatefulWidget
   final int type;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
-  final GetChecklist checkList;
 
   checkListItemScreenEmployee(this.activeCheckList, this.mGetActvityTypes,
-      this.locationsList, this.checkList, this.type);
+      this.locationsList, this.type);
 
   @override
   State<checkListItemScreenEmployee> createState() =>
       _checkListItemScreenEmployeeState(this.activeCheckList,
-          this.mGetActvityTypes, this.locationsList, this.checkList, this.type);
+          this.mGetActvityTypes, this.locationsList, this.type);
 }
 
 class _checkListItemScreenEmployeeState
@@ -40,10 +39,9 @@ class _checkListItemScreenEmployeeState
   int type;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
-  GetChecklist checkList;
 
   _checkListItemScreenEmployeeState(this.activeCheckList, this.mGetActvityTypes,
-      this.locationsList, this.checkList, this.type);
+      this.locationsList, this.type);
 
   // late final Future myFuture = getData();
   bool loading = false;
@@ -99,7 +97,7 @@ class _checkListItemScreenEmployeeState
                   1,
                   widget.mGetActvityTypes,
                   widget.locationsList,
-                  widget.checkList),
+                  ),
             ));
 
         return Future.value(false);
@@ -233,7 +231,6 @@ class _checkListItemScreenEmployeeState
                                                       0,
                                                       widget.locationsList,
                                                       widget.mGetActvityTypes,
-                                                      widget.checkList,
                                                       0,'')), ////for non edit
                                         ).then((value) {
                                           getData();
@@ -649,7 +646,7 @@ class _checkListItemScreenEmployeeState
                           1,
                           widget.mGetActvityTypes,
                           widget.locationsList,
-                          widget.checkList),
+                       ),
                     ));
               },
               child: Container(

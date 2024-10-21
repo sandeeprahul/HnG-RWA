@@ -40,7 +40,6 @@ class AmAcceptSelectionScreen_Employee extends StatefulWidget {
   final int type;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
-  final GetChecklist checkList;
 
   // final HeaderQuestionEmployee headerQuestionEmployee;
 
@@ -48,14 +47,13 @@ class AmAcceptSelectionScreen_Employee extends StatefulWidget {
     this.activeCheckList,
     this.mGetActvityTypes,
     this.locationsList,
-    this.checkList,
     this.type,
   );
 
   @override
   State<AmAcceptSelectionScreen_Employee> createState() =>
       _AmAcceptSelectionScreen_EmployeeState(this.activeCheckList,
-          this.mGetActvityTypes, this.locationsList, this.checkList, this.type);
+          this.mGetActvityTypes, this.locationsList, this.type);
 }
 
 class _AmAcceptSelectionScreen_EmployeeState
@@ -64,7 +62,6 @@ class _AmAcceptSelectionScreen_EmployeeState
   final int type;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
-  final GetChecklist checkList;
 
   // final HeaderQuestionEmployee headerQuestionEmployee;
 
@@ -72,7 +69,6 @@ class _AmAcceptSelectionScreen_EmployeeState
     this.activeCheckList,
     this.mGetActvityTypes,
     this.locationsList,
-    this.checkList,
     this.type,
   );
 
@@ -194,7 +190,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                         1,
                         widget.mGetActvityTypes,
                         widget.locationsList,
-                        widget.checkList),
+                       ),
                   ));
             }
 
@@ -218,7 +214,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                         1,
                                         widget.mGetActvityTypes,
                                         widget.locationsList,
-                                        widget.checkList),
+                                       ),
                                   ));
                             },
                             child: const Padding(
@@ -1169,7 +1165,6 @@ class _AmAcceptSelectionScreen_EmployeeState
                                                           widget.locationsList,
                                                           widget
                                                               .mGetActvityTypes,
-                                                          widget.checkList,
                                                           sendingToEditAmHeaderQuestion
                                                               .updatedBy,
                                                           "${selectedAmHeaderQuestion!.checklisTItemMstId}")),
@@ -2099,7 +2094,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                           1,
                           widget.mGetActvityTypes,
                           widget.locationsList,
-                          widget.checkList),
+                          ),
                     ));
               },
               child: Container(

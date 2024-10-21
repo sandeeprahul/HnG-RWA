@@ -36,7 +36,6 @@ class applicableScreen extends StatefulWidget {
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
 
-  // final GetChecklist mGetChecklist;
 
   //0=DILO,1=LPD,2=STORE AUDIT
   // ActiveCheckList activeCheckList;
@@ -118,13 +117,13 @@ class _applicableScreenState extends State<applicableScreen>
                       padding: const EdgeInsets.only(left: 20),
                       child: Text(
                         '${widget.mGetActvityTypes.auditName}',
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ],
                 ),
               ),
-              Text(
+              const Text(
                 'Applicable Activity',
                 style: TextStyle(
                     color: Colors.black,
@@ -143,20 +142,20 @@ class _applicableScreenState extends State<applicableScreen>
           Visibility(
               visible: loading,
               child: Container(
-                color: Color(0x80000000),
+                color: const Color(0x80000000),
                 child: Center(
                     child: Container(
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(5)),
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         height: 115,
                         width: 150,
-                        child: Column(
+                        child: const Column(
                           children: [
                             CircularProgressIndicator(),
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: EdgeInsets.all(8.0),
                               child: Text('Please wait..'),
                             )
                           ],
@@ -168,9 +167,9 @@ class _applicableScreenState extends State<applicableScreen>
   }
 
   Widget checkListView() {
-    return checkList.length == 0
-        ? Padding(
-            padding: const EdgeInsets.all(10.0),
+    return checkList.isEmpty
+        ? const Padding(
+            padding: EdgeInsets.all(10.0),
             child: Text('No records found'),
           )
         : ListView.builder(
@@ -194,7 +193,7 @@ class _applicableScreenState extends State<applicableScreen>
                               1,
                               widget.mGetActvityTypes,
                               widget.locationsList,
-                              checkList[index]),
+                              ),
                         )).then((value) {
                       if (context.mounted) {
                         getAcitiveCheckListData();
@@ -235,7 +234,7 @@ class _applicableScreenState extends State<applicableScreen>
                     children: [
                       Text(
                         '${checkList[index].checklistName}',
-                        style: TextStyle(fontSize: 18),
+                        style: const TextStyle(fontSize: 18),
                       ),
                       const Spacer(),
                       Container(
@@ -289,7 +288,7 @@ class _applicableScreenState extends State<applicableScreen>
 
       print("ACTIVEEEEEE " + url);
       final response =
-          await http.get(Uri.parse(url)).timeout(Duration(seconds: 3));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
       print(response.body);
 
       var responseData = json.decode(response.body);
@@ -323,7 +322,7 @@ class _applicableScreenState extends State<applicableScreen>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content: Text('Network issue\nPlease retry'),
+          content: const Text('Network issue\nPlease retry'),
           actions: <Widget>[
             /*  Container(
               padding: EdgeInsets.all(15),
@@ -338,7 +337,7 @@ class _applicableScreenState extends State<applicableScreen>
                       style: TextStyle(color: Colors.white))),
             ),*/
             Container(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               decoration:
                   const BoxDecoration(color: CupertinoColors.activeBlue),
               child: InkWell(
@@ -386,7 +385,7 @@ class _applicableScreenState extends State<applicableScreen>
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
-                    checkList[index]),
+                  ),
               )).then((value) => () {
                 getAcitiveCheckListData();
               });
@@ -465,7 +464,7 @@ class _applicableScreenState extends State<applicableScreen>
       String url;
 
       url =
-          "Constants.apiHttpsUrl/StoreAudit/CreateStoreChecklist?locationcode=$locationCode&createdby=$userID&checklistid=$id";
+          "${Constants.apiHttpsUrl}/StoreAudit/CreateStoreChecklist?locationcode=$locationCode&createdby=$userID&checklistid=$id";
 
       final response = await http.get(Uri.parse(url));
 
@@ -485,7 +484,7 @@ class _applicableScreenState extends State<applicableScreen>
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
-                    checkList[index]),
+                   ),
               )).then((value) => () {
                 getAcitiveCheckListData();
               });
@@ -587,7 +586,7 @@ class _applicableScreenState extends State<applicableScreen>
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
-                    checkList[index]),
+                    ),
               )).then((value) {
             if (context.mounted) {
               getAcitiveCheckListData();
@@ -693,7 +692,7 @@ class _applicableScreenState extends State<applicableScreen>
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
-                    checkList[index]),
+             ),
               )).then((value) {
             if (context.mounted) {
               getAcitiveCheckListData();
@@ -788,7 +787,7 @@ class _applicableScreenState extends State<applicableScreen>
                       style: TextStyle(color: Colors.white))),
             ),*/
             Container(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               decoration:
                   const BoxDecoration(color: CupertinoColors.activeBlue),
               child: InkWell(

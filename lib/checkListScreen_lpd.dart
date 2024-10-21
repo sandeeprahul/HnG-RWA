@@ -8,12 +8,14 @@ import 'package:hng_flutter/data/ActiveCheckListLpd.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/data/GetChecklist.dart';
 import 'package:hng_flutter/storeAuditCheckListScreen.dart';
+import 'package:hng_flutter/tem.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'AmAcceptSelectionScreen.dart';
 import 'AmAcceptSelectionScreen_Employee.dart';
 import 'AmAcceptSelectionScreen_LPD.dart';
+import 'checkListItemScreenExmployee.dart';
 import 'common/constants.dart';
 import 'data/ActiveCheckListAm.dart';
 import 'data/ActiveCheckListEmployee.dart';
@@ -37,22 +39,20 @@ class checkListScreen_lpd extends StatefulWidget {
   final int type;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
-  final GetChecklist checkList;
 
   // LPDSection mLpdChecklist;
 
   //0=DILO,1=LPD,2=STORE AUDIT
   // ActiveCheckList activeCheckList;
 
-  checkListScreen_lpd(this.type, this.mGetActvityTypes, this.locationsList,
-      this.checkList);
+  checkListScreen_lpd(this.type, this.mGetActvityTypes, this.locationsList);
 
   // checkListScreen_lpd(this.type, this.mGetActvityTypes, this.locationsList, this. mLpdChecklist);
 
   @override
   State<checkListScreen_lpd> createState() =>
       _checkListScreen_lpdState(
-          this.type, this.mGetActvityTypes, this.locationsList, this.checkList);
+          this.type, this.mGetActvityTypes, this.locationsList);
 }
 
 class _checkListScreen_lpdState extends State<checkListScreen_lpd>
@@ -60,14 +60,10 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
   int type;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
-  GetChecklist checkList_;
 
-  // LPDSection mLpdChecklist;
-
-  // ActiveCheckList activeCheckList;
-
-  _checkListScreen_lpdState(this.type, this.mGetActvityTypes,
-      this.locationsList, this.checkList_);
+  _checkListScreen_lpdState(this.type,
+      this.mGetActvityTypes,
+      this.locationsList,);
 
   var isSelected = 0;
   var popupVisible = false;
@@ -115,8 +111,8 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 15),
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 15),
                             child: Icon(Icons.arrow_back),
                           ),
                         ),
@@ -124,7 +120,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                           padding: const EdgeInsets.only(left: 20),
                           child: Text(
                             widget.mGetActvityTypes.auditName,
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                           ),
                         ),
                       ],
@@ -178,7 +174,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                   isSelected == 1 ? Colors.blue : Colors.black),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 7),
+                              margin: const EdgeInsets.only(top: 7),
                               height: 1,
                               color: isSelected != 0
                                   ? Colors.blueAccent
@@ -208,30 +204,31 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                 .of(context)
                                 .size
                                 .width,
-                            color: Color(0xFF80808080),
+                            color: const Color(0xFF80808080),
                             child: Center(
                               child: Container(
                                 height: 185,
                                 width: double.infinity,
-                                margin: EdgeInsets.all(15),
-                                padding: EdgeInsets.all(20),
-                                decoration: BoxDecoration(color: Colors.white),
+                                margin: const EdgeInsets.all(15),
+                                padding: const EdgeInsets.all(20),
+                                decoration:
+                                const BoxDecoration(color: Colors.white),
                                 child: Column(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.map_pin_ellipse,
                                       size: 50,
                                       color: Colors.lightBlueAccent,
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 5,
                                     ),
-                                    Text(
+                                    const Text(
                                       'Check-in at the',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Text(
+                                    const Text(
                                       'Location',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
@@ -249,10 +246,10 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     checkInOutScreenLPD(
-                                                        checkListLpd[index_],
-                                                        widget.mGetActvityTypes,
-                                                        widget.locationsList,
-                                                        widget.checkList),
+                                                      checkListLpd[index_],
+                                                      widget.mGetActvityTypes,
+                                                      widget.locationsList,
+                                                    ),
                                               )).then((value) {
                                             getAcitiveCheckListData();
                                           });
@@ -264,37 +261,58 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     checkInOutScreenStoreAudit(
-                                                        checkListStoreAudit[index_],
-                                                        widget.mGetActvityTypes,
-                                                        widget.locationsList,
-                                                        widget.checkList),
+                                                      checkListStoreAudit[index_],
+                                                      widget.mGetActvityTypes,
+                                                      widget.locationsList,
+                                                    ),
                                               )).then((value) {
                                             getAcitiveCheckListData();
                                           });
-                                        }else if(widget
-                                            .mGetActvityTypes.auditId =="4"){
-                                          //GetActvityTypes mGetActvityTypes;
-                                          //   String locationsList;
-                                          //   GetChecklist checkList_;
-                                          Navigator.pushReplacement(
+                                        } else if (widget
+                                            .mGetActvityTypes.auditId ==
+                                            "4") {
+                                       /*   Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => checkListItemScreenEmployee(
+                                                    checkListEmployee[index_],
+                                                    widget.mGetActvityTypes,
+                                                    widget.locationsList,
+                                                    0),
+                                              ));*/
+                                        /*  Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    checkInOutScreenEmployee(
-                                                        checkListEmployee[index_],
-                                                        widget.mGetActvityTypes,
-                                                        widget.locationsList,
-                                                        widget.checkList),
-
+                                                 CheckListPage(
+                                                  activeCheckList: checkListEmployee[index_],
+                                                  isEdit: 0,
+                                                  locationsList: widget.locationsList,
+                                                  mGetActivityTypes: widget.mGetActvityTypes,
+                                                  sendingToEditAmHeaderQuestion: 0,
+                                                  checkListItemMstId: "${checkListEmployee[index_].checklisTId}",),
                                               )).then((value) {
                                             getAcitiveCheckListData();
-                                          });
+                                          });*/
+                                          //remove in production
+
+                                          Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                checkInOutScreenEmployee(
+                                                    checkListEmployee[index_],
+                                                    widget.mGetActvityTypes,
+                                                    widget.locationsList,
+                                                    ),
+                                          )).then((value) {
+                                        getAcitiveCheckListData();
+                                      });
                                           //106042324000002
-                                        }
-                                        else if (widget
+                                        } else if (widget
                                             .mGetActvityTypes.auditId ==
                                             "5") {
-                                        /*  Navigator.push(
+                                          /*  Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
@@ -310,14 +328,15 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                           Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => amCheckListScreen(
-                                                    1,
-                                                    widget.mGetActvityTypes,
-                                                    widget.locationsList,
-                                                    widget.checkList,checkListAm[index_]),
-                                              )).then((value) => (){
+                                                builder: (context) =>
+                                                    amCheckListScreen(
+                                                        1,
+                                                        widget.mGetActvityTypes,
+                                                        widget.locationsList,
+                                                        checkListAm[index_]),
+                                              )).then((value) =>
+                                              () {
                                             getAcitiveCheckListData();
-
                                           });
                                         }
                                       },
@@ -329,7 +348,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                             color: Colors.blue,
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(15))),
-                                        child: Center(
+                                        child: const Center(
                                             child: Text(
                                               'Check In',
                                               style: TextStyle(
@@ -351,20 +370,20 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
               Visibility(
                   visible: loading,
                   child: Container(
-                    color: Color(0x80000000),
+                    color: const Color(0x80000000),
                     child: Center(
                         child: Container(
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(5)),
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             height: 115,
                             width: 150,
-                            child: Column(
+                            child: const Column(
                               children: [
                                 CircularProgressIndicator(),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: EdgeInsets.all(8.0),
                                   child: Text('Please wait..'),
                                 )
                               ],
@@ -377,14 +396,17 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
 
   Widget checkListViewLpd() {
     print(" widget.mGetActvityTypes.auditId");
-    print( widget.mGetActvityTypes.auditId);
-    return  widget.mGetActvityTypes.auditId == "3" ? lpdList() : widget
-        .mGetActvityTypes.auditId == "2" ? storeAuditList() : widget
-        .mGetActvityTypes.auditId == "5" ? amList() : widget
-        .mGetActvityTypes.auditId == "4"?empList():Text('Something went wrong');
+    print(widget.mGetActvityTypes.auditId);
+    return widget.mGetActvityTypes.auditId == "3"
+        ? lpdList()
+        : widget.mGetActvityTypes.auditId == "2"
+        ? storeAuditList()
+        : widget.mGetActvityTypes.auditId == "5"
+        ? amList()
+        : widget.mGetActvityTypes.auditId == "4"
+        ? empList()
+        : const Text('Something went wrong');
   }
-
-
 
   Widget lpdList() {
     return checkListLpd.length == 0
@@ -392,7 +414,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       padding: EdgeInsets.all(10.0),
       child: Center(child: Text('No records found')),
     )
-        :   ListView.builder(
+        : ListView.builder(
       itemBuilder: (BuildContext context, int index) {
         String date = checkListLpd[index].publishDate;
         DateTime parseDate =
@@ -434,13 +456,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList,
                             checkListLpd[index]),
-                  )).then((value) => (){
-                    getAcitiveCheckListData();
+                  )).then((value) =>
+                  () {
+                getAcitiveCheckListData();
               });
-            }
-            else if (checkListLpd[index].checklistEditStatus == "R") {
+            } else if (checkListLpd[index].checklistEditStatus == "R") {
               // checklist_edit_status=="R" = edit
 
               Navigator.pushReplacement(
@@ -451,13 +472,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList,
                             checkListLpd[index]),
-                  )).then((value) => (){
+                  )).then((value) =>
+                  () {
                 getAcitiveCheckListData();
               });
-            }
-            else {
+            } else {
               if (checkListLpd[index].check_In_Flag == "1") {
                 setState(() {
                   popupVisible = true;
@@ -532,7 +552,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                               alignment: Alignment.topLeft,
                               child: Text(
                                 'Time : $outputTime - $enddTime',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12,
                                 ),
                               ),
@@ -561,13 +581,14 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       itemCount: checkListLpd.length,
     );
   }
+
   Widget empList() {
     return checkListEmployee.length == 0
         ? const Padding(
       padding: EdgeInsets.all(10.0),
       child: Center(child: Text('No records found')),
     )
-        :   ListView.builder(
+        : ListView.builder(
       itemBuilder: (BuildContext context, int index) {
         String date = checkListEmployee[index].publishDate;
         DateTime parseDate =
@@ -606,25 +627,31 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                   MaterialPageRoute(
                     builder: (context) =>
                         AmAcceptSelectionScreen_Employee(
-
-                            checkListEmployee[index],widget.mGetActvityTypes,widget.locationsList,widget.checkList,widget.type,),
-                  )).then((value) => (){
+                          checkListEmployee[index],
+                          widget.mGetActvityTypes,
+                          widget.locationsList,
+                          widget.type,
+                        ),
+                  )).then((value) =>
+                  () {
                 getAcitiveCheckListData();
               });
-            }
-            else if (checkListEmployee[index].checklistEditStatus == "R") {
-
+            } else if (checkListEmployee[index].checklistEditStatus ==
+                "R") {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
                         AmAcceptSelectionScreen_Employee(
-                            checkListEmployee[index],widget.mGetActvityTypes,widget.locationsList,widget.checkList,widget.type),
-                  )).then((value) => (){
+                            checkListEmployee[index],
+                            widget.mGetActvityTypes,
+                            widget.locationsList,
+                            widget.type),
+                  )).then((value) =>
+                  () {
                 getAcitiveCheckListData();
               });
-            }
-            else {
+            } else {
               if (checkListEmployee[index].checkinFlag == "1") {
                 setState(() {
                   popupVisible = true;
@@ -699,7 +726,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                               alignment: Alignment.topLeft,
                               child: Text(
                                 'Time : $outputTime - $enddTime',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12,
                                 ),
                               ),
@@ -730,12 +757,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
   }
 
   Widget storeAuditList() {
-    return  checkListStoreAudit.length == 0
-        ? Padding(
-      padding: const EdgeInsets.all(10.0),
+    return checkListStoreAudit.length == 0
+        ? const Padding(
+      padding: EdgeInsets.all(10.0),
       child: Text('No records found'),
     )
-        :  ListView.builder(
+        : ListView.builder(
       itemBuilder: (BuildContext context, int index) {
         String date = checkListStoreAudit[index].publishDate;
         DateTime parseDate =
@@ -777,13 +804,13 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList,
                             checkListStoreAudit[index]),
-                  )).then((value) => (){
+                  )).then((value) =>
+                  () {
                 getAcitiveCheckListData();
               });
-            }
-            else if (checkListStoreAudit[index].checklistEditStatus == "R") {
+            } else if (checkListStoreAudit[index].checklistEditStatus ==
+                "R") {
               // checklist_edit_status=="R" = edit
 
               Navigator.pushReplacement(
@@ -794,13 +821,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList,
                             checkListStoreAudit[index]),
-                  )).then((value) => (){
+                  )).then((value) =>
+                  () {
                 getAcitiveCheckListData();
               });
-            }
-            else {
+            } else {
               if (checkListStoreAudit[index].check_In_Flag == "1") {
                 setState(() {
                   popupVisible = true;
@@ -875,7 +901,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                               alignment: Alignment.topLeft,
                               child: Text(
                                 'Time : $outputTime - $enddTime',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12,
                                 ),
                               ),
@@ -907,11 +933,11 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
 
   Widget amList() {
     return checkListAm.length == 0
-        ? Padding(
-      padding: const EdgeInsets.all(10.0),
+        ? const Padding(
+      padding: EdgeInsets.all(10.0),
       child: Text('No records found'),
     )
-        :  ListView.builder(
+        : ListView.builder(
       itemBuilder: (BuildContext context, int index) {
         String date = checkListAm[index].publishDate;
         DateTime parseDate =
@@ -953,13 +979,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList,
                             checkListAm[index]),
-                  )).then((value) => (){
+                  )).then((value) =>
+                  () {
                 getAcitiveCheckListData();
               });
-            }
-            else if (checkListAm[index].checklistEditStatus == "R") {
+            } else if (checkListAm[index].checklistEditStatus == "R") {
               // checklist_edit_status=="R" = edit
 
               Navigator.pushReplacement(
@@ -970,13 +995,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList,
                             checkListAm[index]),
-                  )).then((value) => (){
+                  )).then((value) =>
+                  () {
                 getAcitiveCheckListData();
               });
-            }
-            else {
+            } else {
               if (checkListAm[index].check_In_Flag == "1") {
                 setState(() {
                   popupVisible = true;
@@ -1051,7 +1075,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                               alignment: Alignment.topLeft,
                               child: Text(
                                 'Time : $outputTime - $enddTime',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12,
                                 ),
                               ),
@@ -1100,28 +1124,31 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       var url;
       //replace your restFull API here.
 
-
       if (widget.mGetActvityTypes.auditId == "3") {
         url =
-        "${Constants.apiHttpsUrl}/lpdaudit/Active_CheckList/$locationCode/${widget
+        "${Constants
+            .apiHttpsUrl}/lpdaudit/Active_CheckList/$locationCode/${widget
             .mGetActvityTypes.auditId}/$userID";
       } else if (widget.mGetActvityTypes.auditId == "2") {
         url =
-        "${Constants.apiHttpsUrl}/StoreAudit/Active_CheckList/$locationCode/${widget
+        "${Constants
+            .apiHttpsUrl}/StoreAudit/Active_CheckList/$locationCode/${widget
             .mGetActvityTypes.auditId}/$userID";
       } else if (widget.mGetActvityTypes.auditId == "5") {
         url =
-        "${Constants.apiHttpsUrl}/AreaManager/Active_CheckList/$locationCode/${widget
+        "${Constants
+            .apiHttpsUrl}/AreaManager/Active_CheckList/$locationCode/${widget
             .mGetActvityTypes.auditId}/$userID";
-      }
-      else if(widget.mGetActvityTypes.auditId == "4"){
+      } else if (widget.mGetActvityTypes.auditId == "4") {
         url =
-        "${Constants.apiHttpsUrl}/Employee/Active_CheckList/$locationCode/${widget
+        "${Constants
+            .apiHttpsUrl}/Employee/Active_CheckList/$locationCode/${widget
             .mGetActvityTypes.auditId}/$userID";
       }
 
       final response =
-      await http.get(Uri.parse(url)).timeout(Duration(seconds: 5));
+      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
+      print(url);
       print(response.body);
 
       var responseData = json.decode(response.body);
@@ -1141,8 +1168,8 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       } else if (widget.mGetActvityTypes.auditId == "5") {
         checkListAm = List<ActiveCheckListAm>.from(
             l.map((model) => ActiveCheckListAm.fromJson(model)));
-      }else if(widget.mGetActvityTypes.auditId == "4"){
-        checkListEmployee  = List<ActiveCheckListEmployee>.from(
+      } else if (widget.mGetActvityTypes.auditId == "4") {
+        checkListEmployee = List<ActiveCheckListEmployee>.from(
             l.map((model) => ActiveCheckListEmployee.fromJson(model)));
       }
       print('checkListEmployee');
@@ -1167,7 +1194,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-            content: Text('Network issue\nPlease retry'),
+          content: const Text('Network issue\nPlease retry'),
 // Please retry?'),
           actions: <Widget>[
             /*  Container(
@@ -1183,7 +1210,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                       style: TextStyle(color: Colors.white))),
             ),*/
             Container(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               decoration:
               const BoxDecoration(color: CupertinoColors.activeBlue),
               child: InkWell(

@@ -3,11 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:hng_flutter/data/ActiveCheckListLpd.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
-import 'package:hng_flutter/data/Locations.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,12 +13,9 @@ import 'common/constants.dart';
 import 'data/ActiveCheckListEmployee.dart';
 import 'data/ActiveCheckListModel.dart';
 import 'OutletSelectScreen.dart';
-import 'PageHome.dart';
 import 'checkInOutScreenDilo.dart';
 import 'checkListItemScreen.dart';
-import 'checkListItemScreen_Lpd.dart';
-import 'imageUploadScreen.dart';
-import 'mainCntrl.dart';
+
 
 class checkListScreen extends StatefulWidget {
   // const checkListScreen({Key? key}) : super(key: key);
@@ -56,6 +49,7 @@ class _checkListScreenState extends State<checkListScreen>
   late int index_;
   bool loading = false;
 
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       print("resumedCheckListScreen");
@@ -115,11 +109,11 @@ class _checkListScreenState extends State<checkListScreen>
                           child: Icon(Icons.arrow_back),
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 20),
+                       Padding(
+                        padding: const EdgeInsets.only(left: 20),
                         child: Text(
-                          'DILO',
-                          style: TextStyle(color: Colors.black),
+                          widget.mGetActvityTypes.auditName,
+                          style: const TextStyle(color: Colors.black),
                         ),
                       ),
                     ],
@@ -649,7 +643,7 @@ class _checkListScreenState extends State<checkListScreen>
 
       url =
           "${Constants.apiHttpsUrl}/CheckList/Active_CheckList/$locationCode/${widget.mGetActvityTypes.auditId}/$userID";
-
+      print(url);
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
       var responseData = json.decode(response.body);
@@ -664,6 +658,14 @@ class _checkListScreenState extends State<checkListScreen>
             .map((data) => ActiveCheckList.fromJson(data))
             .toList();
         checkList = checkList_;
+/*
+       if(widget.mGetActvityTypes.auditId == "4"){
+        checkListEmployee  = List<ActiveCheckListEmployee>.from(
+            l.map((model) => ActiveCheckListEmployee.fromJson(model)));
+      }else{
+
+       }*/
+
         return checkList_;
       }else{
 

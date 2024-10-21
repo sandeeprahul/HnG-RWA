@@ -36,31 +36,29 @@ class checkInOutScreenLPD extends StatefulWidget {
   final ActiveCheckListLpd activeCheckList;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
-  final GetChecklist checkList;
 
   // LPDSection mLpdChecklist;
 
   checkInOutScreenLPD(this.activeCheckList, this.mGetActvityTypes,
-      this.locationsList, this.checkList);
+      this.locationsList);
 
   @override
   State<checkInOutScreenLPD> createState() => _checkInOutScreenLPDState(
       this.activeCheckList,
       this.mGetActvityTypes,
       this.locationsList,
-      this.checkList);
+      );
 }
 
 class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
   ActiveCheckListLpd activeCheckList;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
-  GetChecklist checkList;
 
   // LPDSection mLpdChecklist;
 
   _checkInOutScreenLPDState(this.activeCheckList, this.mGetActvityTypes,
-      this.locationsList, this.checkList);
+      this.locationsList);
 
   XFile? photo;
   var _croppedFile;
@@ -231,7 +229,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
       print(distanceInMeters);
       var mts = distanceInMeters.toString().split('.');
       var meters = mts[0];
-      if (int.parse(meters) <= 100) {
+      if (int.parse(meters) <= 150) {
         setState(() {
           loading = false;
           takePhoto = true;
@@ -280,7 +278,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList),
+                         ),
                       ));
                 },
               ),
@@ -295,7 +293,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
-                            widget.checkList),
+                           ),
                       )); // getPhoto(0);
 
                   // getLocationStatus(f);
@@ -408,7 +406,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
-                    widget.checkList),
+                   ),
               ));
           return Future.value(false);
         },
@@ -434,7 +432,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
                                         1,
                                         widget.mGetActvityTypes,
                                         widget.locationsList,
-                                        widget.checkList),
+                                       ),
                                   ));
                             },
                             child: const Padding(
@@ -1159,7 +1157,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
-                    widget.checkList,
+
                     widget.activeCheckList),
               ));
 
