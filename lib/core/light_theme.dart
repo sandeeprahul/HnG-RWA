@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 final ThemeData lightTheme = ThemeData(
   useMaterial3: true,
   // colorScheme: lightColorScheme,
@@ -45,24 +44,27 @@ final ThemeData lightTheme = ThemeData(
       fontSize: 16,
       fontWeight: FontWeight.w400,
     ),
+
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16)
+      ),
+      foregroundColor: Colors.blue, // Button text color
+      textStyle: const TextStyle(fontSize: 16), // Button text style
+    ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
-
       style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4.0),
-        ),
-        backgroundColor:const Color(0xfff76613),
-        textStyle: GoogleFonts.poppins(
-            fontSize: 16.0,
-            color: Colors.white
-        ),
-      )
-  ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(4.0),
+    ),
+    backgroundColor: const Color(0xfff76613),
+    textStyle: GoogleFonts.poppins(fontSize: 16.0, color: Colors.white),
+  )),
   filledButtonTheme: FilledButtonThemeData(
-
     style: FilledButton.styleFrom(
-
       textStyle: GoogleFonts.poppins(
         color: Colors.white,
         fontSize: 16.0,
@@ -70,7 +72,6 @@ final ThemeData lightTheme = ThemeData(
     ),
   ),
   iconTheme: const IconThemeData(
-
     color: Colors.black,
     size: 24.0,
   ),
@@ -119,13 +120,12 @@ final ThemeData lightTheme = ThemeData(
   navigationBarTheme: NavigationBarThemeData(
     // backgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
     // backgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
-    backgroundColor:const Color(0xffffffff),
+    backgroundColor: const Color(0xffffffff),
     // selectedIconBackgroundColor: Colors.grey,
 
     iconTheme: MaterialStateProperty.resolveWith<IconThemeData>((states) {
       if (states.contains(MaterialState.selected)) {
         return const IconThemeData(
-
           color: Colors.white,
         );
       }

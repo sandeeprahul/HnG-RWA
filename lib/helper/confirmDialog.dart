@@ -27,8 +27,10 @@ void showConfirmDialog(
         ),
         ElevatedButton(
           onPressed: () {
-            Get.back(); // Close the dialog
+             // Close the dialog
+            Get.back();
             onConfirmed(); // Execute the callback function
+
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,

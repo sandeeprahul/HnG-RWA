@@ -280,7 +280,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                                     widget.locationsList,
                                                     0),
                                               ));*/
-                                        /*  Navigator.pushReplacement(
+                                          Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
@@ -293,10 +293,10 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                                   checkListItemMstId: "${checkListEmployee[index_].checklisTId}",),
                                               )).then((value) {
                                             getAcitiveCheckListData();
-                                          });*/
+                                          });
                                           //remove in production
 
-                                          Navigator.pushReplacement(
+                                        /*  Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
@@ -307,7 +307,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                                     ),
                                           )).then((value) {
                                         getAcitiveCheckListData();
-                                      });
+                                      });*/
                                           //106042324000002
                                         } else if (widget
                                             .mGetActvityTypes.auditId ==
