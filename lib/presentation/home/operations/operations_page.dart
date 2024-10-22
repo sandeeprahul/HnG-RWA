@@ -17,6 +17,8 @@ import '../../../provider/store_transfer_provider.dart';
 import '../../../provider/week_off_provider.dart';
 import 'package:http/http.dart' as http;
 
+import '../../week_off_employee_list_page.dart';
+
 class PageSurvey extends ConsumerStatefulWidget {
   const PageSurvey({Key? key}) : super(key: key);
 
@@ -60,7 +62,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const WeekOffApplyPage(),
+                            builder: (context) => const WeekOffEmployeeListPage(),
                           ),
                         );
                       } else if (audit.auditId == 102) {

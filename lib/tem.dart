@@ -15,6 +15,8 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_service.dart';
+import 'checkListScreen_lpd.dart';
+import 'controllers/progressController.dart';
 import 'data/ActiveCheckListEmployee.dart';
 import 'data/GetActvityTypes.dart';
 import 'helper/confirmDialog.dart';
@@ -59,13 +61,18 @@ class _CheckListPageState extends State<CheckListPage> {
     loadCheckListData(); // Fetch data from the API
   }
 
+  final ProgressController progressController = Get.put(ProgressController());
+
   // Fetch checklist data from API
   Future<void> loadCheckListData() async {
     try {
       // Replace this with your API endpoint
+      final pref = await SharedPreferences.getInstance();
+      var empCode = pref.getString("userCode");
+
       final response = await http.get(Uri.parse(
-          'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionAnswersList/777042324000132/70002/70002'));
-      // final response = await http.get(Uri.parse('https://your-api-endpoint.com/checklist'));
+          'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionAnswersList/${widget.activeCheckList.empChecklistAssignId}/$empCode/$empCode'));
+      print('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionAnswersList/${widget.activeCheckList.empChecklistAssignId}/$empCode/$empCode');
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         setState(() {
@@ -147,9 +154,18 @@ class _CheckListPageState extends State<CheckListPage> {
     // setState(() {
     //   loading = false;
     // });
-    if (context.mounted) {
-      Navigator.pop(context);
-    }
+
+
+    // showConfirmDialog(onConfirmed: (){}, title: 'Success', msg: '')
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => checkListScreen_lpd(
+            1,
+            widget.mGetActivityTypes,
+            widget.locationsList,
+          ),
+        ));
   }
 
   @override
@@ -173,173 +189,175 @@ class _CheckListPageState extends State<CheckListPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            '${widget.activeCheckList.empChecklistAssignId}',
-            style: const TextStyle(fontSize: 14),
+          title: const Text(
+            'Employee DILO',
+            style: TextStyle(fontSize: 14),
           ),
         ),
-        body: isLoading
-            ? const Center(
-                child:
-                    CircularProgressIndicator()) // Show loader while loading data
-            : PageView.builder(
-                controller: _pageController,
-                // physics: const NeverScrollableScrollPhysics(),
-                itemCount: checkListItems.length,
-                // Number of checklist items (pages)
+        body:Obx((){
+            if (progressController.isLoading.value){
+              return const Center(
+                child: CircularProgressIndicator(), // Display progress indicator
+              );
+            }
+            return  PageView.builder(
+              controller: _pageController,
+              // physics: const NeverScrollableScrollPhysics(),
+              itemCount: checkListItems.length,
+              // Number of checklist items (pages)
 
-                itemBuilder: (context, index) {
-                  var checkListItem =
-                      checkListItems[index]; // Get the current checklist item
-                  return camVisible
-                      ? Visibility(
-                          visible: camController == null ? false : camVisible,
-                          child: SizedBox(
-                            height: MediaQuery.of(context).size.height,
-                            width: MediaQuery.of(context).size.width,
-                            child: Stack(
-                              children: [
-                                SizedBox(
-                                  height: double.infinity,
-                                  width: double.infinity,
-                                  child: camController == null
-                                      ? const CircularProgressIndicator()
-                                      : CameraPreview(camController!),
-                                ),
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: InkWell(
-                                    onTap: () async {
-                                      try {
-                                        final image =
-                                            await camController!.takePicture();
-                                        setState(() {
-                                          imagePath = image.path;
-                                          camVisible = false;
-                                        });
-                                        _cropImage(image.path);
-                                      } catch (e) {
-                                        print(e);
-                                      }
-                                    },
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(15.0),
-                                      child: CircleAvatar(
-                                        backgroundColor: Colors.white,
-                                        radius: 35,
-                                        child: Icon(Icons.camera),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Text(
-                                checkListItem
-                                    .itemName!, // Display the checklist item name
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+              itemBuilder: (context, index) {
+                var checkListItem =
+                checkListItems[index]; // Get the current checklist item
+                return camVisible
+                    ? Visibility(
+                  visible: camController == null ? false : camVisible,
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child: Stack(
+                      children: [
+                        SizedBox(
+                          height: double.infinity,
+                          width: double.infinity,
+                          child: camController == null
+                              ? const CircularProgressIndicator()
+                              : CameraPreview(camController!),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: InkWell(
+                            onTap: () async {
+                              try {
+                                final image =
+                                await camController!.takePicture();
+                                setState(() {
+                                  imagePath = image.path;
+                                  camVisible = false;
+                                });
+                                _cropImage(image.path);
+                              } catch (e) {
+                                print(e);
+                              }
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(15.0),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 35,
+                                child: Icon(Icons.camera),
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: checkListItem.questions!.length,
-                                // Number of questions for this checklist item
-                                itemBuilder: (context, questionIndex) {
-                                  var question =
-                                      checkListItem.questions![questionIndex];
-                                  _question =
-                                      checkListItem.questions![questionIndex];
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                    : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        checkListItem
+                            .itemName!, // Display the checklist item name
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: checkListItem.questions!.length,
+                        // Number of questions for this checklist item
+                        itemBuilder: (context, questionIndex) {
+                          var question =
+                          checkListItem.questions![questionIndex];
+                          _question =
+                          checkListItem.questions![questionIndex];
 
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (question.answerTypeId != 7)
-                                          Text(
-                                            question
-                                                .questionText!, // Display question
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        const SizedBox(height: 10),
-                                        if (question.answerTypeId ==
-                                            1) // Comment type question
-                                          TextField(
-                                            decoration: InputDecoration(
-                                              hintText: question.questionText,
-                                              border:
-                                                  const OutlineInputBorder(),
-                                            ),
-                                            onChanged: (value) {
-                                              // Handle comment input
-                                              question.answer = value;
-                                            },
-                                          ),
-                                        if (question.answerTypeId ==
-                                            4) // Dropdown question
-                                          Container(
-                                            padding: const EdgeInsets.all(8.0),
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.grey),
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0)),
-                                            child: DropdownButton<String>(
-                                              underline: const SizedBox(),
-                                              isExpanded: true,
-                                              icon: const Icon(Icons
-                                                  .keyboard_arrow_down_outlined),
-                                              value: question.selectedOption,
-                                              hint: const Text(
-                                                  'Select an option'),
-                                              items: question.options!
-                                                  .map((option) =>
-                                                      DropdownMenuItem<String>(
-                                                        value:
-                                                            option.answerOption,
-                                                        child: Text(option
-                                                                .answerOption ??
-                                                            ''),
-                                                      ))
-                                                  .toList(),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  question.selectedOption =
-                                                      value;
-                                                  dropDownOptionAnswer =
-                                                      value!; // Store selected answer
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 10),
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                if (question.answerTypeId != 7)
+                                  Text(
+                                    question
+                                        .questionText!, // Display question
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                const SizedBox(height: 10),
+                                if (question.answerTypeId ==
+                                    1) // Comment type question
+                                  TextField(
+                                    decoration: InputDecoration(
+                                      hintText: question.questionText,
+                                      border:
+                                      const OutlineInputBorder(),
+                                    ),
+                                    onChanged: (value) {
+                                      // Handle comment input
+                                      question.answer = value;
+                                    },
+                                  ),
+                                if (question.answerTypeId ==
+                                    4) // Dropdown question
+                                  Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.grey),
+                                        borderRadius:
+                                        BorderRadius.circular(8.0)),
+                                    child: DropdownButton<String>(
+                                      underline: const SizedBox(),
+                                      isExpanded: true,
+                                      icon: const Icon(Icons
+                                          .keyboard_arrow_down_outlined),
+                                      value: question.selectedOption,
+                                      hint: const Text(
+                                          'Select an option'),
+                                      items: question.options!
+                                          .map((option) =>
+                                          DropdownMenuItem<String>(
+                                            value:
+                                            option.answerOption,
+                                            child: Text(option
+                                                .answerOption ??
+                                                ''),
+                                          ))
+                                          .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          question.selectedOption =
+                                              value;
+                                          dropDownOptionAnswer =
+                                          value!; // Store selected answer
 
-                                                  // Find the selected option based on the answerOption
-                                                  Option selectedOption = question
-                                                      .options!
-                                                      .firstWhere((option) =>
-                                                          option.answerOption ==
-                                                          value);
+                                          // Find the selected option based on the answerOption
+                                          Option selectedOption = question
+                                              .options!
+                                              .firstWhere((option) =>
+                                          option.answerOption ==
+                                              value);
 
-                                                  // Now store the corresponding answerOptionId
-                                                  dropDownOptionAnswerID =
-                                                      "${selectedOption.checkListAnswerOptionId}";
+                                          // Now store the corresponding answerOptionId
+                                          dropDownOptionAnswerID =
+                                          "${selectedOption.checkListAnswerOptionId}";
 
-                                                  non_Compliance_Flag =
-                                                      "${selectedOption.nonComplianceFlag}";
-                                                });
-                                                print(dropDownOptionAnswerID);
-                                              },
-                                            ),
-                                            /*DropdownButton<String>(
+                                          non_Compliance_Flag =
+                                          "${selectedOption.nonComplianceFlag}";
+                                        });
+                                        print(dropDownOptionAnswerID);
+                                      },
+                                    ),
+                                    /*DropdownButton<String>(
                                   underline: const SizedBox(),
                                   isExpanded: true,
                                   icon: const Icon(Icons
@@ -366,168 +384,170 @@ class _CheckListPageState extends State<CheckListPage> {
                                     });
                                   },
                                 )*/
-                                          ),
-                                        // Handle custom widget for answerTypeId == 3
-                                        if (question.answerTypeId == 3)
-                                          Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              // Padding for the new widget
-                                              child: Container(
-                                                margin: const EdgeInsets.only(
-                                                    top: 5, bottom: 5),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const Text(
-                                                      'ATTACH PROOF',
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    Container(
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              bottom: 10,
-                                                              top: 10),
-                                                      width: double.infinity,
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 10,
-                                                              right: 10),
-                                                      decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              const BorderRadius
-                                                                  .all(Radius
-                                                                      .circular(
-                                                                          5)),
-                                                          border: Border.all(
-                                                              color:
-                                                                  Colors.grey)),
-                                                      child: Row(
-                                                        children: [
-                                                          InkWell(
-                                                            child: Container(
-                                                                margin: const EdgeInsets
-                                                                    .only(
-                                                                    bottom: 10,
-                                                                    top: 10),
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(
-                                                                        10),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius:
-                                                                        const BorderRadius.all(Radius.circular(
-                                                                            5)),
-                                                                    border: Border.all(
-                                                                        color: Colors
-                                                                            .grey)),
-                                                                child:
-                                                                    _body() /*imageList.isEmpty
+                                  ),
+                                // Handle custom widget for answerTypeId == 3
+                                if (question.answerTypeId == 3)
+                                  Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      // Padding for the new widget
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 5, bottom: 5),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'ATTACH PROOF',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight:
+                                                  FontWeight.bold),
+                                            ),
+                                            Container(
+                                              margin:
+                                              const EdgeInsets.only(
+                                                  bottom: 10,
+                                                  top: 10),
+                                              width: double.infinity,
+                                              padding:
+                                              const EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 10),
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                  const BorderRadius
+                                                      .all(Radius
+                                                      .circular(
+                                                      5)),
+                                                  border: Border.all(
+                                                      color:
+                                                      Colors.grey)),
+                                              child: Row(
+                                                children: [
+                                                  InkWell(
+                                                    child: Container(
+                                                        margin: const EdgeInsets
+                                                            .only(
+                                                            bottom: 10,
+                                                            top: 10),
+                                                        padding:
+                                                        const EdgeInsets
+                                                            .all(
+                                                            10),
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                            const BorderRadius.all(Radius.circular(
+                                                                5)),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .grey)),
+                                                        child:
+                                                        _body() /*imageList.isEmpty
                                                 ? _body()
                                                 : imageList.isEmpty
                                                     ? _body()
                                                     :*/
-                                                                ),
-                                                            onTap: () {
-                                                              setState(() {
-                                                                cameraOpen = 0;
-                                                              });
-                                                              getPhoto();
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
                                                     ),
-                                                  ],
-                                                ),
-                                              )),
-                                        // if (question.answerTypeId == 3)
-                                        //  ,
-
-                                        if (question.answerTypeId == 7)
-                                          Align(
-                                            alignment: Alignment.topLeft,
-                                            child: InkWell(
-                                              onTap: () {
-                                                Get.to(ZoomableImage(
-                                                    imageUrl:
-                                                        'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}'));
-                                              },
-                                              child: SizedBox(
-                                                height: 200,
-                                                width: 150,
-                                                child: Card(
-                                                  color: Colors.orange,
-                                                  child: Image.network(
-                                                    'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}',
-                                                    height: 200,
-                                                    width: 150,
+                                                    onTap: () {
+                                                      setState(() {
+                                                        cameraOpen = 0;
+                                                      });
+                                                      getPhoto();
+                                                    },
                                                   ),
-                                                ),
+                                                ],
                                               ),
                                             ),
-                                          )
-                                        else
-                                          const SizedBox.shrink()
-                                      ],
+                                          ],
+                                        ),
+                                      )),
+                                // if (question.answerTypeId == 3)
+                                //  ,
+
+                                if (question.answerTypeId == 7)
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Get.to(ZoomableImage(
+                                            imageUrl:
+                                            'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}'));
+                                      },
+                                      child: SizedBox(
+                                        height:  MediaQuery.of(context).size.height,
+                                        width: MediaQuery.of(context).size.width,
+                                        child: Card(
+                                          color: Colors.orange,
+                                          child: Image.network(
+                                            'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}',
+                                            height: 200,
+                                            width: 150,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  );
-                                },
-                              ),
+                                  )
+                                else
+                                  const SizedBox.shrink()
+                              ],
                             ),
-                            const SizedBox(height: 20),
-                            InkWell(
-                              onTap: () {
-                                _submitCheckListItem(checkListItem);
-                              },
-                              child: Container(
-                                height: 50,
-                                margin: EdgeInsets.zero,
-                                // Remove margins
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    InkWell(
+                      onTap: () {
+                        _submitCheckListItem(checkListItem);
+                      },
+                      child: Container(
+                        height: 50,
+                        margin: EdgeInsets.zero,
+                        // Remove margins
 
-                                decoration: const BoxDecoration(
-                                  color: Colors.blue,
-                                ),
-                                width: double.infinity,
-                                child: const Center(
-                                    child: Text('Submit',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                              ),
-                            ),
-                          ],
-                        );
-                },
-                onPageChanged: (v) {
-                  for (int v = 0; v < checkListItems.length; v++) {
-                    bool hasMandatoryOption = checkListItems[v]
-                        .questions![0]
-                        .options!
-                        .any((option) => option.option_mandatory_Flag == "1");
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                        ),
+                        width: double.infinity,
+                        child: const Center(
+                            child: Text('Submit',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18))),
+                      ),
+                    ),
+                  ],
+                );
+              },
+              onPageChanged: (v) {
+                for (int v = 0; v < checkListItems.length; v++) {
+                  bool hasMandatoryOption = checkListItems[v]
+                      .questions![0]
+                      .options!
+                      .any((option) => option.option_mandatory_Flag == "1");
 
-                    if (hasMandatoryOption) {
-                      print(
-                          "Checklist item ${checkListItems[v].checkListItemId} has at least one mandatory option.");
-                      setState(() {
-                        photoMandatoryFlag = true;
-                      });
-                    } else {
-                      setState(() {
-                        photoMandatoryFlag = false;
-                      });
-                      print(
-                          "Checklist item ${checkListItems[v].checkListItemId} has no mandatory options.");
-                    }
-                  } // print(checkListItems[v].questions[0].options.contains(element));
-                  setState(() {
-                    _currentPage = v; // Update the current page
-                  });
-                },
-              ),
+                  if (hasMandatoryOption) {
+                    print(
+                        "Checklist item ${checkListItems[v].checkListItemId} has at least one mandatory option.");
+                    setState(() {
+                      photoMandatoryFlag = true;
+                    });
+                  } else {
+                    setState(() {
+                      photoMandatoryFlag = false;
+                    });
+                    print(
+                        "Checklist item ${checkListItems[v].checkListItemId} has no mandatory options.");
+                  }
+                } // print(checkListItems[v].questions[0].options.contains(element));
+                setState(() {
+                  _currentPage = v; // Update the current page
+                });
+              },
+            );
+        }),
+
       ),
     );
   }
@@ -768,6 +788,9 @@ class _CheckListPageState extends State<CheckListPage> {
         if (_currentPage == checkListItems.length - 1) {
           submitAllDilo();
           // Navigator.pop(context);
+        }
+        else if(question.length<=2){
+          submitAllDilo();
         }
         print('Checklist posted successfully!');
       }

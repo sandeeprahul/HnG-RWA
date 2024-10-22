@@ -14,17 +14,23 @@ import '../helper/progressDialog.dart';
 class EmployeeSubmitChecklistRepository {
   final ApiService apiService;
   // final ProgressController _controller;
+  final ProgressController progressController = Get.find<ProgressController>();
 
   EmployeeSubmitChecklistRepository(
       {required this.apiService});
 
   // Post checklist data using ApiService
   Future<ApiResponse> postChecklistData(List<Map<String, dynamic>> data) async {
+
     try {
+      progressController.show();
+
       final response = await apiService.postData(
         endpoint: "/Employee/AddQuestionAnswer",
         data: data,
       );
+      progressController.hide();
+
       Get.back(); // Close the progress dialog
       final message = response['message'] ?? 'Success';
       final statusCode = response['statusCode'] ?? "200"; // Defaulting to 200 if not present
@@ -33,6 +39,8 @@ class EmployeeSubmitChecklistRepository {
       return ApiResponse(message: message, statusCode: statusCode);
 
     } catch (e) {
+      progressController.hide();
+
       Get.back(); // Close the progress dialog
 
       print('Error posting checklist: $e');
@@ -61,6 +69,8 @@ class EmployeeSubmitChecklistRepository {
     bool goBack = false;
 
     try {
+      progressController.hide();
+
       final pref = await SharedPreferences.getInstance();
       var empCode = pref.getString("userCode");
 
@@ -76,6 +86,7 @@ class EmployeeSubmitChecklistRepository {
       final response = await apiService.postData(
           endpoint: '/Employee/QuestionCancel', data: sendJson);
       print('Response: $response');
+      progressController.hide();
 
       if (response['statusCode'] == '200') {
         goBack = true;
@@ -90,6 +101,8 @@ class EmployeeSubmitChecklistRepository {
                 'Something went wrong\n${response['statusCode']}\nPlease contact IT support.');
       }
     } catch (e) {
+      progressController.hide();
+
       print(e);
     }
 
@@ -103,6 +116,8 @@ class EmployeeSubmitChecklistRepository {
     // _controller.showProgress();
 
     try {
+      progressController.hide();
+
       final pref = await SharedPreferences.getInstance();
       var empCode = pref.getString("userCode");
 
@@ -112,6 +127,7 @@ class EmployeeSubmitChecklistRepository {
       };
 
       print('Sending JSON: $sendJson');
+      progressController.hide();
 
       // Use ApiService to send the request
       final response = await apiService.postData(
@@ -126,6 +142,7 @@ class EmployeeSubmitChecklistRepository {
       }
       return response['message'];
     } catch (e) {
+      progressController.hide();
       print(e);
       return '';
     }

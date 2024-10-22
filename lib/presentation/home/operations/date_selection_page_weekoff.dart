@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../../data/employee_leaveapply_list.dart';
 import '../../../data/opeartions/weekoff_entity.dart';
 import '../../../provider/week_off_provider.dart';
+import '../../week_off_apply_page.dart';
 
 class DateSelectionPageWeekOff extends ConsumerStatefulWidget {
   final EmployeeLeaveAplylist employeeCode;
@@ -204,36 +205,24 @@ class _DateSelectionPageWeekOffState
                                                   ? true
                                                   : false,
                                       onChanged: (bool? value) {
-                                        // widget.employeeCode
-                                        /*  print(weekOffDetails.day);
-                                        print(weekOffDetails.empCode);
-                                        print(weekOffDetails.activeInd);*/
 
-                                        Navigator.pushReplacement(
+
+                                          Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  WeekoffPage(employeeWeekoffDetails: weekOffDetails, employeeWeekOffDetailsList: employeeWeekOffDetails,),),
+                                        );
+
+                                      /*  Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   CalendarPage(weekOffDetails,
                                                       employeeWeekOffDetails),),
-                                        );
+                                        );*/
 
-                                        /* checkDateAndUpdateInd(
-                                            employeeWeekOffDetails,
-                                            employeeWeekOffDetails[index]);*/
-                                        /*  setState(() {
-                                          if (daySelected_.contains(index)) {
-                                            setState(() {
-                                              daySelected_.remove(index);
-                                            });
-                                            selectedItems.removeWhere((item) =>
-                                                item.date == formattedDate);
-                                          } else {
-                                            setState(() {
-                                              daySelected_.add(index);
-                                            });
-                                          }
-                                          // isChecked = value ?? false;
-                                        });*/
+
                                       },
                                     ),
                                   ],
@@ -309,7 +298,8 @@ class _DateSelectionPageWeekOffState
 
   void checkDateAndUpdateInd(
       List<EmployeeWeekoffDetails> employeeWeekOffDetails,
-      EmployeeWeekoffDetails employeeWeekOffDetail) {
+      EmployeeWeekoffDetails employeeWeekOffDetail)
+  {
     List<EmployeeWeekoffDetails> temp = employeeWeekOffDetails;
 
     for (int i = 0; i < temp.length; i++) {

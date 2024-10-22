@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/foundation.dart';
@@ -237,12 +238,16 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             leavetype: leaveTypeTextController.text.toString(),
             activeInd: "Y"));
 
+
+
         var params = [];
         for (int i = 0; i < temp.length; i++) {
           final detais = temp[i];
+          DateTime parsedDate = DateFormat('dd-MM-yyyy').parse(detais.date);
+          String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
           params.add({
             "empCode": widget.employeeWeekoffDetails.empCode,
-            "date": detais.date, // Convert DateTime to String format
+            "date": detais.date,
             "leaveType": detais.leavetype,
             "activeInd": detais.activeInd,
           });
@@ -254,8 +259,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         applyWeekOff(widget.employeeWeekoffDetails.empCode, params);
       }
 
-      // If the operation is successful, you can perform any additional actions here
-      Fluttertoast.showToast(msg: 'Leave apply success');
+      Get.snackbar("Success",'Leave apply success',colorText: Colors.white,backgroundColor: Colors.black,snackPosition: SnackPosition.BOTTOM);
       _selectedDates.clear();
 
       Navigator.pop(context);
@@ -341,7 +345,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     // String formattedDate = DateFormat('EEE d\'\'th \' MMMM y').format(selectedDay);
     // String formattedDate = DateFormat('EEE d\'\'th \' MMMM y','en_US').format(selectedDay);
     // String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
-    String formattedDate = DateFormat('dd-MM-yyyy').format(selectedDay);
+    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+    DateTime dateTime = DateTime.parse(formattedDate);
+
+
 
     print(" formated date -> $formattedDate");
 
@@ -349,7 +356,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     _selectedDates.add(
       WeekoffEntity(
         empCode: 'Employee Code',
-        date: selectedDay,
+        date: dateTime,
         leaveType: "Week-Off",
         // Initialize with an empty value or provide a default value
         comment:
@@ -360,18 +367,11 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     final isAlreadySelected =
         _selectedDates.any((date) => isSameDay(date.date, selectedDay));
 
-    /* setState(() {
-      if (_selectedDates.contains(selectedDay)) {
-        _selectedDates.remove(selectedDay);
-      } else {
-        _selectedDates.add(selectedDay.day );
-      }
-    });*/
     final selectedDate = ref.read(selectedDatesProvider).firstWhere(
           (date) => date.date.isAtSameMomentAs(selectedDay),
           orElse: () => WeekoffEntity(
             empCode: widget.employeeWeekoffDetails.empCode,
-            date: selectedDay,
+            date: dateTime,
             leaveType: 'Leave Type',
             comment: widget.employeeWeekoffDetails.activeInd,
           ),
