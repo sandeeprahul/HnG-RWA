@@ -11,7 +11,7 @@ void showSimpleDialog({required String title , required String msg}) {
           onPressed: () {
             Get.back(); // Close the dialog
           },
-          child: const Text('Ok'),
+          child: const Text('OK',style: TextStyle(color: Colors.white,fontSize: 16),),
         ),
 
       ],

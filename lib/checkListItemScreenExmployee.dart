@@ -94,10 +94,10 @@ class _checkListItemScreenEmployeeState
             context,
             MaterialPageRoute(
               builder: (context) => checkListScreen_lpd(
-                  1,
-                  widget.mGetActvityTypes,
-                  widget.locationsList,
-                  ),
+                1,
+                widget.mGetActvityTypes,
+                widget.locationsList,
+              ),
             ));
 
         return Future.value(false);
@@ -231,7 +231,8 @@ class _checkListItemScreenEmployeeState
                                                       0,
                                                       widget.locationsList,
                                                       widget.mGetActvityTypes,
-                                                      0,'')), ////for non edit
+                                                      0,
+                                                      '')), ////for non edit
                                         ).then((value) {
                                           getData();
                                         });
@@ -334,7 +335,7 @@ class _checkListItemScreenEmployeeState
     var updatedByDatetime =
         outputFormatSub.format(subTUpdated); //updated_Datetime
 
-    var status =headerQuestionDetails.checklistProgressStatus;
+    var status = headerQuestionDetails.checklistProgressStatus;
     return Stack(
       children: [
         Container(
@@ -458,6 +459,7 @@ class _checkListItemScreenEmployeeState
       ],
     );
   }
+
   /*
   *     return HeaderQuestionWidget(status: status, itemName: headerQuestionDetails.itemName, submissionDate: outputDate, updatedBy: headerQuestionDetails.updatedBy, updatedName: headerQuestionDetails.updatedName, updatedByDatetime: headerQuestionDetails.updatedDatetime, checklistEditStatus: headerQuestionDetails.checklistEditStatus, non_compliance_flag: headerQuestionDetails.non_compliance_flag, outputDate: updatedByDatetime,);
 */
@@ -476,8 +478,7 @@ class _checkListItemScreenEmployeeState
       var userID = prefs.getString('userCode') ?? '105060';
 
       String url =
-          "${Constants.apiHttpsUrl}/Employee/HeaderQuestion/${widget
-          .activeCheckList.empChecklistAssignId}/$userID";
+          "${Constants.apiHttpsUrl}/Employee/HeaderQuestion/${widget.activeCheckList.empChecklistAssignId}/$userID";
 
       final response = await http
           .get(Uri.parse(url))
@@ -485,7 +486,6 @@ class _checkListItemScreenEmployeeState
 
       if (response.statusCode == 200) {
         Map<String, dynamic> map = json.decode(response.body);
-
 
         headerQuestion = [];
         List<dynamic> data = map["checklist_Question_Header"];
@@ -512,7 +512,7 @@ class _checkListItemScreenEmployeeState
         // yield headerQuestion;
         return headerQuestion;
       }
-    }catch (e) {
+    } catch (e) {
       setState(() {
         loading = false;
       });
@@ -535,8 +535,9 @@ class _checkListItemScreenEmployeeState
           actions: <Widget>[
             Container(
               padding: const EdgeInsets.all(10),
-              decoration:
-                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -547,8 +548,9 @@ class _checkListItemScreenEmployeeState
             ),
             Container(
               padding: const EdgeInsets.all(10),
-              decoration:
-                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -575,7 +577,8 @@ class _checkListItemScreenEmployeeState
 
       var userId = prefs.getString("userCode");
 
-      var url = Uri.parse("https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Employee/WorkFlowStatusEmp");
+      var url = Uri.parse(
+          "https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Employee/WorkFlowStatusEmp");
 
       Map<String, String> headers = {
         'Content-Type': 'application/json; charset=UTF-8',
@@ -587,14 +590,11 @@ class _checkListItemScreenEmployeeState
       };
       String jsonBody = jsonEncode(body);
 
-
       var response = await http.post(
         url,
         headers: headers,
         body: jsonBody,
       );
-
-
 
       var respo = jsonDecode(response.body);
       if (response.statusCode == 200) {
@@ -643,10 +643,10 @@ class _checkListItemScreenEmployeeState
                     context,
                     MaterialPageRoute(
                       builder: (context) => checkListScreen_lpd(
-                          1,
-                          widget.mGetActvityTypes,
-                          widget.locationsList,
-                       ),
+                        1,
+                        widget.mGetActvityTypes,
+                        widget.locationsList,
+                      ),
                     ));
               },
               child: Container(

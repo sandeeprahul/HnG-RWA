@@ -7,11 +7,15 @@ import 'package:hng_flutter/helper/simpleDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api_service.dart';
+import '../controllers/progressController.dart';
+import '../helper/progressDialog.dart';
 
 class EmployeeSubmitChecklistRepository {
   final ApiService apiService;
+  // final ProgressController _controller;
 
-  EmployeeSubmitChecklistRepository({required this.apiService});
+  EmployeeSubmitChecklistRepository(
+      {required this.apiService});
 
   // Post checklist data using ApiService
   Future<void> postChecklistData(List<Map<String, dynamic>> data) async {
@@ -48,8 +52,7 @@ class EmployeeSubmitChecklistRepository {
   Future<bool> questionCancel({
     required int checklistAssignId,
     required int checklistMstItemId,
-  }) async
-  {
+  }) async {
     bool goBack = false;
 
     try {
@@ -72,7 +75,9 @@ class EmployeeSubmitChecklistRepository {
       if (response['statusCode'] == '200') {
         goBack = true;
         Get.snackbar('Success', 'Question cancelled successfully',
-            snackPosition: SnackPosition.BOTTOM,backgroundColor: Colors.black,colorText: Colors.white);
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.black,
+            colorText: Colors.white);
       } else {
         showSimpleDialog(
             title: 'Alert!',
@@ -86,21 +91,18 @@ class EmployeeSubmitChecklistRepository {
     return goBack;
   }
 
-
-
-  Future<bool> submitAllDilo({
+  Future<String> submitAllDilo({
     required int checklistAssignId,
     required int checklistMstItemId,
-  }) async
-  {
-    bool goBack = false;
+  }) async {
+    // _controller.showProgress();
 
     try {
       final pref = await SharedPreferences.getInstance();
       var empCode = pref.getString("userCode");
 
       var sendJson = {
-        'emp_checklist_assign_id':checklistAssignId,
+        'emp_checklist_assign_id': checklistAssignId,
         'employee_code': empCode,
       };
 
@@ -112,19 +114,15 @@ class EmployeeSubmitChecklistRepository {
       print('Response: $response');
 
       if (response['statusCode'] == '200') {
-        goBack = true;
         Get.snackbar('Success', response['message'],
             snackPosition: SnackPosition.BOTTOM);
       } else {
-        showSimpleDialog(
-            title: 'Alert!',
-            msg:
-                'Something went wrong\n${response['statusCode']}\nPlease contact IT support.');
+        showSimpleDialog(title: 'Alert!', msg: response['message']);
       }
+      return response['message'];
     } catch (e) {
       print(e);
+      return '';
     }
-
-    return goBack;
   }
 }

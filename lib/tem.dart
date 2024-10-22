@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/common/constants.dart';
+import 'package:hng_flutter/common/zoomable_image.dart';
 import 'package:hng_flutter/repository/employee_checklist_submit_repository.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -112,42 +113,41 @@ class _CheckListPageState extends State<CheckListPage> {
     setState(() {
       loading = false;
     });
-    if(context.mounted){
+    if (context.mounted) {
       Navigator.pop(context);
     }
   }
 
   void onBackPressed() async {
-
     showConfirmDialog(
         onConfirmed: () {
           Get.back();
           hitQuestionCancel();
-
         },
         title: 'Alert!',
         msg: 'Are you sure to want go back?');
   }
+
   Future<void> submitAllDilo() async {
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
 
     final EmployeeSubmitChecklistRepository checklistRepo =
-    EmployeeSubmitChecklistRepository(
-        apiService: apiService); // Initialize the repository
+        EmployeeSubmitChecklistRepository(
+            apiService: apiService); // Initialize the repository
 
-    setState(() {
+    /* setState(() {
       loading = true;
-    });
+    });*/
 
-    bool success = await checklistRepo.submitAllDilo(
+    var success = await checklistRepo.submitAllDilo(
       checklistAssignId: widget.activeCheckList.empChecklistAssignId,
       checklistMstItemId: widget.activeCheckList.checklisTId,
     );
 
-    setState(() {
-      loading = false;
-    });
-    if(context.mounted){
+    // setState(() {
+    //   loading = false;
+    // });
+    if (context.mounted) {
       Navigator.pop(context);
     }
   }
@@ -160,10 +160,9 @@ class _CheckListPageState extends State<CheckListPage> {
         // Trigger the question cancel method on back press
         // bool canGoBack = ;
 
-        if(isConsumed){
-        }else{
+        if (isConsumed) {
+        } else {
           onBackPressed();
-
         }
         // print('1');
         /*  if (canGoBack) {
@@ -264,16 +263,17 @@ class _CheckListPageState extends State<CheckListPage> {
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 10),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      // crossAxisAlignment:
+                                      //     CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          question
-                                              .questionText!, // Display question
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600),
-                                        ),
+                                        if (question.answerTypeId != 7)
+                                          Text(
+                                            question
+                                                .questionText!, // Display question
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600),
+                                          ),
                                         const SizedBox(height: 10),
                                         if (question.answerTypeId ==
                                             1) // Comment type question
@@ -446,6 +446,31 @@ class _CheckListPageState extends State<CheckListPage> {
                                               )),
                                         // if (question.answerTypeId == 3)
                                         //  ,
+
+                                        if (question.answerTypeId == 7)
+                                          Align(
+                                            alignment: Alignment.topLeft,
+                                            child: InkWell(
+                                              onTap:(){
+                                                Get.to(ZoomableImage(imageUrl: 'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}'));
+                                              },
+                                              child: SizedBox(
+                                                height: 200,
+                                                width: 150,
+                                                child: Card(
+                                                  color:Colors.orange,
+                                                  child: Image.network(
+                                                    'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}',
+                                                    height: 200,
+
+                                                    width: 150,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        else
+                                          const SizedBox.shrink()
                                       ],
                                     ),
                                   );
@@ -500,10 +525,6 @@ class _CheckListPageState extends State<CheckListPage> {
                   setState(() {
                     _currentPage = v; // Update the current page
                   });
-                  if (_currentPage == checkListItems.length - 1) {
-                    submitAllDilo();
-                    // Navigator.pop(context);
-                  }
                 },
               ),
       ),
@@ -660,7 +681,6 @@ class _CheckListPageState extends State<CheckListPage> {
       String imageName,
       String checkList_Answer_Option_Id_,
       String non_Compliance_Flag) async {
-
     final prefs = await SharedPreferences.getInstance();
 
     String dateForEmpCode_ =
@@ -713,30 +733,34 @@ class _CheckListPageState extends State<CheckListPage> {
       if (_question!.answerTypeId == 3 &&
           photoMandatoryFlag &&
           base64img_.isEmpty) {
-
         // If photo is mandatory and not provided, show alert
         showSimpleDialog(title: 'Alert!', msg: 'Please take photo');
       } else {
         // If photo is provided or not mandatory, proceed with posting data
         if (base64img_.isNotEmpty) {
-
           cloudstorageRef(base64img_, empCode, sendJson);
         } else {
           await checklistRepo.postChecklistData(sendJson);
 
           _pageController.nextPage(
-              duration: const Duration(milliseconds: 500), curve: Curves.linear);
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.linear);
         }
 
-        Get.snackbar(
+        /* Get.snackbar(
           'Alert!', 'Checklist posted successfully!',
           backgroundColor: Colors.black,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM, // Set gravity to bottom
-        );
+        );*/
+        showSimpleDialog(
+            title: 'Alert!', msg: 'Checklist posted successfully!');
         // Move to the next page
 
-
+        if (_currentPage == checkListItems.length - 1) {
+          submitAllDilo();
+          // Navigator.pop(context);
+        }
         print('Checklist posted successfully!');
       }
     } catch (e) {
@@ -799,8 +823,11 @@ class _CheckListPageState extends State<CheckListPage> {
         await checklistRepo.postChecklistData(sendJson);
         showSimpleDialog(
             title: 'Alert!', msg: 'Checklist posted successfully!');
-        _pageController.nextPage(
-            duration: const Duration(milliseconds: 500), curve: Curves.linear);
+        if (_currentPage != checkListItems.length - 1) {
+          _pageController.nextPage(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.linear);
+        }
       } catch (e) {
         showSimpleDialog(title: 'Alert!', msg: 'Failed to post checklist: $e');
       }
@@ -854,8 +881,6 @@ class _CheckListPageState extends State<CheckListPage> {
     }
     // }
   }
-
-
 }
 
 // Data Models

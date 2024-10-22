@@ -35,7 +35,7 @@ final ThemeData lightTheme = ThemeData(
     backgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
     surfaceTintColor: const Color.fromRGBO(237, 237, 237, 1.0),
     titleTextStyle: GoogleFonts.poppins(
-      color: Colors.black,
+      color: Colors.white,
       fontSize: 20.0,
       fontWeight: FontWeight.w500,
     ),
@@ -51,8 +51,9 @@ final ThemeData lightTheme = ThemeData(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16)
       ),
-      foregroundColor: Colors.blue, // Button text color
-      textStyle: const TextStyle(fontSize: 16), // Button text style
+      // foregroundColor: Colors.blue,
+      backgroundColor: Colors.blue,// Button text color
+      textStyle: const TextStyle(fontSize: 16,color: Colors.white), // Button text style
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
