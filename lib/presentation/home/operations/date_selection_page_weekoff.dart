@@ -12,8 +12,7 @@ import '../../../provider/week_off_provider.dart';
 class DateSelectionPageWeekOff extends ConsumerStatefulWidget {
   final EmployeeLeaveAplylist employeeCode;
 
-  const DateSelectionPageWeekOff(this.employeeCode, {Key? key})
-      : super(key: key);
+  const DateSelectionPageWeekOff(this.employeeCode, {super.key});
 
   @override
   ConsumerState<DateSelectionPageWeekOff> createState() =>
@@ -49,6 +48,10 @@ class _DateSelectionPageWeekOffState
       dates.add(date);
     }
     selectedValues = List.generate(dates.length, (index) => leaveOptions.first);
+    // Listen to the provider and handle disposal
+    /*ref.listen(employeeWeekOfDetailsProvider, (previous, next) {
+      // You can listen to changes and handle them here
+    });*/
   }
 
   String? selectedValue;
@@ -57,7 +60,6 @@ class _DateSelectionPageWeekOffState
   Widget build(BuildContext context) {
     final employeeWeekOffDetailsAsync =
         ref.watch(employeeWeekOfDetailsProvider);
-
 
     return Scaffold(
       appBar: AppBar(
@@ -203,7 +205,7 @@ class _DateSelectionPageWeekOffState
                                                   : false,
                                       onChanged: (bool? value) {
                                         // widget.employeeCode
-                                      /*  print(weekOffDetails.day);
+                                        /*  print(weekOffDetails.day);
                                         print(weekOffDetails.empCode);
                                         print(weekOffDetails.activeInd);*/
 
@@ -211,13 +213,14 @@ class _DateSelectionPageWeekOffState
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  CalendarPage(weekOffDetails,employeeWeekOffDetails)),
+                                                  CalendarPage(weekOffDetails,
+                                                      employeeWeekOffDetails),),
                                         );
 
-                                       /* checkDateAndUpdateInd(
+                                        /* checkDateAndUpdateInd(
                                             employeeWeekOffDetails,
                                             employeeWeekOffDetails[index]);*/
-                                      /*  setState(() {
+                                        /*  setState(() {
                                           if (daySelected_.contains(index)) {
                                             setState(() {
                                               daySelected_.remove(index);
@@ -279,7 +282,10 @@ class _DateSelectionPageWeekOffState
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Something went wrong: $erro',textAlign: TextAlign.center,),
+                    Text(
+                      'Something went wrong: $erro',
+                      textAlign: TextAlign.center,
+                    ),
                     ElevatedButton(
                       onPressed: () {
                         ref.refresh(weekOffProvider);
@@ -296,7 +302,8 @@ class _DateSelectionPageWeekOffState
   @override
   void dispose() {
     // TODO: implement dispose
-    ref.invalidate(employeeWeekOfDetailsProvider);
+
+    // ref.invalidate(employeeWeekOfDetailsProvider);
     super.dispose();
   }
 
@@ -306,7 +313,8 @@ class _DateSelectionPageWeekOffState
     List<EmployeeWeekoffDetails> temp = employeeWeekOffDetails;
 
     for (int i = 0; i < temp.length; i++) {
-      if (temp[i].date == employeeWeekOffDetail.date&&temp[i].activeInd=="Y") {
+      if (temp[i].date == employeeWeekOffDetail.date &&
+          temp[i].activeInd == "Y") {
         temp.removeAt(i);
         EmployeeWeekoffDetails tempDetais = EmployeeWeekoffDetails(
             empCode: employeeWeekOffDetail.empCode,
@@ -319,16 +327,14 @@ class _DateSelectionPageWeekOffState
       }
     }
 
-
-
     print("details");
 
     for (int j = 0; j < temp.length; j++) {
       final detaisl = temp[j];
-     print(detaisl.activeInd);
+      print(detaisl.activeInd);
     }
 
-     /* Navigator.pushReplacement(
+    /* Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>

@@ -17,7 +17,7 @@ import '../../../data/employee_leaveapply_list.dart';
 import '../../../provider/week_off_provider.dart';
 
 class WeekOffApplyPage extends ConsumerStatefulWidget {
-  const WeekOffApplyPage({Key? key}) : super(key: key);
+  const WeekOffApplyPage({super.key});
 
   @override
   ConsumerState<WeekOffApplyPage> createState() => _WeekOffApplyPageState();
@@ -44,6 +44,7 @@ class _WeekOffApplyPageState extends ConsumerState<WeekOffApplyPage> {
                 data: (snapshot) {
                   if (snapshot != null && snapshot.isNotEmpty) {
                     final employeeList = snapshot;
+                    print("Emp List snapshot:${snapshot.length}");
                     return CustomScrollView(
                       slivers: [
                         SliverAppBar(
@@ -96,7 +97,6 @@ class _WeekOffApplyPageState extends ConsumerState<WeekOffApplyPage> {
                           flexibleSpace: FlexibleSpaceBar(
                             background: Hero(
                               tag: 'weekoff',
-
                               child: Image.asset(
                                 'assets/weekoff_icon.png',
                                 color: Colors.white,
@@ -119,7 +119,6 @@ class _WeekOffApplyPageState extends ConsumerState<WeekOffApplyPage> {
                             padding: EdgeInsets.all(8.0),
                             child: Text(
                               'Employees list is empty',
-
                               style: TextStyle(
                                 fontSize: 16,
                               ),
@@ -138,12 +137,19 @@ class _WeekOffApplyPageState extends ConsumerState<WeekOffApplyPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                          Text(Constants.networkIssue,textAlign: TextAlign.center,style: Theme.of(context).textTheme.titleMedium,),
-                        const SizedBox(height: 8,),
-
-                        CustomElevatedButton(text: 'Retry', onPressed: (){                            ref.refresh(weekOffProvider);
-                        }),
-
+                        Text(
+                          Constants.networkIssue,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        CustomElevatedButton(
+                            text: 'Retry',
+                            onPressed: () {
+                              ref.refresh(weekOffProvider);
+                            }),
                       ],
                     ),
                   );
@@ -159,8 +165,7 @@ class _WeekOffApplyPageState extends ConsumerState<WeekOffApplyPage> {
       final prefs = await SharedPreferences.getInstance();
       var userID = prefs.getString('userCode') ?? '';
 
-      String url =
-          "${Constants.apiHttpsUrl}/Login/WeekoffEmployees/$userID";
+      String url = "${Constants.apiHttpsUrl}/Login/WeekoffEmployees/$userID";
 /*      String url =
           "${Constants.apiHttpsUrl}/Login/WeekoffEmployees/userID";*/
 
@@ -246,9 +251,9 @@ class _WeekOffApplyPageState extends ConsumerState<WeekOffApplyPage> {
     });
     final prefs = await SharedPreferences.getInstance();
 
-     var url = Uri.https(
-        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff',
+    var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff',
     );
 
     try {
@@ -332,7 +337,7 @@ class _WeekOffApplyPageState extends ConsumerState<WeekOffApplyPage> {
 
   @override
   void dispose() {
-    ref.invalidate(weekOffProvider);
+    // ref.invalidate(weekOffProvider);
     super.dispose();
   }
 }

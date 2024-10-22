@@ -4,20 +4,32 @@ import '../data/employee_leaveapply_list.dart';
 import '../data/opeartions/employee_weekoff_entity.dart';
 import '../data/opeartions/weekoff_entity.dart';
 import '../repository/week_off_respository.dart';
+//
+// final weekOffProvider =
+//     StreamProvider<List<EmployeeLeaveAplylist>?>((ref) async* {
+//   final repository = WeekOffRepository();
+//   try {
+//     List<EmployeeLeaveAplylist>? employeeList =
+//         await repository.getEmployeeList();
+//     yield employeeList;
+//   } catch (e) {
+//     print("Error:$e");
+//     yield* Stream.error(e);
+//   }
+// });
 
-final weekOffProvider =
-    StreamProvider<List<EmployeeLeaveAplylist>?>((ref) async* {
+final weekOffProvider = FutureProvider<List<EmployeeLeaveAplylist>?>((ref) async {
   final repository = WeekOffRepository();
   try {
     List<EmployeeLeaveAplylist>? employeeList =
-        await repository.getEmployeeList();
-    yield employeeList;
+    await repository.getEmployeeList();
+    return employeeList;
   } catch (e) {
-    print("Error:$e");
-    yield* Stream.error(e);
+    print("Error: $e");
+    // You can return null, empty list, or rethrow the error depending on your handling.
+    return [];
   }
 });
-
 /*
 class EmployeeCodeNotifier extends StateNotifier<String> {
   EmployeeCodeNotifier() : super("");
@@ -32,8 +44,6 @@ final employeeCodeProvider =
   return EmployeeCodeNotifier();
 });
 */
-
-
 
 final employeeCodeProvider = StateProvider<String>((ref) => "");
 

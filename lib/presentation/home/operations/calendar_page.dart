@@ -22,14 +22,13 @@ class CalendarPage extends ConsumerStatefulWidget {
 
   const CalendarPage(
       this.employeeWeekoffDetails, this.employeeWeekOffDetailsList,
-      {Key? key})
-      : super(key: key);
+      {super.key});
 
   @override
   ConsumerState<CalendarPage> createState() => _CalendarPageState();
 }
 
-TextEditingController leavetypeTextController = TextEditingController();
+TextEditingController leaveTypeTextController = TextEditingController();
 
 class _CalendarPageState extends ConsumerState<CalendarPage> {
   // final List<DateTime> _selectedDates = [];
@@ -41,10 +40,29 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     customColorsMap.clear();
 
     for (var item in list) {
-      DateTime date = DateTime.parse(item.date);
+      try {
+        String dateString = item.date;
+        List<String> dateParts = dateString.split('-');
 
-      // Add the date to the customColorsMap with red color
-      customColorsMap[date] = [Colors.red];
+        if (dateParts.length != 3) {
+          // Invalid date format
+          print("Invalid date format for: $dateString");
+          continue; // Skip this entry
+        }
+
+        int day = int.parse(dateParts[0]);
+        int month = int.parse(dateParts[1]);
+        int year = int.parse(dateParts[2]);
+
+        // Ensure the date is valid and handle invalid date cases
+        DateTime date = DateTime(year, month, day);
+
+        // Add the date to the customColorsMap with red color
+        customColorsMap[date] = [Colors.red];
+      } catch (e) {
+        // Handle any parsing or date errors
+        print("Error processing date for: ${item.date} - $e");
+      }
     }
   }
 
@@ -58,18 +76,22 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     print(widget.employeeWeekoffDetails.date);
+
+    String dateString = widget.employeeWeekoffDetails.date;
+    List<String> dateParts = dateString.split('-');
+    int year = int.parse(dateParts[0]);
+    int month = int.parse(dateParts[1]);
+    int day = int.parse(dateParts[2]);
+
     const CalendarFormat calendarFormat = CalendarFormat.month;
-    final DateTime _selectedDay = DateTime.now();
-    final DateTime focusedDay =
-        DateTime.parse(widget.employeeWeekoffDetails.date);
-    final DateTime firstDay =
-        DateTime.parse(widget.employeeWeekoffDetails.date);
+    final DateTime focusedDay = DateTime(year, month, day);
+    final DateTime firstDay = DateTime(year, month, day);
     final DateTime lastDay = firstDay.add(const Duration(days: 7));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${widget.employeeWeekoffDetails.empCode} ',
+          '${widget.employeeWeekoffDetails.empCode} - Apply leave',
           //${widget.employeeWeekoffDetails.}
           style: const TextStyle(fontSize: 16),
         ),
@@ -212,14 +234,14 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             date:
                 '${_selectedDates[0].date.day}-${_selectedDates[0].date.month}-${_selectedDates[0].date.year} ',
             day: widget.employeeWeekoffDetails.day,
-            leavetype: leavetypeTextController.text.toString(),
+            leavetype: leaveTypeTextController.text.toString(),
             activeInd: "Y"));
 
         var params = [];
         for (int i = 0; i < temp.length; i++) {
           final detais = temp[i];
           params.add({
-            "empCode": detais.empCode,
+            "empCode": widget.employeeWeekoffDetails.empCode,
             "date": detais.date, // Convert DateTime to String format
             "leaveType": detais.leavetype,
             "activeInd": detais.activeInd,
@@ -250,9 +272,9 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     setState(() {
       showProgress = true;
     });
-     var url = Uri.https(
-        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff',
+    var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff',
     );
 
     try {
@@ -288,13 +310,13 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         print(response.statusCode);
       } else {
         setState(() {
-          showProgress = true;
+          showProgress = false;
         });
         print(response.statusCode);
       }
     } catch (e) {
       setState(() {
-        showProgress = true;
+        showProgress = false;
       });
       print(e);
       rethrow;

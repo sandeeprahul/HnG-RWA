@@ -17,7 +17,7 @@ class WeekOffRepository {
           "${Constants.apiHttpsUrl}/Login/WeekoffEmployees/$userID";
 
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
       print(url);
 
       var responseData = json.decode(response.body);
@@ -27,15 +27,15 @@ class WeekOffRepository {
       Map<String, dynamic> map = json.decode(response.body);
       final statusCode = map['statusCode'];
       if (statusCode == "200") {
-        List<dynamic> data = map['employeelist'];
+        final List<dynamic> data = map['employeelist'] ?? [];
 
         List<EmployeeLeaveAplylist> employeeDetailsTemp = [];
 
-        data.forEach((element) {
+        for (var element in data) {
           employeeDetailsTemp.add(EmployeeLeaveAplylist.fromJson(element));
-        });
+        }
 
-        return employeeDetailsTemp;
+        return data.map((element) => EmployeeLeaveAplylist.fromJson(element)).toList();
       } else {
         // Return null or an empty list based on your requirement
         return [];
@@ -46,6 +46,7 @@ class WeekOffRepository {
       rethrow;
     }
   }
+
 
   Future<void> applyWeekOff( String empCode, List<dynamic> params) async {
 

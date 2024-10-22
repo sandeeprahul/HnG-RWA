@@ -35,7 +35,7 @@ final ThemeData lightTheme = ThemeData(
     backgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
     surfaceTintColor: const Color.fromRGBO(237, 237, 237, 1.0),
     titleTextStyle: GoogleFonts.poppins(
-      color: Colors.white,
+      color: Colors.black,
       fontSize: 20.0,
       fontWeight: FontWeight.w500,
     ),

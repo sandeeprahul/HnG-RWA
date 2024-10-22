@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api_service.dart';
 import '../controllers/progressController.dart';
+import '../helper/apiResponse.dart';
 import '../helper/progressDialog.dart';
 
 class EmployeeSubmitChecklistRepository {
@@ -18,20 +19,24 @@ class EmployeeSubmitChecklistRepository {
       {required this.apiService});
 
   // Post checklist data using ApiService
-  Future<void> postChecklistData(List<Map<String, dynamic>> data) async {
+  Future<ApiResponse> postChecklistData(List<Map<String, dynamic>> data) async {
     try {
       final response = await apiService.postData(
         endpoint: "/Employee/AddQuestionAnswer",
         data: data,
       );
       Get.back(); // Close the progress dialog
+      final message = response['message'] ?? 'Success';
+      final statusCode = response['statusCode'] ?? "200"; // Defaulting to 200 if not present
 
       print('Checklist posted successfully: $response');
+      return ApiResponse(message: message, statusCode: statusCode);
+
     } catch (e) {
       Get.back(); // Close the progress dialog
 
       print('Error posting checklist: $e');
-      rethrow;
+      throw Exception("Failed to post checklist: $e");
     }
   }
 

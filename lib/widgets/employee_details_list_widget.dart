@@ -7,32 +7,33 @@ import '../presentation/home/operations/calendar_page.dart';
 import '../presentation/home/operations/date_selection_page_weekoff.dart';
 import '../provider/week_off_provider.dart';
 
-
 class EmployeeDetailsListWidget extends ConsumerStatefulWidget {
   final EmployeeLeaveAplylist employeeDetails;
   final int sno;
 
-  const EmployeeDetailsListWidget(this.employeeDetails, this.sno, {Key? key}) : super(key: key);
+  const EmployeeDetailsListWidget(this.employeeDetails, this.sno, {super.key});
 
   @override
-  ConsumerState<EmployeeDetailsListWidget> createState() => _EmployeeDetailsListWidgetState();
+  ConsumerState<EmployeeDetailsListWidget> createState() =>
+      _EmployeeDetailsListWidgetState();
 }
 
-class _EmployeeDetailsListWidgetState extends ConsumerState<EmployeeDetailsListWidget> {
-
+class _EmployeeDetailsListWidgetState
+    extends ConsumerState<EmployeeDetailsListWidget> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        ref.read(employeeCodeProvider.notifier).state  = widget.employeeDetails.empCode;
+        ref.read(employeeCodeProvider.notifier).state =
+            widget.employeeDetails.empCode;
 
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => DateSelectionPageWeekOff(widget.employeeDetails,)),
+              builder: (context) => DateSelectionPageWeekOff(
+                    widget.employeeDetails,
+                  )),
         );
-
-
       },
       child: Container(
         // height: 50,
@@ -46,11 +47,11 @@ class _EmployeeDetailsListWidgetState extends ConsumerState<EmployeeDetailsListW
               child: Text(widget.employeeDetails.empName.getInitials()),
             ),
             Expanded(
-                child:
-                Text(widget.employeeDetails.empName, textAlign: TextAlign.center)),
+                child: Text(widget.employeeDetails.empName,
+                    textAlign: TextAlign.center)),
             Expanded(
-                child:
-                Text(widget.employeeDetails.empCode, textAlign: TextAlign.center)),
+                child: Text(widget.employeeDetails.empCode,
+                    textAlign: TextAlign.center)),
             Expanded(
                 child: Text(widget.employeeDetails.scheduledDay,
                     textAlign: TextAlign.center)),
@@ -60,7 +61,6 @@ class _EmployeeDetailsListWidgetState extends ConsumerState<EmployeeDetailsListW
     );
   }
 }
-
 
 /*class EmployeeDetailsListWidget extends StatelessWidget {
 

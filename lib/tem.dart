@@ -263,8 +263,8 @@ class _CheckListPageState extends State<CheckListPage> {
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 10),
                                     child: Column(
-                                      // crossAxisAlignment:
-                                      //     CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         if (question.answerTypeId != 7)
                                           Text(
@@ -451,18 +451,19 @@ class _CheckListPageState extends State<CheckListPage> {
                                           Align(
                                             alignment: Alignment.topLeft,
                                             child: InkWell(
-                                              onTap:(){
-                                                Get.to(ZoomableImage(imageUrl: 'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}'));
+                                              onTap: () {
+                                                Get.to(ZoomableImage(
+                                                    imageUrl:
+                                                        'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}'));
                                               },
                                               child: SizedBox(
                                                 height: 200,
                                                 width: 150,
                                                 child: Card(
-                                                  color:Colors.orange,
+                                                  color: Colors.orange,
                                                   child: Image.network(
                                                     'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}',
                                                     height: 200,
-
                                                     width: 150,
                                                   ),
                                                 ),
@@ -740,11 +741,19 @@ class _CheckListPageState extends State<CheckListPage> {
         if (base64img_.isNotEmpty) {
           cloudstorageRef(base64img_, empCode, sendJson);
         } else {
-          await checklistRepo.postChecklistData(sendJson);
+          final apiResponse = await checklistRepo.postChecklistData(sendJson);
 
-          _pageController.nextPage(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.linear);
+          if (apiResponse.statusCode == "200") {
+            _pageController.nextPage(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.linear);
+            showSimpleDialog(
+                title: 'Alert!', msg: 'Checklist posted successfully!');
+          } else {
+            showSimpleDialog(
+                title: 'Alert!',
+                msg: '${apiResponse.message}\n${apiResponse.statusCode}');
+          }
         }
 
         /* Get.snackbar(
@@ -753,8 +762,7 @@ class _CheckListPageState extends State<CheckListPage> {
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM, // Set gravity to bottom
         );*/
-        showSimpleDialog(
-            title: 'Alert!', msg: 'Checklist posted successfully!');
+
         // Move to the next page
 
         if (_currentPage == checkListItems.length - 1) {
@@ -820,13 +828,19 @@ class _CheckListPageState extends State<CheckListPage> {
       EmployeeSubmitChecklistRepository checklistRepo =
           EmployeeSubmitChecklistRepository(apiService: apiService);
       try {
-        await checklistRepo.postChecklistData(sendJson);
-        showSimpleDialog(
-            title: 'Alert!', msg: 'Checklist posted successfully!');
-        if (_currentPage != checkListItems.length - 1) {
-          _pageController.nextPage(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.linear);
+        final response = await checklistRepo.postChecklistData(sendJson);
+        if (response.statusCode == "200") {
+          showSimpleDialog(title: 'Alert!', msg: response.message);
+          if (_currentPage != checkListItems.length - 1) {
+            _pageController.nextPage(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.linear);
+          }
+          else{
+            Navigator.pop(context);
+          }
+        } else {
+          showSimpleDialog(title: 'Alert!', msg: response.message);
         }
       } catch (e) {
         showSimpleDialog(title: 'Alert!', msg: 'Failed to post checklist: $e');
