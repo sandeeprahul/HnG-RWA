@@ -44,7 +44,7 @@ class CheckListPage extends StatefulWidget {
 }
 
 class _CheckListPageState extends State<CheckListPage> {
-  final PageController _pageController = PageController();
+  // final PageController _pageController = PageController();
   List<CheckListItem> checkListItems = [];
   bool isLoading = true;
 
@@ -53,11 +53,15 @@ class _CheckListPageState extends State<CheckListPage> {
   var dropDownOptionAnswerID = '';
   var non_Compliance_Flag = '';
   bool photoMandatoryFlag = false;
-  int _currentPage = 0; // To track the current page
 
   @override
   void initState() {
     super.initState();
+
+   /* WidgetsBinding.instance.addPostFrameCallback((_) {
+      double currentPage = _pageController.page ?? 0;
+      print("Current page: $currentPage");
+    });*/
     loadCheckListData(); // Fetch data from the API
   }
 
@@ -66,6 +70,10 @@ class _CheckListPageState extends State<CheckListPage> {
   // Fetch checklist data from API
   Future<void> loadCheckListData() async {
     try {
+      setState(() {
+        isLoading = true;
+
+      });
       // Replace this with your API endpoint
       final pref = await SharedPreferences.getInstance();
       var empCode = pref.getString("userCode");
@@ -93,13 +101,11 @@ class _CheckListPageState extends State<CheckListPage> {
 
   @override
   void dispose() {
-    _pageController.dispose();
     camController?.dispose();
 
     super.dispose();
   }
 
-  bool loading = false;
 
   Future<void> hitQuestionCancel() async {
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
@@ -109,7 +115,7 @@ class _CheckListPageState extends State<CheckListPage> {
             apiService: apiService); // Initialize the repository
 
     setState(() {
-      loading = true;
+      isLoading = true;
     });
 
     bool success = await checklistRepo.questionCancel(
@@ -118,11 +124,17 @@ class _CheckListPageState extends State<CheckListPage> {
     );
 
     setState(() {
-      loading = false;
+      isLoading = false;
     });
-    if (context.mounted) {
-      Navigator.pop(context);
-    }
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => checkListScreen_lpd(
+            1,
+            widget.mGetActivityTypes,
+            widget.locationsList,
+          ),
+        ));
   }
 
   void onBackPressed() async {
@@ -136,6 +148,7 @@ class _CheckListPageState extends State<CheckListPage> {
   }
 
   Future<void> submitAllDilo() async {
+
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
 
     final EmployeeSubmitChecklistRepository checklistRepo =
@@ -168,6 +181,40 @@ class _CheckListPageState extends State<CheckListPage> {
         ));
   }
 
+  void _goToNextCheckListItem() {
+    setState(() {
+      if (_currentIndex < checkListItems.length - 1) {
+        _currentIndex++;
+      } else {
+        submitAllDilo();
+
+        print("All checklist items completed.");
+      }
+    });
+  }
+
+  void _goBackToCheckListItem() {
+    if(_currentIndex==0){
+      hitQuestionCancel();
+      print("CheckList SUBMIT Cancel in if.");
+
+    }else{
+      setState(() {
+        if (_currentIndex < checkListItems.length - 1) {
+
+          _currentIndex--;
+        } else {
+          // submitAllDilo();
+          hitQuestionCancel();
+
+          print("CheckList SUBMIT Cancel.");
+        }
+      });
+    }
+
+  }
+  int _currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -188,324 +235,281 @@ class _CheckListPageState extends State<CheckListPage> {
         }*/
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Employee DILO',
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
-        body:Obx((){
-            if (progressController.isLoading.value){
-              return const Center(
-                child: CircularProgressIndicator(), // Display progress indicator
-              );
-            }
-            return  PageView.builder(
-              controller: _pageController,
-              // physics: const NeverScrollableScrollPhysics(),
-              itemCount: checkListItems.length,
-              // Number of checklist items (pages)
 
-              itemBuilder: (context, index) {
-                var checkListItem =
-                checkListItems[index]; // Get the current checklist item
-                return camVisible
-                    ? Visibility(
-                  visible: camController == null ? false : camVisible,
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: Stack(
-                      children: [
-                        SizedBox(
-                          height: double.infinity,
-                          width: double.infinity,
-                          child: camController == null
-                              ? const CircularProgressIndicator()
-                              : CameraPreview(camController!),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: InkWell(
-                            onTap: () async {
-                              try {
-                                final image =
-                                await camController!.takePicture();
-                                setState(() {
-                                  imagePath = image.path;
-                                  camVisible = false;
-                                });
-                                _cropImage(image.path);
-                              } catch (e) {
-                                print(e);
-                              }
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(15.0),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 35,
-                                child: Icon(Icons.camera),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+        body:SafeArea(
+          child: isLoading?   const Center(
+            child: CircularProgressIndicator(), // Display progress indicator
+              ):  camVisible
+              ? Visibility(
+            visible: camController == null ? false : camVisible,
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: Stack(
+                children: [
+                  SizedBox(
+                    height: double.infinity,
+                    width: double.infinity,
+                    child: camController == null
+                        ? const CircularProgressIndicator()
+                        : CameraPreview(camController!),
                   ),
-                )
-                    : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(
-                        checkListItem
-                            .itemName!, // Display the checklist item name
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: InkWell(
+                      onTap: () async {
+                        try {
+                          final image =
+                          await camController!.takePicture();
+                          setState(() {
+                            imagePath = image.path;
+                            camVisible = false;
+                          });
+                          _cropImage(image.path);
+                        } catch (e) {
+                          print(e);
+                        }
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 35,
+                          child: Icon(Icons.camera),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: checkListItem.questions!.length,
-                        // Number of questions for this checklist item
-                        itemBuilder: (context, questionIndex) {
-                          var question =
-                          checkListItem.questions![questionIndex];
-                          _question =
-                          checkListItem.questions![questionIndex];
+                  ),
+                ],
+              ),
+            ),
+          )
+              :Obx((){
+              if (progressController.isLoading.value){
+                return const Center(
+                  child: CircularProgressIndicator(), // Display progress indicator
+                );
+              }
+              var checkListItem = checkListItems[_currentIndex]; // Get the current checklist item
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 10),
-                            child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                if (question.answerTypeId != 7)
-                                  Text(
-                                    question
-                                        .questionText!, // Display question
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                const SizedBox(height: 10),
-                                if (question.answerTypeId ==
-                                    1) // Comment type question
-                                  TextField(
-                                    decoration: InputDecoration(
-                                      hintText: question.questionText,
-                                      border:
-                                      const OutlineInputBorder(),
-                                    ),
-                                    onChanged: (value) {
-                                      // Handle comment input
-                                      question.answer = value;
-                                    },
-                                  ),
-                                if (question.answerTypeId ==
-                                    4) // Dropdown question
-                                  Container(
-                                    padding: const EdgeInsets.all(8.0),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.grey),
-                                        borderRadius:
-                                        BorderRadius.circular(8.0)),
-                                    child: DropdownButton<String>(
-                                      underline: const SizedBox(),
-                                      isExpanded: true,
-                                      icon: const Icon(Icons
-                                          .keyboard_arrow_down_outlined),
-                                      value: question.selectedOption,
-                                      hint: const Text(
-                                          'Select an option'),
-                                      items: question.options!
-                                          .map((option) =>
-                                          DropdownMenuItem<String>(
-                                            value:
-                                            option.answerOption,
-                                            child: Text(option
-                                                .answerOption ??
-                                                ''),
-                                          ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          question.selectedOption =
-                                              value;
-                                          dropDownOptionAnswer =
-                                          value!; // Store selected answer
+              return Stack(
+                children: [
+                  ListView(
+                    padding: const EdgeInsets.all(10.0),
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(onPressed: (){
+                            _goBackToCheckListItem();
+                          }, icon: const Icon(Icons.arrow_back)),
+                          const Text('Employee Dilo',  style: TextStyle(
+            fontSize: 18, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                     Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Display checklist item name
+                          const SizedBox(height: 20),
 
-                                          // Find the selected option based on the answerOption
-                                          Option selectedOption = question
-                                              .options!
-                                              .firstWhere((option) =>
-                                          option.answerOption ==
-                                              value);
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            child: Text(
+                              checkListItem.itemName!,
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
 
-                                          // Now store the corresponding answerOptionId
-                                          dropDownOptionAnswerID =
-                                          "${selectedOption.checkListAnswerOptionId}";
+                          // Display questions within this checklist item
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: checkListItem.questions!.length,
+                            itemBuilder: (context, questionIndex) {
+                              var question = checkListItem.questions![questionIndex];
+                              _question = checkListItem.questions![questionIndex];
 
-                                          non_Compliance_Flag =
-                                          "${selectedOption.nonComplianceFlag}";
-                                        });
-                                        print(dropDownOptionAnswerID);
-                                      },
-                                    ),
-                                    /*DropdownButton<String>(
-                                  underline: const SizedBox(),
-                                  isExpanded: true,
-                                  icon: const Icon(Icons
-                                      .keyboard_arrow_down_outlined),
-                                  value: question.selectedOption,
-                                  hint:
-                                  const Text('Select an option'),
-                                  items: question.options!
-                                      .map((option) =>
-                                      DropdownMenuItem<String>(
-                                        value:
-                                        option.answerOption,
-                                        child: Text(
-                                            option.answerOption!),
-                                      ))
-                                      .toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      question.selectedOption =
-                                          value;
-                                      dropDownOptionAnswer =
-                                      value!; // Store selected answer
-                                      dropDownOptionAnswerID = question.selectedOption!;
-                                    });
-                                  },
-                                )*/
-                                  ),
-                                // Handle custom widget for answerTypeId == 3
-                                if (question.answerTypeId == 3)
-                                  Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      // Padding for the new widget
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            top: 5, bottom: 5),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'ATTACH PROOF',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight:
-                                                  FontWeight.bold),
-                                            ),
-                                            Container(
-                                              margin:
-                                              const EdgeInsets.only(
-                                                  bottom: 10,
-                                                  top: 10),
-                                              width: double.infinity,
-                                              padding:
-                                              const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10),
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                  const BorderRadius
-                                                      .all(Radius
-                                                      .circular(
-                                                      5)),
-                                                  border: Border.all(
-                                                      color:
-                                                      Colors.grey)),
-                                              child: Row(
-                                                children: [
-                                                  InkWell(
-                                                    child: Container(
-                                                        margin: const EdgeInsets
-                                                            .only(
-                                                            bottom: 10,
-                                                            top: 10),
-                                                        padding:
-                                                        const EdgeInsets
-                                                            .all(
-                                                            10),
-                                                        decoration: BoxDecoration(
-                                                            borderRadius:
-                                                            const BorderRadius.all(Radius.circular(
-                                                                5)),
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .grey)),
-                                                        child:
-                                                        _body() /*imageList.isEmpty
-                                                ? _body()
-                                                : imageList.isEmpty
-                                                    ? _body()
-                                                    :*/
-                                                    ),
-                                                    onTap: () {
-                                                      setState(() {
-                                                        cameraOpen = 0;
-                                                      });
-                                                      getPhoto();
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Text for non-image questions
+                                    if (question.answerTypeId != 7)
+                                      Text(
+                                        question.questionText!,
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    const SizedBox(height: 10),
+
+                                    // Comment type question
+                                    if (question.answerTypeId == 1)
+                                      TextField(
+                                        decoration: InputDecoration(
+                                          hintText: question.questionText,
+                                          border: const OutlineInputBorder(),
                                         ),
-                                      )),
-                                // if (question.answerTypeId == 3)
-                                //  ,
+                                        onChanged: (value) {
+                                          question.answer = value;
+                                        },
+                                      ),
 
-                                if (question.answerTypeId == 7)
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: InkWell(
-                                      onTap: () {
-                                        Get.to(ZoomableImage(
-                                            imageUrl:
-                                            'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}'));
-                                      },
-                                      child: SizedBox(
-                                        height:  MediaQuery.of(context).size.height,
-                                        width: MediaQuery.of(context).size.width,
-                                        child: Card(
-                                          color: Colors.orange,
-                                          child: Image.network(
-                                            'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}',
-                                            height: 200,
-                                            width: 150,
+                                    // Dropdown question
+                                    if (question.answerTypeId == 4)
+                                      Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.grey),
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        child: DropdownButton<String>(
+                                          underline: const SizedBox(),
+                                          isExpanded: true,
+                                          icon: const Icon(
+                                              Icons.keyboard_arrow_down_outlined),
+                                          value: question.selectedOption,
+                                          hint: const Text('Select an option'),
+                                          items: question.options!
+                                              .map((option) =>
+                                              DropdownMenuItem<String>(
+                                                value: option.answerOption,
+                                                child: Text(
+                                                    option.answerOption ?? ''),
+                                              ))
+                                              .toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              question.selectedOption = value;
+                                              dropDownOptionAnswer = value!;
+
+                                              // Find the selected option based on the answerOption
+                                              Option selectedOption = question
+                                                  .options!
+                                                  .firstWhere((option) =>
+                                              option.answerOption == value);
+
+                                              dropDownOptionAnswerID =
+                                              "${selectedOption.checkListAnswerOptionId}";
+                                              non_Compliance_Flag =
+                                              "${selectedOption.nonComplianceFlag}";
+                                            });
+                                          },
+                                        ),
+                                      ),
+
+                                    // Custom widget for answerTypeId == 3 (Attach proof)
+                                    if (question.answerTypeId == 3)
+                                      Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Container(
+                                          margin: const EdgeInsets.only(top: 5, bottom: 5),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                'ATTACH PROOF',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 10, top: 10),
+                                                width: double.infinity,
+                                                padding: const EdgeInsets.only(
+                                                    left: 10, right: 10),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(5)),
+                                                    border: Border.all(
+                                                        color: Colors.grey)),
+                                                child: Row(
+                                                  children: [
+                                                    InkWell(
+                                                      child: Container(
+                                                        margin: const EdgeInsets.only(
+                                                            bottom: 10, top: 10),
+                                                        padding:
+                                                        const EdgeInsets.all(10),
+                                                        decoration: BoxDecoration(
+                                                          borderRadius:
+                                                          const BorderRadius.all(
+                                                              Radius.circular(5)),
+                                                          border: Border.all(
+                                                              color: Colors.grey),
+                                                        ),
+                                                        child: _body(),
+                                                      ),
+                                                      onTap: () {
+                                                        setState(() {
+                                                          cameraOpen = 0;
+                                                        });
+                                                        getPhoto();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                else
-                                  const SizedBox.shrink()
-                              ],
-                            ),
-                          );
-                        },
+
+                                    if (question.answerTypeId == 7)
+                                                          Align(
+                                                            alignment: Alignment.center,
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                Get.to(ZoomableImage(
+                                                                    imageUrl:
+                                                                    'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}'));
+                                                              },
+                                                              child: SizedBox(
+                                                                height:  MediaQuery.of(context).size.height,
+                                                                width: MediaQuery.of(context).size.width,
+                                                                child: Card(
+                                                                  color: Colors.orange,
+                                                                  child: Image.network(
+                                                                    'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}',
+                                                                    height: 200,
+                                                                    width: 150,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        else
+                                                          const SizedBox.shrink()
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+
+                          // Submit button
+                          // SizedBox(height: MediaQuery.of(context).size.height*0.4,),
+                          // Spacer(),
+
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    InkWell(
+
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: InkWell(
                       onTap: () {
                         _submitCheckListItem(checkListItem);
                       },
                       child: Container(
                         height: 50,
                         margin: EdgeInsets.zero,
-                        // Remove margins
-
                         decoration: const BoxDecoration(
                           color: Colors.blue,
                         ),
@@ -513,40 +517,360 @@ class _CheckListPageState extends State<CheckListPage> {
                         child: const Center(
                             child: Text('Submit',
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18))),
+                                    color: Colors.white, fontSize: 18))),
                       ),
                     ),
-                  ],
-                );
-              },
-              onPageChanged: (v) {
-                for (int v = 0; v < checkListItems.length; v++) {
-                  bool hasMandatoryOption = checkListItems[v]
-                      .questions![0]
-                      .options!
-                      .any((option) => option.option_mandatory_Flag == "1");
-
-                  if (hasMandatoryOption) {
-                    print(
-                        "Checklist item ${checkListItems[v].checkListItemId} has at least one mandatory option.");
-                    setState(() {
-                      photoMandatoryFlag = true;
-                    });
-                  } else {
-                    setState(() {
-                      photoMandatoryFlag = false;
-                    });
-                    print(
-                        "Checklist item ${checkListItems[v].checkListItemId} has no mandatory options.");
-                  }
-                } // print(checkListItems[v].questions[0].options.contains(element));
-                setState(() {
-                  _currentPage = v; // Update the current page
-                });
-              },
-            );
-        }),
+                  ),
+                ],
+              );
+              // return  PageView.builder(
+              //   controller: _pageController,
+              //   // physics: const NeverScrollableScrollPhysics(),
+              //   itemCount: checkListItems.length,
+              //   // Number of checklist items (pages)
+              //
+              //   itemBuilder: (context, index) {
+              //     var checkListItem =
+              //     checkListItems[index]; // Get the current checklist item
+              //     return camVisible
+              //         ? Visibility(
+              //       visible: camController == null ? false : camVisible,
+              //       child: SizedBox(
+              //         height: MediaQuery.of(context).size.height,
+              //         width: MediaQuery.of(context).size.width,
+              //         child: Stack(
+              //           children: [
+              //             SizedBox(
+              //               height: double.infinity,
+              //               width: double.infinity,
+              //               child: camController == null
+              //                   ? const CircularProgressIndicator()
+              //                   : CameraPreview(camController!),
+              //             ),
+              //             Align(
+              //               alignment: Alignment.bottomCenter,
+              //               child: InkWell(
+              //                 onTap: () async {
+              //                   try {
+              //                     final image =
+              //                     await camController!.takePicture();
+              //                     setState(() {
+              //                       imagePath = image.path;
+              //                       camVisible = false;
+              //                     });
+              //                     _cropImage(image.path);
+              //                   } catch (e) {
+              //                     print(e);
+              //                   }
+              //                 },
+              //                 child: const Padding(
+              //                   padding: EdgeInsets.all(15.0),
+              //                   child: CircleAvatar(
+              //                     backgroundColor: Colors.white,
+              //                     radius: 35,
+              //                     child: Icon(Icons.camera),
+              //                   ),
+              //                 ),
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     )
+              //         : Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: [
+              //         Padding(
+              //           padding: const EdgeInsets.all(10.0),
+              //           child: Text(
+              //             checkListItem
+              //                 .itemName!, // Display the checklist item name
+              //             style: const TextStyle(
+              //                 fontSize: 18, fontWeight: FontWeight.bold),
+              //           ),
+              //         ),
+              //         const SizedBox(height: 20),
+              //         Expanded(
+              //           child: ListView.builder(
+              //             itemCount: checkListItem.questions!.length,
+              //             // Number of questions for this checklist item
+              //             itemBuilder: (context, questionIndex) {
+              //               var question =
+              //               checkListItem.questions![questionIndex];
+              //               _question =
+              //               checkListItem.questions![questionIndex];
+              //
+              //               return Padding(
+              //                 padding: const EdgeInsets.symmetric(
+              //                     vertical: 10, horizontal: 10),
+              //                 child: Column(
+              //                   crossAxisAlignment:
+              //                   CrossAxisAlignment.start,
+              //                   children: [
+              //                     if (question.answerTypeId != 7)
+              //                       Text(
+              //                         question
+              //                             .questionText!, // Display question
+              //                         style: const TextStyle(
+              //                             fontSize: 16,
+              //                             fontWeight: FontWeight.w600),
+              //                       ),
+              //                     const SizedBox(height: 10),
+              //                     if (question.answerTypeId ==
+              //                         1) // Comment type question
+              //                       TextField(
+              //                         decoration: InputDecoration(
+              //                           hintText: question.questionText,
+              //                           border:
+              //                           const OutlineInputBorder(),
+              //                         ),
+              //                         onChanged: (value) {
+              //                           // Handle comment input
+              //                           question.answer = value;
+              //                         },
+              //                       ),
+              //                     if (question.answerTypeId ==
+              //                         4) // Dropdown question
+              //                       Container(
+              //                         padding: const EdgeInsets.all(8.0),
+              //                         decoration: BoxDecoration(
+              //                             border: Border.all(
+              //                                 color: Colors.grey),
+              //                             borderRadius:
+              //                             BorderRadius.circular(8.0)),
+              //                         child: DropdownButton<String>(
+              //                           underline: const SizedBox(),
+              //                           isExpanded: true,
+              //                           icon: const Icon(Icons
+              //                               .keyboard_arrow_down_outlined),
+              //                           value: question.selectedOption,
+              //                           hint: const Text(
+              //                               'Select an option'),
+              //                           items: question.options!
+              //                               .map((option) =>
+              //                               DropdownMenuItem<String>(
+              //                                 value:
+              //                                 option.answerOption,
+              //                                 child: Text(option
+              //                                     .answerOption ??
+              //                                     ''),
+              //                               ))
+              //                               .toList(),
+              //                           onChanged: (value) {
+              //                             setState(() {
+              //                               question.selectedOption =
+              //                                   value;
+              //                               dropDownOptionAnswer =
+              //                               value!; // Store selected answer
+              //
+              //                               // Find the selected option based on the answerOption
+              //                               Option selectedOption = question
+              //                                   .options!
+              //                                   .firstWhere((option) =>
+              //                               option.answerOption ==
+              //                                   value);
+              //
+              //                               // Now store the corresponding answerOptionId
+              //                               dropDownOptionAnswerID =
+              //                               "${selectedOption.checkListAnswerOptionId}";
+              //
+              //                               non_Compliance_Flag =
+              //                               "${selectedOption.nonComplianceFlag}";
+              //                             });
+              //                             print(dropDownOptionAnswerID);
+              //                           },
+              //                         ),
+              //                         /*DropdownButton<String>(
+              //                       underline: const SizedBox(),
+              //                       isExpanded: true,
+              //                       icon: const Icon(Icons
+              //                           .keyboard_arrow_down_outlined),
+              //                       value: question.selectedOption,
+              //                       hint:
+              //                       const Text('Select an option'),
+              //                       items: question.options!
+              //                           .map((option) =>
+              //                           DropdownMenuItem<String>(
+              //                             value:
+              //                             option.answerOption,
+              //                             child: Text(
+              //                                 option.answerOption!),
+              //                           ))
+              //                           .toList(),
+              //                       onChanged: (value) {
+              //                         setState(() {
+              //                           question.selectedOption =
+              //                               value;
+              //                           dropDownOptionAnswer =
+              //                           value!; // Store selected answer
+              //                           dropDownOptionAnswerID = question.selectedOption!;
+              //                         });
+              //                       },
+              //                     )*/
+              //                       ),
+              //                     // Handle custom widget for answerTypeId == 3
+              //                     if (question.answerTypeId == 3)
+              //                       Padding(
+              //                           padding: const EdgeInsets.all(10),
+              //                           // Padding for the new widget
+              //                           child: Container(
+              //                             margin: const EdgeInsets.only(
+              //                                 top: 5, bottom: 5),
+              //                             child: Column(
+              //                               crossAxisAlignment:
+              //                               CrossAxisAlignment.start,
+              //                               children: [
+              //                                 const Text(
+              //                                   'ATTACH PROOF',
+              //                                   style: TextStyle(
+              //                                       fontSize: 16,
+              //                                       fontWeight:
+              //                                       FontWeight.bold),
+              //                                 ),
+              //                                 Container(
+              //                                   margin:
+              //                                   const EdgeInsets.only(
+              //                                       bottom: 10,
+              //                                       top: 10),
+              //                                   width: double.infinity,
+              //                                   padding:
+              //                                   const EdgeInsets.only(
+              //                                       left: 10,
+              //                                       right: 10),
+              //                                   decoration: BoxDecoration(
+              //                                       borderRadius:
+              //                                       const BorderRadius
+              //                                           .all(Radius
+              //                                           .circular(
+              //                                           5)),
+              //                                       border: Border.all(
+              //                                           color:
+              //                                           Colors.grey)),
+              //                                   child: Row(
+              //                                     children: [
+              //                                       InkWell(
+              //                                         child: Container(
+              //                                             margin: const EdgeInsets
+              //                                                 .only(
+              //                                                 bottom: 10,
+              //                                                 top: 10),
+              //                                             padding:
+              //                                             const EdgeInsets
+              //                                                 .all(
+              //                                                 10),
+              //                                             decoration: BoxDecoration(
+              //                                                 borderRadius:
+              //                                                 const BorderRadius.all(Radius.circular(
+              //                                                     5)),
+              //                                                 border: Border.all(
+              //                                                     color: Colors
+              //                                                         .grey)),
+              //                                             child:
+              //                                             _body() /*imageList.isEmpty
+              //                                     ? _body()
+              //                                     : imageList.isEmpty
+              //                                         ? _body()
+              //                                         :*/
+              //                                         ),
+              //                                         onTap: () {
+              //                                           setState(() {
+              //                                             cameraOpen = 0;
+              //                                           });
+              //                                           getPhoto();
+              //                                         },
+              //                                       ),
+              //                                     ],
+              //                                   ),
+              //                                 ),
+              //                               ],
+              //                             ),
+              //                           )),
+              //                     // if (question.answerTypeId == 3)
+              //                     //  ,
+              //
+              //                     if (question.answerTypeId == 7)
+              //                       Align(
+              //                         alignment: Alignment.center,
+              //                         child: InkWell(
+              //                           onTap: () {
+              //                             Get.to(ZoomableImage(
+              //                                 imageUrl:
+              //                                 'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}'));
+              //                           },
+              //                           child: SizedBox(
+              //                             height:  MediaQuery.of(context).size.height,
+              //                             width: MediaQuery.of(context).size.width,
+              //                             child: Card(
+              //                               color: Colors.orange,
+              //                               child: Image.network(
+              //                                 'https://storage.googleapis.com/hng-offline-marketing.appspot.com${question.options![0].answerOption}',
+              //                                 height: 200,
+              //                                 width: 150,
+              //                               ),
+              //                             ),
+              //                           ),
+              //                         ),
+              //                       )
+              //                     else
+              //                       const SizedBox.shrink()
+              //                   ],
+              //                 ),
+              //               );
+              //             },
+              //           ),
+              //         ),
+              //         const SizedBox(height: 20),
+              //         InkWell(
+              //           onTap: () {
+              //             _submitCheckListItem(checkListItem);
+              //           },
+              //           child: Container(
+              //             height: 50,
+              //             margin: EdgeInsets.zero,
+              //             // Remove margins
+              //
+              //             decoration: const BoxDecoration(
+              //               color: Colors.blue,
+              //             ),
+              //             width: double.infinity,
+              //             child: const Center(
+              //                 child: Text('Submit',
+              //                     style: TextStyle(
+              //                         color: Colors.white,
+              //                         fontSize: 18))),
+              //           ),
+              //         ),
+              //       ],
+              //     );
+              //   },
+              //   onPageChanged: (v) {
+              //     for (int v = 0; v < checkListItems.length; v++) {
+              //       bool hasMandatoryOption = checkListItems[v]
+              //           .questions![0]
+              //           .options!
+              //           .any((option) => option.option_mandatory_Flag == "1");
+              //
+              //       if (hasMandatoryOption) {
+              //         print(
+              //             "Checklist item ${checkListItems[v].checkListItemId} has at least one mandatory option.");
+              //         setState(() {
+              //           photoMandatoryFlag = true;
+              //         });
+              //       } else {
+              //         setState(() {
+              //           photoMandatoryFlag = false;
+              //         });
+              //         print(
+              //             "Checklist item ${checkListItems[v].checkListItemId} has no mandatory options.");
+              //       }
+              //     } // print(checkListItems[v].questions[0].options.contains(element));
+              //     setState(() {
+              //       _currentPage = v; // Update the current page
+              //     });
+              //   },
+              // );
+          }),
+        ),
 
       ),
     );
@@ -764,11 +1088,17 @@ class _CheckListPageState extends State<CheckListPage> {
           final apiResponse = await checklistRepo.postChecklistData(sendJson);
 
           if (apiResponse.statusCode == "200") {
-            _pageController.nextPage(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.linear);
-            showSimpleDialog(
-                title: 'Alert!', msg: 'Checklist posted successfully!');
+            _goToNextCheckListItem(); // Load the next checklist item
+
+
+/*
+              _pageController.nextPage(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.linear);*/
+              showSimpleDialog(
+                  title: 'Alert!', msg: 'Checklist posted successfully!');
+
+
           } else {
             showSimpleDialog(
                 title: 'Alert!',
@@ -785,13 +1115,7 @@ class _CheckListPageState extends State<CheckListPage> {
 
         // Move to the next page
 
-        if (_currentPage == checkListItems.length - 1) {
-          submitAllDilo();
-          // Navigator.pop(context);
-        }
-        else if(question.length<=2){
-          submitAllDilo();
-        }
+
         print('Checklist posted successfully!');
       }
     } catch (e) {
@@ -854,14 +1178,18 @@ class _CheckListPageState extends State<CheckListPage> {
         final response = await checklistRepo.postChecklistData(sendJson);
         if (response.statusCode == "200") {
           showSimpleDialog(title: 'Alert!', msg: response.message);
-          if (_currentPage != checkListItems.length - 1) {
-            _pageController.nextPage(
+
+          _goToNextCheckListItem(); // Load the next checklist item
+
+          /* if (_currentPage != checkListItems.length - 1) {
+
+          *//*  _pageController.nextPage(
                 duration: const Duration(milliseconds: 500),
-                curve: Curves.linear);
+                curve: Curves.linear);*//*
           }
           else{
             Navigator.pop(context);
-          }
+          }*/
         } else {
           showSimpleDialog(title: 'Alert!', msg: response.message);
         }

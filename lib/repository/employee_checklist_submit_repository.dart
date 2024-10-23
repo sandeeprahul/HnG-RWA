@@ -116,7 +116,7 @@ class EmployeeSubmitChecklistRepository {
     // _controller.showProgress();
 
     try {
-      progressController.hide();
+      progressController.show();
 
       final pref = await SharedPreferences.getInstance();
       var empCode = pref.getString("userCode");
