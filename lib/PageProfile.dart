@@ -17,7 +17,7 @@ import 'ViewProfile.dart';
 import 'presentation/attendance/attendence_screen.dart';
 
 class PageProfile extends StatefulWidget {
-  const PageProfile({Key? key}) : super(key: key);
+  const PageProfile({super.key});
 
   @override
   State<PageProfile> createState() => _PageProfileState();

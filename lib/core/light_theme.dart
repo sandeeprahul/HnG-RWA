@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-final ThemeData lightTheme = ThemeData(
+final ThemeData
+lightTheme = ThemeData(
   useMaterial3: true,
+  primaryColor: Colors.orange,
+
   // colorScheme: lightColorScheme,
   textTheme: GoogleFonts.aBeeZeeTextTheme().apply(
     bodyColor: Colors.black,

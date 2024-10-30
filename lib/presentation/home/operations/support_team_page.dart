@@ -9,7 +9,7 @@ import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/team_details_widget.dart';
 
 class SupportTeamPage extends ConsumerStatefulWidget {
-  const SupportTeamPage({Key? key}) : super(key: key);
+  const SupportTeamPage({super.key});
 
   @override
   ConsumerState<SupportTeamPage> createState() => _SupportTeamPageState();
