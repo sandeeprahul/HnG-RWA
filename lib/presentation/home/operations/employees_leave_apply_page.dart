@@ -123,9 +123,17 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                       style: TextStyle(color: Colors.grey[700]),
                                     ),
                                     const SizedBox(height: 2.0),
-                                    Text(
-                                      "Date: ${employee.date}",
-                                      style: TextStyle(color: Colors.grey[700]),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Date: ${employee.date} ",
+                                          style: TextStyle(color: Colors.grey[700]),
+                                        ),
+                                        if(employee.status.isNotEmpty) Text(
+                                          employee.status,
+                                          style: const TextStyle(color: Colors.green),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),

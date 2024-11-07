@@ -46,7 +46,7 @@ class CheckListPage extends StatefulWidget {
 class _CheckListPageState extends State<CheckListPage> {
   // final PageController _pageController = PageController();
   List<CheckListItem> checkListItems = [];
-  bool isLoading = true;
+  bool isLoading = false;
 
   Question? _question;
   var dropDownOptionAnswer = '';
@@ -200,37 +200,10 @@ class _CheckListPageState extends State<CheckListPage> {
         ));
   }
 
-  void _goToNextCheckListItem() {
-    setState(() {
-      if (_currentIndex < checkListItems.length - 1) {
-        _currentIndex++;
-      } else {
-        submitAllDilo();
 
-        print("All checklist items completed.");
-      }
-    });
-  }
 
-  void _goBackToCheckListItem() {
-    if (_currentIndex == 0) {
-      hitQuestionCancel();
-      print("CheckList SUBMIT Cancel in if.");
-    } else {
-      setState(() {
-        if (_currentIndex < checkListItems.length - 1) {
-          _currentIndex--;
-        } else {
-          // submitAllDilo();
-          hitQuestionCancel();
 
-          print("CheckList SUBMIT Cancel.");
-        }
-      });
-    }
-  }
 
-  int _currentIndex = 0;
   final ScrollController _scrollController = ScrollController();
   bool isAtBottom = false;
 
@@ -252,7 +225,10 @@ class _CheckListPageState extends State<CheckListPage> {
         appBar: AppBar(title: const Text('Questions List')),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: camVisible
+          child:isLoading? const Center(
+            child:
+            CircularProgressIndicator(), // Display progress indicator
+          ): camVisible
               ? Visibility(
             visible: camController == null ? false : camVisible,
             child: SizedBox(
@@ -350,7 +326,7 @@ class _CheckListPageState extends State<CheckListPage> {
                                 _submitCheckListItem(checkListItem);
                               },
                               child: Container(
-                                height: 50,
+                                height: 45,
                                 margin: EdgeInsets.zero,
                                 decoration:  BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
@@ -376,24 +352,33 @@ class _CheckListPageState extends State<CheckListPage> {
                   },
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  submitAllDilo();
-                },
-                child: Container(
-                  height: 50,
-                  margin: EdgeInsets.zero,
-                  decoration:  BoxDecoration(
+              ElevatedButton(
+                onPressed:isAllSubmitted? ()
+                {
+                  showConfirmDialog(
+                    onConfirmed: () {
+                      submitAllDilo();
+                    },
+                    title: "Submit all?",
+                    msg: "Are you sure?",
+                  );
+                }:null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:isAllSubmitted ? Colors.green : Colors.grey[700],
+                  // Background color
+                  // onPrimary: Colors.white, // Text color
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.indigo,
                   ),
-                  width: double.infinity,
-                  child: const Center(
-                      child: Text('Submit All',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 18))),
+                  minimumSize: const Size(double.infinity, 50), // Width and height
+                ),
+                child: const Text(
+                  'Submit All',
+                  style: TextStyle(fontSize: 18,color: Colors.white),
+
                 ),
               ),
+
 
             ],
           ),
@@ -434,6 +419,7 @@ class _CheckListPageState extends State<CheckListPage> {
 
   Widget buildDropdown(Question question) {
     return Container(
+      height: 45,
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
@@ -683,6 +669,9 @@ class _CheckListPageState extends State<CheckListPage> {
     }
   }
 
+  List<int> submittedItems = []; // Tracks submitted items by ID or index
+  bool isAllSubmitted = false; // Controls the "Submit All" button state
+
   Future<void> addToJson(
       int answerTypeId,
       String itemName,
@@ -692,7 +681,10 @@ class _CheckListPageState extends State<CheckListPage> {
       int orderFlag,
       String imageName,
       String checkList_Answer_Option_Id_,
-      String non_Compliance_Flag, Question currentQuestion) async {
+      String non_Compliance_Flag, Question currentQuestion, CheckListItem checkListItem) async {
+
+
+
     final prefs = await SharedPreferences.getInstance();
 
     String dateForEmpCode_ =
@@ -705,8 +697,8 @@ class _CheckListPageState extends State<CheckListPage> {
     sendJson.add({
       "emp_checklist_assign_id": widget.activeCheckList.empChecklistAssignId,
       "checkList_Item_Mst_Id": widget.isEdit == 0
-          ? widget.activeCheckList.checklisTId
-          : widget.activeCheckList.checklisTId,
+          ? checkListItem.checkListItemId
+          : checkListItem.checkListItemId,
       "checklist_Id": widget.activeCheckList.checklisTId,
       "empcode":
           widget.isEdit == 1 ? widget.sendingToEditAmHeaderQuestion : userId,
@@ -741,6 +733,9 @@ class _CheckListPageState extends State<CheckListPage> {
         EmployeeSubmitChecklistRepository(apiService: apiService);
 
     try {
+      setState(() {
+        isLoading=true;
+      });
       // Check if the answer type requires a photo
       if (currentQuestion.answerTypeId == 3 &&
           photoMandatoryFlag &&
@@ -750,19 +745,23 @@ class _CheckListPageState extends State<CheckListPage> {
       } else {
         // If photo is provided or not mandatory, proceed with posting data
         if (base64img_.isNotEmpty) {
-          cloudstorageRef(base64img_, empCode, sendJson);
+          cloudstorageRef(base64img_, empCode, sendJson,checkListItem);
         } else {
           final apiResponse = await checklistRepo.postChecklistData(sendJson);
 
           if (apiResponse.statusCode == "200") {
-            // _goToNextCheckListItem(); // Load the next checklist item
 
-/*
-              _pageController.nextPage(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.linear);*/
             showSimpleDialog(
                 title: 'Alert!', msg: 'Checklist posted successfully!');
+
+            // Add to submittedItems if successful
+            if (!submittedItems.contains(checkListItem.checkListItemId)) {
+              setState(() {
+                submittedItems.add(checkListItem.checkListItemId!);
+              });
+            }
+            _checkAllSubmitted();
+
           } else {
             showSimpleDialog(
                 title: 'Alert!',
@@ -787,9 +786,24 @@ class _CheckListPageState extends State<CheckListPage> {
           msg: 'Failed to post checklist:$e');
       print('Failed to post checklist: $e');
     }
+    finally{
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
-  Future<void> cloudstorageRef(var img, var empcode, var sendJson) async {
+  // Function to check if all items are submitted
+  void _checkAllSubmitted() {
+    setState(() {
+      // isAllSubmitted = submittedItems.isNotEmpty;
+      isAllSubmitted = submittedItems.length == checkListItems.length;
+    });
+  }
+
+  Future<void> cloudstorageRef(var img, var empcode, var sendJson, CheckListItem checkListItem) async {
+
+
     final prefs = await SharedPreferences.getInstance();
 
     String empCode = empcode;
@@ -806,6 +820,9 @@ class _CheckListPageState extends State<CheckListPage> {
     final imagesRef = storageRef.child("$locationCode/QuesAns/$empCode.jpg");
 
     try {
+      setState(() {
+        isLoading = true;
+      });
       // await imagesRef.putString(img, format: PutStringFormat.dataUrl);
       await imagesRef
           .putString(img,
@@ -844,27 +861,28 @@ class _CheckListPageState extends State<CheckListPage> {
         final response = await checklistRepo.postChecklistData(sendJson);
         if (response.statusCode == "200") {
           showSimpleDialog(title: 'Alert!', msg: response.message);
-          //
-          // _goToNextCheckListItem(); // Load the next checklist item
-
-          /* if (_currentPage != checkListItems.length - 1) {
-
-          */ /*  _pageController.nextPage(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.linear);*/ /*
+          // Add to submittedItems if successful
+          if (!submittedItems.contains(checkListItem.checkListItemId)) {
+            setState(() {
+              submittedItems.add(checkListItem.checkListItemId!);
+            });
           }
-          else{
-            Navigator.pop(context);
-          }*/
+          _checkAllSubmitted();
         } else {
           showSimpleDialog(title: 'Alert!', msg: response.message);
         }
       } catch (e) {
         showSimpleDialog(title: 'Alert!', msg: 'Failed to post checklist: $e');
       }
+      finally{
+        setState(() {
+          isLoading = false;
+        });
+      }
     } on FirebaseException catch (e) {
       showSimpleDialog(title: 'Alert!', msg: 'Failed to upload image');
     }
+
   }
 
   Future<void> handleChecklistSubmission(CheckListItem checkListItem) async {
@@ -908,7 +926,7 @@ class _CheckListPageState extends State<CheckListPage> {
           int.parse(currentQuestion.orderFlag!),
           imageName,
           dropDownOptionAnswerID,
-          non_Compliance_Flag,          currentQuestion,
+          non_Compliance_Flag,          currentQuestion,checkListItem
       );
     }
     // }

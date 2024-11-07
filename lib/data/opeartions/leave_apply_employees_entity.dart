@@ -18,12 +18,14 @@ class Employee {
   final String empName;
   final String designation;
   final String date;
+  final String status;
 
   Employee({
     required this.empCode,
     required this.empName,
     required this.designation,
     required this.date,
+    required this.status,
   });
 
   // Factory method to create an Employee from JSON
@@ -33,6 +35,7 @@ class Employee {
       empName: json['empName'] as String,
       designation: json['designation'] as String,
       date: json['date'] as String,
+      status: json['status'] as String,
     );
   }
 }
