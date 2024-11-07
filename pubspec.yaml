@@ -72,10 +72,12 @@ dependencies:
   riverpod: ^2.3.6
   flutter_riverpod: ^2.3.6
 
+
+
 flutter_icons:
-  android: true
-  ios: true
-  image_path: "assets/app_icon.png"
+    android: true
+    ios: true
+    image_path: "assets/app_icon.png"
 
 dev_dependencies:
   flutter_test:

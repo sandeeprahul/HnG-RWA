@@ -76,7 +76,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
               setState(() {
                 selectAll = value ?? false;
                 selectedEmployees = {
-                  for (var employee in employees) employee.empCode: selectAll
+                  for (var employee in employees)
+                    if (employee.status.isEmpty) employee.empCode: selectAll
                 };
               });
             },
@@ -150,14 +151,14 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                             child: Checkbox(
                               value:
                                   selectedEmployees[employee.empCode] ?? false,
-                              onChanged: (bool? value) {
+                              onChanged:employee.status.isEmpty? (bool? value) {
                                 setState(() {
                                   selectedEmployees[employee.empCode] =
                                       value ?? false;
                                   selectAll = selectedEmployees.values
                                       .every((isSelected) => isSelected);
                                 });
-                              },
+                              }:null,
                             ),
                           ),
                         ),
