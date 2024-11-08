@@ -13,138 +13,107 @@ import '../helper/progressDialog.dart';
 
 class EmployeeSubmitChecklistRepository {
   final ApiService apiService;
-  // final ProgressController _controller;
+  final SharedPreferences _preferences;
   final ProgressController progressController = Get.find<ProgressController>();
 
-  EmployeeSubmitChecklistRepository(
-      {required this.apiService});
+  EmployeeSubmitChecklistRepository({
+    required this.apiService,
+    required SharedPreferences preferences,
+  }) : _preferences = preferences;
 
-  // Post checklist data using ApiService
   Future<ApiResponse> postChecklistData(List<Map<String, dynamic>> data) async {
-
+    progressController.show();
     try {
-      progressController.show();
-
       final response = await apiService.postData(
         endpoint: "/Employee/AddQuestionAnswer",
         data: data,
       );
-      progressController.hide();
-
-      Get.back(); // Close the progress dialog
-      final message = response['message'] ?? 'Success';
-      final statusCode = response['statusCode'] ?? "200"; // Defaulting to 200 if not present
-
-      print('Checklist posted successfully: $response');
-      return ApiResponse(message: message, statusCode: statusCode);
-
+      return ApiResponse(
+        message: response['message'] ?? 'Success',
+        statusCode: response['statusCode'] ?? '200',
+      );
     } catch (e) {
+      handleError(e);
+      rethrow;
+    } finally {
       progressController.hide();
-
-      Get.back(); // Close the progress dialog
-
-      print('Error posting checklist: $e');
-      throw Exception("Failed to post checklist: $e");
+      Get.back(); // Optionally handle this in the controller instead
     }
   }
 
-  // Fetch checklist data
   Future<Map<String, dynamic>> getChecklistData() async {
     try {
-      final response = await apiService.getData(
-        endpoint: 'checklist', // Example endpoint for getting checklist data
-      );
-      return response;
+      return await apiService.getData(endpoint: 'checklist');
     } catch (e) {
-      print('Error fetching checklist: $e');
-      throw e;
+      handleError(e);
+      rethrow;
     }
   }
 
-  //question cancel
   Future<bool> questionCancel({
     required int checklistAssignId,
     required int checklistMstItemId,
   }) async {
-    bool goBack = false;
-
+    progressController.show();
     try {
-      progressController.hide();
-
-      final pref = await SharedPreferences.getInstance();
-      var empCode = pref.getString("userCode");
-
-      var sendJson = {
+      final empCode = _preferences.getString("userCode");
+      final sendJson = {
         "checklist_assign_id": checklistAssignId,
         "checklist_mst_item_id": checklistMstItemId,
         "employeeCode": empCode,
       };
 
-      print('Sending JSON: $sendJson');
-
-      // Use ApiService to send the request
       final response = await apiService.postData(
           endpoint: '/Employee/QuestionCancel', data: sendJson);
-      print('Response: $response');
-      progressController.hide();
 
       if (response['statusCode'] == '200') {
-        goBack = true;
-        Get.snackbar('Success', 'Question cancelled successfully',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.black,
-            colorText: Colors.white);
+        Get.snackbar('Success', 'Question cancelled successfully');
+        return true;
       } else {
-        showSimpleDialog(
-            title: 'Alert!',
-            msg:
-                'Something went wrong\n${response['statusCode']}\nPlease contact IT support.');
+        showSimpleDialog(title: 'Alert!', msg: response['message']);
+        return false;
       }
     } catch (e) {
+      handleError(e);
+      return false;
+    } finally {
       progressController.hide();
-
-      print(e);
     }
-
-    return goBack;
   }
 
   Future<String> submitAllDilo({
     required int checklistAssignId,
     required int checklistMstItemId,
   }) async {
-    // _controller.showProgress();
-
+    progressController.show();
     try {
-      progressController.show();
-
-      final pref = await SharedPreferences.getInstance();
-      var empCode = pref.getString("userCode");
-
-      var sendJson = {
+      final empCode = _preferences.getString("userCode");
+      final sendJson = {
         'emp_checklist_assign_id': checklistAssignId,
         'employee_code': empCode,
       };
 
-      print('Sending JSON: $sendJson');
-      progressController.hide();
-
-      // Use ApiService to send the request
       final response = await apiService.postData(
           endpoint: '/Employee/WorkFlowStatusEmp', data: sendJson);
-      print('Response: $response');
 
       if (response['statusCode'] == '200') {
-        Get.snackbar('Success', response['message'],
-            snackPosition: SnackPosition.BOTTOM);
+        showSimpleDialog(title: 'Success', msg: response['message']);
+        return response['message'];
       } else {
         showSimpleDialog(title: 'Alert!', msg: response['message']);
+        return response['message'];
       }
-      return response['message'];
     } catch (e) {
+      handleError(e);
+      return 'Error';
+    } finally {
       progressController.hide();
-      print(e);
-      return '';
     }
   }
+
+  void handleError(dynamic error) {
+    print('Error: $error');
+    Get.snackbar('Error', 'Something went wrong. Please try again.');
+  }
 }
+

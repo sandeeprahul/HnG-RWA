@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/common/constants.dart';
 import 'package:hng_flutter/common/zoomable_image.dart';
+import 'package:hng_flutter/presentation/camera_page.dart';
 import 'package:hng_flutter/repository/employee_checklist_submit_repository.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_service.dart';
 import 'checkListScreen_lpd.dart';
+import 'controllers/camerapageController.dart';
 import 'controllers/progressController.dart';
 import 'data/ActiveCheckListEmployee.dart';
 import 'data/GetActvityTypes.dart';
@@ -47,12 +49,16 @@ class _CheckListPageState extends State<CheckListPage> {
   // final PageController _pageController = PageController();
   List<CheckListItem> checkListItems = [];
   bool isLoading = false;
+  final CameraPageController cameraPageController =
+      Get.put(CameraPageController());
 
+  final ProgressController progressController = Get.put(ProgressController());
   Question? _question;
   var dropDownOptionAnswer = '';
   var dropDownOptionAnswerID = '';
   var non_Compliance_Flag = '';
   bool photoMandatoryFlag = false;
+  List<GlobalKey> itemKeys = [];
 
   @override
   void initState() {
@@ -66,10 +72,7 @@ class _CheckListPageState extends State<CheckListPage> {
         isAtBottom = true;
       });
     }
-
   }
-
-  final ProgressController progressController = Get.put(ProgressController());
 
   // Fetch checklist data from API
   Future<void> loadCheckListData() async {
@@ -92,6 +95,7 @@ class _CheckListPageState extends State<CheckListPage> {
               data.map((item) => CheckListItem.fromJson(item)).toList();
           isLoading = false;
         });
+        itemKeys = List.generate(checkListItems.length, (index) => GlobalKey());
       } else {
         throw Exception('Failed to load checklist items');
       }
@@ -106,15 +110,17 @@ class _CheckListPageState extends State<CheckListPage> {
   @override
   void dispose() {
     camController?.dispose();
-    _scrollController.removeListener(_scrollListener);
+    // _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
+    submittedItems.clear();
     super.dispose();
   }
 
   void _scrollListener() {
     // Check if scrolled to the bottom
     if (_scrollController.position.atEdge) {
-      bool isBottom = _scrollController.position.pixels == _scrollController.position.maxScrollExtent;
+      bool isBottom = _scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent;
       if (isBottom && !isAtBottom) {
         setState(() {
           isAtBottom = true;
@@ -129,11 +135,13 @@ class _CheckListPageState extends State<CheckListPage> {
   }
 
   Future<void> hitQuestionCancel() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
 
     final EmployeeSubmitChecklistRepository checklistRepo =
         EmployeeSubmitChecklistRepository(
-            apiService: apiService); // Initialize the repository
+            apiService: apiService,
+            preferences: sharedPreferences); // Initialize the repository
 
     setState(() {
       isLoading = true;
@@ -169,11 +177,15 @@ class _CheckListPageState extends State<CheckListPage> {
   }
 
   Future<void> submitAllDilo() async {
+    progressController.show();
+    final sharedPreferences = await SharedPreferences.getInstance();
+
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
 
     final EmployeeSubmitChecklistRepository checklistRepo =
         EmployeeSubmitChecklistRepository(
-            apiService: apiService); // Initialize the repository
+            apiService: apiService,
+            preferences: sharedPreferences); // Initialize the repository
 
     /* setState(() {
       loading = true;
@@ -184,9 +196,11 @@ class _CheckListPageState extends State<CheckListPage> {
       checklistMstItemId: widget.activeCheckList.checklisTId,
     );
 
-    // setState(() {
-    //   loading = false;
-    // });
+    /* setState(() {
+      loading = false;
+    });
+*/
+    progressController.hide();
 
     // showConfirmDialog(onConfirmed: (){}, title: 'Success', msg: '')
     Navigator.pushReplacement(
@@ -199,10 +213,6 @@ class _CheckListPageState extends State<CheckListPage> {
           ),
         ));
   }
-
-
-
-
 
   final ScrollController _scrollController = ScrollController();
   bool isAtBottom = false;
@@ -225,163 +235,145 @@ class _CheckListPageState extends State<CheckListPage> {
         appBar: AppBar(title: const Text('Questions List')),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child:isLoading? const Center(
-            child:
-            CircularProgressIndicator(), // Display progress indicator
-          ): camVisible
-              ? Visibility(
-            visible: camController == null ? false : camVisible,
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: Stack(
-                children: [
-                  SizedBox(
-                    height: double.infinity,
-                    width: double.infinity,
-                    child: camController == null
-                        ? const CircularProgressIndicator()
-                        : CameraPreview(camController!),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: InkWell(
-                      onTap: () async {
-                        try {
-                          final image =
-                          await camController!.takePicture();
-                          setState(() {
-                            imagePath = image.path;
-                            camVisible = false;
-                          });
-                          _cropImage(image.path);
-                        } catch (e) {
-                          print(e);
-                        }
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(15.0),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 35,
-                          child: Icon(Icons.camera),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-              :Column(
-            children: [
-              Expanded(
-                child: ListView.separated(
-                  controller:_scrollController ,
-                  // shrinkWrap: true, // Allows ListView to work within a SingleChildScrollView
-                  // physics: const NeverScrollableScrollPhysics(), // Disables inner ListView scroll
-                  // itemCount:1,
-                  itemCount: checkListItems.length,
-                  itemBuilder: (context, questionIndex) {
-                    var checkListItem =
-                        checkListItems[questionIndex]; // Get the current checklist item
+          child:
+             isLoading
+                ? const Center(
+              child:
+              CircularProgressIndicator(), // Display progress indicator
+            )
+                : Column(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    controller: _scrollController,
+                    // shrinkWrap: true, // Allows ListView to work within a SingleChildScrollView
+                    // physics: const NeverScrollableScrollPhysics(), // Disables inner ListView scroll
+                    // itemCount:1,
+                    itemCount: checkListItems.length,
+                    itemBuilder: (context, questionIndex) {
+                      var checkListItem = checkListItems[
+                      questionIndex]; // Get the current checklist item
 
-                    return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            ListView.builder(
-                              shrinkWrap: true,
-                              // Allows ListView to work within a SingleChildScrollView
-                              physics: const NeverScrollableScrollPhysics(),
-                              // Disables inner ListView scroll
-                              itemCount: checkListItem.questions!.length,
-                              itemBuilder: (context, subQuestionIndex) {
-                                var question = checkListItem.questions![subQuestionIndex];
+                      return Card(
+                        key: itemKeys[questionIndex],
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                // Allows ListView to work within a SingleChildScrollView
+                                physics:
+                                const NeverScrollableScrollPhysics(),
+                                // Disables inner ListView scroll
+                                itemCount:
+                                checkListItem.questions!.length,
+                                itemBuilder:
+                                    (context, subQuestionIndex) {
+                                  var question = checkListItem
+                                      .questions![subQuestionIndex];
 
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 20),
+                                  return Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 20),
 
-                                    // Display question text
-                                    // if (question.answerTypeId != 7)
+                                      // Display question text
+                                      // if (question.answerTypeId != 7)
                                       buildQuestionText(question),
-                                    const SizedBox(height: 10),
+                                      const SizedBox(height: 10),
 
-                                    // Different UI for each answer type
-                                    if (question.answerTypeId == 1) buildCommentField(question),
-                                    if (question.answerTypeId == 4) buildDropdown(question),
-                                    if (question.answerTypeId == 3) buildAttachProofWidget(question),
+                                      // Different UI for each answer type
+                                      if (question.answerTypeId == 1)
+                                        buildCommentField(question),
+                                      if (question.answerTypeId == 4)
+                                        buildDropdown(question),
+                                      if (question.answerTypeId == 3)
+                                        buildAttachProofWidget(
+                                            question),
 
-                                    // if (question.answerTypeId == 7) buildImageWidget(question),
-                                    // Separate each question visually
-                                  ],
-                                );
-                              },
-                            ),
-                            InkWell(
-                              onTap: () {
-                                _submitCheckListItem(checkListItem);
-                              },
-                              child: Container(
-                                height: 45,
-                                margin: EdgeInsets.zero,
-                                decoration:  BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Colors.blue,
-                                ),
-                                width: double.infinity,
-                                child: const Center(
-                                    child: Text('Submit',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 18))),
+                                      // if (question.answerTypeId == 7) buildImageWidget(question),
+                                      // Separate each question visually
+                                    ],
+                                  );
+                                },
                               ),
-                            ),
-                          ],
+                              InkWell(
+                                onTap: () {
+                                  _submitCheckListItem(
+                                      checkListItem, questionIndex);
+                                },
+                                child: Container(
+                                  height: 45,
+                                  margin: EdgeInsets.zero,
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                    BorderRadius.circular(12),
+                                    color: !submittedItems.contains(checkListItem.checkListItemId)?Colors.blue:Colors.green,
+                                  ),
+                                  width: double.infinity,
+                                  child:  Center(
+                                      child: Obx(
+                                         () {
+                                          return Text(progressController.isLoading.value?'Submitting..': !submittedItems.contains(checkListItem.checkListItemId)?'Submit':'Submitted',
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18));
+                                        }
+                                      )),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Divider(thickness: 2.0,color: Colors.black,),
-                    );
-                  },
-                ),
-              ),
-              ElevatedButton(
-                onPressed:isAllSubmitted? ()
-                {
-                  showConfirmDialog(
-                    onConfirmed: () {
-                      submitAllDilo();
+                      );
                     },
-                    title: "Submit all?",
-                    msg: "Are you sure?",
-                  );
-                }:null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:isAllSubmitted ? Colors.green : Colors.grey[700],
-                  // Background color
-                  // onPrimary: Colors.white, // Text color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    separatorBuilder:
+                        (BuildContext context, int index) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Divider(
+                          thickness: 2.0,
+                          color: Colors.black,
+                        ),
+                      );
+                    },
                   ),
-                  minimumSize: const Size(double.infinity, 50), // Width and height
                 ),
-                child: const Text(
-                  'Submit All',
-                  style: TextStyle(fontSize: 18,color: Colors.white),
-
+                ElevatedButton(
+                  onPressed: isAllSubmitted
+                      ? () {
+                    showConfirmDialog(
+                      onConfirmed: () {
+                        submitAllDilo();
+                      },
+                      title: "Submit all?",
+                      msg: "Are you sure?",
+                    );
+                  }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isAllSubmitted
+                        ? Colors.green
+                        : Colors.grey[700],
+                    // Background color
+                    // onPrimary: Colors.white, // Text color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    minimumSize: const Size(
+                        double.infinity, 50), // Width and height
+                  ),
+                  child: const Text(
+                    'Submit All',
+                    style:
+                    TextStyle(fontSize: 18, color: Colors.white),
+                  ),
                 ),
-              ),
-
-
-            ],
-          ),
+              ],
+            )
+          ,
         ),
       ),
     );
@@ -398,9 +390,7 @@ class _CheckListPageState extends State<CheckListPage> {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
-        if(question.answerTypeId==7)  buildImageWidget(question),
-
-
+        if (question.answerTypeId == 7) buildImageWidget(question),
       ],
     );
   }
@@ -449,6 +439,8 @@ class _CheckListPageState extends State<CheckListPage> {
             dropDownOptionAnswerID =
                 "${selectedOption.checkListAnswerOptionId}";
             non_Compliance_Flag = "${selectedOption.nonComplianceFlag}";
+            print(
+                "$dropDownOptionAnswer , $dropDownOptionAnswerID , $non_Compliance_Flag");
           });
         },
       ),
@@ -463,8 +455,8 @@ class _CheckListPageState extends State<CheckListPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Text(
-               question.questionText??'',
+            Text(
+              question.questionText ?? '',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             Container(
@@ -489,10 +481,12 @@ class _CheckListPageState extends State<CheckListPage> {
                       child: _body(),
                     ),
                     onTap: () {
-                      setState(() {
+                      Get.to(() => const CameraPage());
+
+                      /*   setState(() {
                         cameraOpen = 0;
                       });
-                      getPhoto();
+                      getPhoto();*/
                     },
                   ),
                 ],
@@ -530,7 +524,23 @@ class _CheckListPageState extends State<CheckListPage> {
   }
 
   Widget _body() {
-    if (_croppedFile != null) {
+    return Obx(() {
+      if (cameraPageController.croppedImageFile.value != null) {
+        return Image.file(
+          File(cameraPageController.croppedImageFile.value!.path),
+          height: 100,
+          width: 100,
+        );
+      } else {
+        return const Icon(
+          Icons.photo,
+          size: 50,
+        );
+      }
+    });
+  }
+
+  /*if (_croppedFile != null) {
       return _imageCard();
     } else {
       return const Icon(
@@ -538,7 +548,7 @@ class _CheckListPageState extends State<CheckListPage> {
         size: 50,
       );
     }
-  }
+  }*/
 
   Widget multipleImages() {
     return Column(
@@ -580,7 +590,7 @@ class _CheckListPageState extends State<CheckListPage> {
     }
   }
 
-  void _submitCheckListItem(CheckListItem checkListItem) {
+  void _submitCheckListItem(CheckListItem checkListItem, int questionIndex) {
     // Submit the checklist item data
     print('Submitting checklist item: ${checkListItem.itemName}');
     // Here you can add logic to send the answers back to the server or handle locally
@@ -590,43 +600,27 @@ class _CheckListPageState extends State<CheckListPage> {
     }
     showConfirmDialog(
         onConfirmed: () {
-          handleChecklistSubmission(checkListItem);
+          handleChecklistSubmission(checkListItem, questionIndex);
         },
         title: 'Alert!',
         msg: "Are you sure you want to proceed?");
   }
 
-  Future<void> getPhoto() async {
-    final ImagePicker _picker = ImagePicker();
 
-    if (cameraOpen == 0) {
-      setState(() {
-        cameraOpen = 1;
-      });
 
-      if (Platform.isAndroid) {
-        try {
-          final cameras = await availableCameras(); // get available cameras
-          final frontCam = cameras[0];
 
-          camController = CameraController(frontCam, ResolutionPreset.medium);
-          await camController?.initialize();
-          if (!mounted) return;
-
-          setState(() {
-            camVisible = true;
-          });
-        } on CameraException catch (e) {
-          print('Error in fetching cameras: $e');
-        }
-      } else {
-        // for iOS or other platforms
-        var photo = await _picker.pickImage(
-            source: ImageSource.camera,
-            preferredCameraDevice: CameraDevice.rear);
-        _cropImage(photo);
+  void scrollToKey(GlobalKey key) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = key.currentContext;
+      if (context != null) {
+        // Scroll to the widget using ensureVisible
+        Scrollable.ensureVisible(
+          context,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOut,
+        );
       }
-    }
+    });
   }
 
   CameraController? camController;
@@ -635,39 +629,6 @@ class _CheckListPageState extends State<CheckListPage> {
   int cameraOpen = 0;
   var base64img_ = '';
   List<String> imageList = [];
-
-  Future<void> _cropImage(var photo) async {
-    if (photo != null) {
-      final croppedFile = await ImageCropper().cropImage(
-        sourcePath: Platform.isAndroid ? photo : photo!.path,
-        compressFormat: ImageCompressFormat.jpg,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: 'Cropper',
-              toolbarColor: Colors.deepOrange,
-              toolbarWidgetColor: Colors.white,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-        ],
-      );
-
-      if (croppedFile != null) {
-        setState(() {
-          _croppedFile = XFile(croppedFile.path);
-          imageList.add(croppedFile.path);
-        });
-
-        final imageBytes = await File(croppedFile.path).readAsBytes();
-        setState(() {
-          base64img_ = base64.encode(imageBytes);
-        });
-
-        print("Base64 Image: $base64img_");
-      }
-    }
-  }
 
   List<int> submittedItems = []; // Tracks submitted items by ID or index
   bool isAllSubmitted = false; // Controls the "Submit All" button state
@@ -681,11 +642,13 @@ class _CheckListPageState extends State<CheckListPage> {
       int orderFlag,
       String imageName,
       String checkList_Answer_Option_Id_,
-      String non_Compliance_Flag, Question currentQuestion, CheckListItem checkListItem) async {
-
-
-
+      String non_Compliance_Flag,
+      Question currentQuestion,
+      CheckListItem checkListItem,
+      int questionIndex) async {
     final prefs = await SharedPreferences.getInstance();
+
+    final cameraPageController = Get.find<CameraPageController>();
 
     String dateForEmpCode_ =
         DateFormat("yyyyMMddhhmmssS").format(DateTime.now());
@@ -728,29 +691,34 @@ class _CheckListPageState extends State<CheckListPage> {
     });
     print("Data to submit: $sendJson");
 
+    final sharedPreferences = await SharedPreferences.getInstance();
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
     EmployeeSubmitChecklistRepository checklistRepo =
-        EmployeeSubmitChecklistRepository(apiService: apiService);
+        EmployeeSubmitChecklistRepository(
+            apiService: apiService, preferences: sharedPreferences);
 
+    progressController.show();
     try {
-      setState(() {
-        isLoading=true;
-      });
+      // setState(() {
+      //   isLoading = true;
+      // });
       // Check if the answer type requires a photo
       if (currentQuestion.answerTypeId == 3 &&
           photoMandatoryFlag &&
-          base64img_.isEmpty) {
+          cameraPageController.base64img.value.isEmpty) {
         // If photo is mandatory and not provided, show alert
         showSimpleDialog(title: 'Alert!', msg: 'Please take photo');
+        progressController.hide();
       } else {
         // If photo is provided or not mandatory, proceed with posting data
-        if (base64img_.isNotEmpty) {
-          cloudstorageRef(base64img_, empCode, sendJson,checkListItem);
+        if (currentQuestion.answerTypeId == 3 &&
+            cameraPageController.base64img.value.isNotEmpty) {
+          cloudstorageRef(cameraPageController.base64img.value, empCode,
+              sendJson, checkListItem, questionIndex);
         } else {
           final apiResponse = await checklistRepo.postChecklistData(sendJson);
 
           if (apiResponse.statusCode == "200") {
-
             showSimpleDialog(
                 title: 'Alert!', msg: 'Checklist posted successfully!');
 
@@ -761,7 +729,6 @@ class _CheckListPageState extends State<CheckListPage> {
               });
             }
             _checkAllSubmitted();
-
           } else {
             showSimpleDialog(
                 title: 'Alert!',
@@ -781,17 +748,20 @@ class _CheckListPageState extends State<CheckListPage> {
         print('Checklist posted successfully!');
       }
     } catch (e) {
-      showSimpleDialog(
-          title: 'Alert!',
-          msg: 'Failed to post checklist:$e');
+      showSimpleDialog(title: 'Alert!', msg: 'Failed to post checklist:$e');
       print('Failed to post checklist: $e');
-    }
-    finally{
-      setState(() {
-        isLoading = false;
-      });
+    } finally {
+      progressController.hide();
+
+      // scrollToKey(itemKeys[questionIndex]);
+      //
+      // setState(() {
+      //   isLoading = false;
+      // });
+      // scrollToIndex(questionIndex);
     }
   }
+
 
   // Function to check if all items are submitted
   void _checkAllSubmitted() {
@@ -801,9 +771,8 @@ class _CheckListPageState extends State<CheckListPage> {
     });
   }
 
-  Future<void> cloudstorageRef(var img, var empcode, var sendJson, CheckListItem checkListItem) async {
-
-
+  Future<void> cloudstorageRef(var img, var empcode, var sendJson,
+      CheckListItem checkListItem, int questionIndex) async {
     final prefs = await SharedPreferences.getInstance();
 
     String empCode = empcode;
@@ -818,7 +787,7 @@ class _CheckListPageState extends State<CheckListPage> {
     var locationCode = widget.activeCheckList.locationCode;
 
     final imagesRef = storageRef.child("$locationCode/QuesAns/$empCode.jpg");
-
+    progressController.show();
     try {
       setState(() {
         isLoading = true;
@@ -832,15 +801,6 @@ class _CheckListPageState extends State<CheckListPage> {
         print('uploaded to firebase storage successfully$p0');
       });
 
-      // Navigator.pop(context);
-      // String downloadUrl = (await FirebaseStorage.instanceFor(bucket: "gs://hng-offline-marketing.appspot.com").ref().getDownloadURL()).toString();
-      String downloadUrl = (await FirebaseStorage.instanceFor(
-                  bucket: "gs://loghng-942e6.appspot.com")
-              .ref())
-          .toString();
-
-      print(downloadUrl);
-
       Get.defaultDialog(
           title: "Info",
           middleText: "Image post success",
@@ -850,16 +810,20 @@ class _CheckListPageState extends State<CheckListPage> {
           confirmTextColor: Colors.white,
           onConfirm: () {
             Get.back();
-            Navigator.pop(context);
+            // Navigator.pop(context);
             // Navigator.pop(context);
           },
           radius: 15);
+      final sharedPreferences = await SharedPreferences.getInstance();
+
       ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
       EmployeeSubmitChecklistRepository checklistRepo =
-          EmployeeSubmitChecklistRepository(apiService: apiService);
+          EmployeeSubmitChecklistRepository(
+              apiService: apiService, preferences: sharedPreferences);
       try {
         final response = await checklistRepo.postChecklistData(sendJson);
         if (response.statusCode == "200") {
+
           showSimpleDialog(title: 'Alert!', msg: response.message);
           // Add to submittedItems if successful
           if (!submittedItems.contains(checkListItem.checkListItemId)) {
@@ -873,35 +837,32 @@ class _CheckListPageState extends State<CheckListPage> {
         }
       } catch (e) {
         showSimpleDialog(title: 'Alert!', msg: 'Failed to post checklist: $e');
-      }
-      finally{
-        setState(() {
-          isLoading = false;
-        });
+      } finally {
+        progressController.hide();
+
+        // scrollToKey(itemKeys[questionIndex]);
+
+        // setState(() {
+        //   isLoading = false;
+        // });
+        // scrollToIndex(questionIndex);
       }
     } on FirebaseException catch (e) {
-      showSimpleDialog(title: 'Alert!', msg: 'Failed to upload image');
-    }
+      progressController.hide();
 
+      showSimpleDialog(title: 'Alert!', msg: 'Failed to upload image');
+
+    }
   }
 
-  Future<void> handleChecklistSubmission(CheckListItem checkListItem) async {
+  Future<void> handleChecklistSubmission(
+      CheckListItem checkListItem, int questionIndex) async {
     final prefs = await SharedPreferences.getInstance();
     String dateForEmpCode_ =
         DateFormat("yyyyMMddhhmmssS").format(DateTime.now());
     var userId = prefs.getString("userCode");
     String empCode = "EMP$userId$dateForEmpCode_";
-    /*if (option_mandatory_Flag == "-1") {
-      addToJson(
-          quesAnsList[0].questions[0].answerTypeId,
-          quesAnsList[0].itemName,
-          quesAnsList[0].questions[0].question,
-          quesAnsList[0].questions[0].checkListAnswerId,
-          dropdownText,
-          int.parse(quesAnsList[0].questions[0].orderFlag),
-          "");
-    }*/
-    // else {
+
     for (int i = 0; i < checkListItem.questions!.length; i++) {
       var currentQuestion = checkListItem.questions![i];
       String answerOption = '';
@@ -922,12 +883,20 @@ class _CheckListPageState extends State<CheckListPage> {
           currentQuestion.questionText!,
           currentQuestion.questionText!,
           currentQuestion.checkListAnswerId!,
-          answerOption,
+          currentQuestion.answerTypeId == 4
+              ? dropDownOptionAnswer
+              : (currentQuestion.answerTypeId == 1 ? _question!.answer! : ''),
           int.parse(currentQuestion.orderFlag!),
           imageName,
-          dropDownOptionAnswerID,
-          non_Compliance_Flag,          currentQuestion,checkListItem
-      );
+          currentQuestion.answerTypeId == 3
+              ? '${currentQuestion.options![0].checkListAnswerOptionId}'
+              : dropDownOptionAnswerID,
+          currentQuestion.answerTypeId == 3
+              ? '${currentQuestion.options![0].nonComplianceFlag}'
+              : non_Compliance_Flag,
+          currentQuestion,
+          checkListItem,
+          questionIndex);
     }
     // }
   }

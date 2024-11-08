@@ -281,6 +281,7 @@ class _PageHomeState extends State<PageHome> {
       final prefs = await SharedPreferences.getInstance();
       var locationCode = prefs.getString('locationCode') ?? '106';
       var profileImageUrl_ = prefs.getString('profile_image_url') ?? '';
+      print(profileImageUrl_);
 
       //        storageRef.child("$locationCode/Profile/$userCode/$empCode.jpg");
       final imageUrl = await storageRef

@@ -108,10 +108,11 @@ class _CheckListPage2State extends State<CheckListPage2> {
 
   Future<void> hitQuestionCancel() async {
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
+    final sharedPref = await SharedPreferences.getInstance();
 
     final EmployeeSubmitChecklistRepository checklistRepo =
         EmployeeSubmitChecklistRepository(
-            apiService: apiService); // Initialize the repository
+            apiService: apiService, preferences: sharedPref); // Initialize the repository
 
     setState(() {
       isLoading = true;
@@ -147,11 +148,12 @@ class _CheckListPage2State extends State<CheckListPage2> {
   }
 
   Future<void> submitAllDilo() async {
+    final sharedPref = await SharedPreferences.getInstance();
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
 
     final EmployeeSubmitChecklistRepository checklistRepo =
         EmployeeSubmitChecklistRepository(
-            apiService: apiService); // Initialize the repository
+            apiService: apiService, preferences: sharedPref); // Initialize the repository
 
     /* setState(() {
       loading = true;
@@ -1118,8 +1120,10 @@ class _CheckListPage2State extends State<CheckListPage2> {
     print("Data to submit: $sendJson");
 
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
+    final sharedPref = await SharedPreferences.getInstance();
+
     EmployeeSubmitChecklistRepository checklistRepo =
-        EmployeeSubmitChecklistRepository(apiService: apiService);
+        EmployeeSubmitChecklistRepository(apiService: apiService, preferences: sharedPref);
 
     try {
       // Check if the answer type requires a photo
@@ -1216,8 +1220,10 @@ class _CheckListPage2State extends State<CheckListPage2> {
           },
           radius: 15);
       ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
+      final sharedPref = await SharedPreferences.getInstance();
+
       EmployeeSubmitChecklistRepository checklistRepo =
-          EmployeeSubmitChecklistRepository(apiService: apiService);
+          EmployeeSubmitChecklistRepository(apiService: apiService, preferences: sharedPref);
       try {
         final response = await checklistRepo.postChecklistData(sendJson);
         if (response.statusCode == "200") {
