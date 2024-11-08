@@ -124,17 +124,13 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                       style: TextStyle(color: Colors.grey[700]),
                                     ),
                                     const SizedBox(height: 2.0),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Date: ${employee.date} ",
-                                          style: TextStyle(color: Colors.grey[700]),
-                                        ),
-                                        if(employee.status.isNotEmpty) Text(
-                                          employee.status,
-                                          style: const TextStyle(color: Colors.green),
-                                        ),
-                                      ],
+                                    Text(
+                                      "Date: ${employee.date}",
+                                      style: TextStyle(color: Colors.grey[700]),
+                                    ),
+                                    Text(
+                                      "Status: ${employee.status}",
+                                      style: const TextStyle(color: Colors.green),
                                     ),
                                   ],
                                 ),
@@ -239,17 +235,20 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     String? userCode = preferences.getString("userCode");
     String? locationCode = preferences.getString("locationCode");
 
-    // Collect selected employees and prepare JSON output
-    List<Map<String, String>> jsonOutput = employees
-        .where((employee) => selectedEmployees[employee.empCode] == true)
-        .map((employee) => {
-      "empCode": employee.empCode,
-      "date": employee.date,
-      "leaveType": selectedLeaveType!.leaveType,
-      "locationCode": locationCode ?? '',
-      "updatedby": userCode ?? '',
-    })
-        .toList();
+    // Collect all employees, including selected and unselected, and prepare JSON output
+    List<Map<String, String>> jsonOutput = employees.map((employee) {
+      bool isSelected = selectedEmployees[employee.empCode] == true;
+
+      return {
+        "empCode": employee.empCode,
+        "date": employee.date,
+        "leaveType": isSelected ? selectedLeaveType!.leaveType : employee.status,
+        "locationCode": locationCode ?? '',
+        "updatedby": userCode ?? '',
+        // "isSelected": isSelected ? "true" : "false",  // Indicates if the employee was selected
+      };
+    }).toList();
+
 
     // Convert the JSON output to a string
     final String jsonBody = json.encode(jsonOutput);
@@ -327,6 +326,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     });
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? userCode = preferences.getString("userCode");
+    // var userCode = '70002';
+
     final String url = "https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Login/GetLeaveTypesAndEmployess/$userCode";  // Replace with your actual URL
   print(url);
     try {
