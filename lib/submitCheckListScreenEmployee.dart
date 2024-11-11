@@ -1323,7 +1323,7 @@ class _submitCheckListScreenEmployeeState
       }else{
         Get.defaultDialog(
             title: "Info",
-            middleText: respo.toString(),
+            middleText: respo['message'],
             backgroundColor: Colors.white,
             titleStyle: const TextStyle(color: Colors.black),
             middleTextStyle: const TextStyle(color: Colors.black),

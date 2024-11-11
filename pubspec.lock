@@ -370,10 +370,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_plugin_android_lifecycle
-      sha256: "9ee02950848f61c4129af3d6ec84a1cfc0e47931abc746b03e7a3bc3e8ff6eda"
+      sha256: "9b78450b89f059e96c9ebb355fa6b3df1d6b330436e0b885fb49594c41721398"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.22"
+    version: "2.0.23"
   flutter_rating_bar:
     dependency: "direct main"
     description:
@@ -960,6 +960,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  simple_barcode_scanner:
+    dependency: "direct main"
+    description:
+      name: simple_barcode_scanner
+      sha256: "9f83135fa4c2329640d7a0ab34dbf6b12f9ebd71f97a13ff20eee597ad7cf430"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.3"
   simple_gesture_detector:
     dependency: transitive
     description:
@@ -1181,6 +1189,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  webview_windows:
+    dependency: transitive
+    description:
+      name: webview_windows
+      sha256: "47fcad5875a45db29dbb5c9e6709bf5c88dcc429049872701343f91ed7255730"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   win32:
     dependency: transitive
     description:
