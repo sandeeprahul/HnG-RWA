@@ -789,9 +789,9 @@ class _CheckListPageState extends State<CheckListPage> {
     final imagesRef = storageRef.child("$locationCode/QuesAns/$empCode.jpg");
     progressController.show();
     try {
-      setState(() {
+     /* setState(() {
         isLoading = true;
-      });
+      });*/
       // await imagesRef.putString(img, format: PutStringFormat.dataUrl);
       await imagesRef
           .putString(img,
