@@ -77,10 +77,15 @@ class _AmAcceptSelectionScreen_EmployeeState
     // TODO: implement initState
     super.initState();
     // myFuture  = getData();
-    print("AmAcceptSelectionScreen_StoreAudit");
+    print("AmAcceptSelectionScreenEmployee");
     getData();
     getDataCheckList();
     nonCompFlag_O.clear();
+    nonCompFlag.clear();
+    setState(() {
+      nonCompFlag = [];
+      nonCompFlag_O = [];
+    });
 
     clearData();
   }
@@ -132,6 +137,8 @@ class _AmAcceptSelectionScreen_EmployeeState
     mAmHeaderQuestion.clear();
     overallScore = [];
     nonCompFlag = [];
+    nonCompFlag.clear();
+    nonCompFlag_O = [];
 
     // clearData();
     super.dispose();
@@ -408,38 +415,24 @@ class _AmAcceptSelectionScreen_EmployeeState
                                     if (showcheckBox) {
                                       setState(() {
                                         showcheckBox = false;
-                                        // headerQuestionSelected = [];
                                         headerQuestionSelected_ = [];
-                                        // headerQuestionSelected.clear;
                                         headerQuestionSelected_.clear();
-                                        /*  for(var i=0;i<users.length;i++){
 
-                                        }*/
                                         for (int i = 0;
                                             i < mAmHeaderQuestion.length;
                                             i++) {
                                           setState(() {
-                                            // selectedHeaderQues = headerQuestion;
-                                            // headerQuestionSelected_.remove(i);
                                             mAmHeaderQuestion_notSelected
                                                 .add(i);
                                           });
                                         }
-                                        // selectedCheckList.addAll(users.);
 
-                                        /*for (var i = 0; i < users.length; i++) {
-                                          users[i].isSlected = true;
-                                        }*/
-                                        // selectedCheckList.addAll(pos);
                                       });
-                                    } else {
+                                    }
+                                    else {
                                       setState(() {
                                         showcheckBox = true;
 
-                                        /* for (int i = 0; i < users.length; i++) {
-                                          setState(() {
-                                          });
-                                        }*/
                                         mAmHeaderQuestion_notSelected = [];
                                         mAmHeaderQuestion_notSelected.clear();
 
@@ -447,10 +440,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                             i < mAmHeaderQuestion.length;
                                             i++) {
                                           setState(() {
-                                            // selectedHeaderQues = headerQuestion;
                                             headerQuestionSelected_.add(i);
-                                            // mAmHeaderQuestion_notSelected
-                                            //     .remove(i);
                                           });
                                         }
 
@@ -462,7 +452,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                         // selectedCheckList.addAll(users);
                                       });
                                     }
-
+/*
                                     if (!showcheckBox) {
                                       for (int i = 0;
                                           i < mAmHeaderQuestion.length;
@@ -473,7 +463,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                           headerQuestionSelected_.remove(i);
                                         });
                                       }
-                                    }
+                                    }*/
                                     setState(() {
                                       selectedAll = showcheckBox;
                                     });
@@ -543,7 +533,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                 ),
                                 Expanded(
                                   child: Text(
-                                    '${pendingCount} Pending',
+                                    '$pendingCount Pending',
                                     style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
@@ -1139,6 +1129,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                           ),
                                         )),
                                     Visibility(
+                                      // visible: true,
                                       visible: index_ == -1
                                           ? false
                                           : checklist_Header_Status == "E" ||
@@ -1550,7 +1541,9 @@ class _AmAcceptSelectionScreen_EmployeeState
       setState(() {
         loading = true;
         overallScore = [];
+        // nonCompFlag.clear();
         nonCompFlag = [];
+        nonCompFlag_O = [];
         pendingCount = 0;
         CompltedCount = 0;
         complanceFlgLength = 0;
@@ -2031,6 +2024,9 @@ class _AmAcceptSelectionScreen_EmployeeState
       loading = true;
     });
 
+    SharedPreferences preferences  = await SharedPreferences.getInstance();
+    final empCode = preferences.getString("userCode");
+
     final payload =
         '{"emp_checklist_assign_id":${widget.activeCheckList.empChecklistAssignId}}';
 
@@ -2045,13 +2041,16 @@ class _AmAcceptSelectionScreen_EmployeeState
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        "emp_checklist_assign_id": widget.activeCheckList.empChecklistAssignId
+        "emp_checklist_assign_id": widget.activeCheckList.empChecklistAssignId,
+        'employee_code': empCode,
       }),
     );
 
     print(response.body);
     print(response.request);
+    print(url);
     print(response.statusCode);
+    print('emp_checklist_assign_id:${widget.activeCheckList.empChecklistAssignId},employee_code:${empCode}');
     var respo = jsonDecode(response.body);
     if (response.statusCode == 200) {
       setState(() {

@@ -12,10 +12,10 @@ class ScanQrWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-       /* Navigator.push(
+        Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const ScanQrPage()));*/
+                builder: (context) => const ScanQrPage()));
       },
       child: Container(
         margin: const EdgeInsets.only(

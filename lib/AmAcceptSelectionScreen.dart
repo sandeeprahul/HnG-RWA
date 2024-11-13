@@ -361,28 +361,14 @@ class _AmAcceptSelectionScreenState extends State<AmAcceptSelectionScreen> {
                                 if (showcheckBox) {
                                   setState(() {
                                     showcheckBox = false;
-                                    // headerQuestionSelected = [];
                                     headerQuestionSelected_ = [];
-                                    // headerQuestionSelected.clear;
                                     headerQuestionSelected_.clear();
-                                    /*  for(var i=0;i<users.length;i++){
 
-                                    }*/
-                                    // selectedCheckList.addAll(users.);
-
-                                    /*for (var i = 0; i < users.length; i++) {
-                                      users[i].isSlected = true;
-                                    }*/
-                                    // selectedCheckList.addAll(pos);
                                   });
                                 } else {
                                   setState(() {
                                     showcheckBox = true;
 
-                                    /* for (int i = 0; i < users.length; i++) {
-                                      setState(() {
-                                      });
-                                    }*/
 
                                     for (int i = 0;
                                         i < mAmHeaderQuestion.length;
@@ -394,12 +380,6 @@ class _AmAcceptSelectionScreenState extends State<AmAcceptSelectionScreen> {
                                       });
                                     }
 
-                                    /* for (var i = 0; i < users.length; i++) {
-                                      users[i].isSlected = false;
-                                    }*/
-                                    // showcheckBox = false;
-
-                                    // selectedCheckList.addAll(users);
                                   });
                                 }
 
@@ -1379,9 +1359,14 @@ class _AmAcceptSelectionScreenState extends State<AmAcceptSelectionScreen> {
         mAmHeaderQuestion = List<AmHeaderQuestion>.from(
             l.map((model) => AmHeaderQuestion.fromJson(model)));
 
-        overallScore = [];
-        nonCompFlag = [];
-        nonCompFlag_O = [];
+        setState(() {
+          overallScore = [];
+          nonCompFlag = [];
+          nonCompFlag_O = [];
+
+        });
+
+
 
         Fluttertoast.showToast(msg: "Please wait..");
 

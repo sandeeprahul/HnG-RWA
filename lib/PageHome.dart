@@ -26,7 +26,7 @@ import 'data/GetProgressStatus.dart';
 import 'checkInOutScreen_TEMP.dart';
 
 class PageHome extends StatefulWidget {
-  const PageHome({Key? key}) : super(key: key);
+  const PageHome({super.key});
 
   @override
   State<PageHome> createState() => _PageHomeState();

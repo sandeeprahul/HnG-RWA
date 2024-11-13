@@ -1424,6 +1424,11 @@ class _AmAcceptSelectionScreen_StoreAuditState
       mAmHeaderQuestion = List<AmHeaderQuestionStoreAudit>.from(
           l.map((model) => AmHeaderQuestionStoreAudit.fromJson(model)));
 
+      setState(() {
+        overallScore = [];
+        nonCompFlag = [];
+        nonCompFlag_O = [];
+      });
 
       for (int i = 0; i < mAmHeaderQuestion.length; i++) {
         setState(() {

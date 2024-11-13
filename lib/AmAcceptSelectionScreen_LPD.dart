@@ -347,28 +347,12 @@ class _AmAcceptSelectionScreen_LPDState
                                     if (showcheckBox) {
                                       setState(() {
                                         showcheckBox = false;
-                                        // headerQuestionSelected = [];
                                         headerQuestionRMSelected_ = [];
-                                        // headerQuestionSelected.clear;
                                         headerQuestionRMSelected_.clear();
-                                        /*  for(var i=0;i<users.length;i++){
-
-                                        }*/
-                                        // selectedCheckList.addAll(users.);
-
-                                        /*for (var i = 0; i < users.length; i++) {
-                                          users[i].isSlected = true;
-                                        }*/
-                                        // selectedCheckList.addAll(pos);
                                       });
                                     } else {
                                       setState(() {
                                         showcheckBox = true;
-
-                                        /* for (int i = 0; i < users.length; i++) {
-                                          setState(() {
-                                          });
-                                        }*/
 
                                         for (int i = 0;
                                             i < mHeaderQuestionRM.length;
@@ -380,13 +364,6 @@ class _AmAcceptSelectionScreen_LPDState
                                                 .remove(i);
                                           });
                                         }
-
-                                        /* for (var i = 0; i < users.length; i++) {
-                                          users[i].isSlected = false;
-                                        }*/
-                                        // showcheckBox = false;
-
-                                        // selectedCheckList.addAll(users);
                                       });
                                     }
 
@@ -1558,9 +1535,11 @@ class _AmAcceptSelectionScreen_LPDState
         mHeaderQuestionRM = List<HeaderQuestionRM>.from(
             l.map((model) => HeaderQuestionRM.fromJson(model)));
 
-        overallScore = [];
-        nonCompFlag = [];
-        nonCompFlag_O = [];
+        setState(() {
+          overallScore = [];
+          nonCompFlag = [];
+          nonCompFlag_O = [];
+        });
 
         for (int i = 0; i < mHeaderQuestionRM.length; i++) {
           setState(() {
@@ -1865,9 +1844,9 @@ class _AmAcceptSelectionScreen_LPDState
 
       var userId = prefs.getString('userCode');
       // String url = staticUrlString + "Login/validateLogin";
-       var url = Uri.https(
-      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/QuestionUpdate',
+      var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/QuestionUpdate',
       );
 
       var params = [];
@@ -2280,9 +2259,9 @@ class _AmAcceptSelectionScreen_LPDState
     final payload =
         '{"checklist_assign_id":${widget.activeCheckList.lpdChecklistAssignId}}';
 
-     var url = Uri.https(
-        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/WorkFlowStatus',
+    var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/WorkFlowStatus',
     );
 
     var response = await http.post(

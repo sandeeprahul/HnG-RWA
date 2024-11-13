@@ -45,11 +45,14 @@ class _PageRetailState extends State<PageRetail> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ListView.builder(
-            itemCount: checkList.isEmpty ? 0 : checkList.length,
-            itemBuilder: (BuildContext context, int pos) {
-              return item(pos);
-            }),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: ListView.builder(
+              itemCount: checkList.isEmpty ? 0 : checkList.length,
+              itemBuilder: (BuildContext context, int pos) {
+                return item(pos);
+              }),
+        ),
         Center(
           child: Visibility(
               visible: loading, child: const CircularProgressIndicator()),

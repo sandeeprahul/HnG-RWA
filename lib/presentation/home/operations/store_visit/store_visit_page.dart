@@ -10,10 +10,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hng_flutter/checkInOutScreenEmployee.dart';
 
 import 'package:hng_flutter/checkListItemScreen.dart';
 import 'package:hng_flutter/common/constants.dart';
 import 'package:hng_flutter/enums/store_visit_select_enum.dart';
+import 'package:hng_flutter/helper/simpleDialog.dart';
 import 'package:hng_flutter/submitCheckListScreen.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:http/http.dart' as http;
@@ -22,11 +24,13 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../data/UserLocations.dart';
 import '../../../../data/opeartions/store_visit/issue_list.dart';
 import '../../../../data/opeartions/store_visit/store_visit_locations_entity.dart';
+import '../../../../helper/permission_helper.dart';
 import '../../../../widgets/issue_list_widget.dart';
 
 class StoreVisitPage extends StatefulWidget {
@@ -92,15 +96,32 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    handlePermission();
     _picker = ImagePicker();
     // _determinePosition();
     // findUserGeoLoc();
 
-    getlocation(0);
+    getLocation(0);
     fetchLocations();
     getDeviceConfig();
     photo = null;
   }
+
+  Future<void> handlePermission() async {
+    final status = await PermissionHelper.requestLocationPermission();
+
+    if (status.isGranted) {
+      // Permission granted, proceed with your logic
+
+    } else if (status.isPermanentlyDenied ||
+        status.isDenied ||
+        status.isRestricted) {
+      const dynamicMessage =
+          'Please allow location permission for Location Check process';
+      PermissionHelper.showPermissionAlert(context, dynamicMessage);
+    }
+  }
+
 
 /*
   Future<void> checkLocationInRadius(double userLatitude, double userLongitude) async {
@@ -151,24 +172,34 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
     super.dispose();
   }
 
-  Future<Position> getlocation(var firstime) async {
-    setState(() {
-      loading = true;
-    });
+  Future<Position> getLocation(var firsTime) async {
+    try{
+      setState(() {
+        loading = true;
+      });
 
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      Position position = await   Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
 
-    setState(() {
-      lat_ = position.latitude;
-      lng_ = position.longitude;
-    });
+      setState(() {
+        lat_ = position.latitude;
+        lng_ = position.longitude;
+      });
 
-    setState(() {
-      loading = false;
-    });
+      setState(() {
+        loading = false;
+      });
+      return position;
 
-    return position;
+    }catch(e){
+      setState(() {
+        loading = false;
+      });
+      showSimpleDialog(title: "Alert!", msg: "Please enable Location permissions\n$e");
+      rethrow ;
+    }
+
+
   }
 
   // var imagePath = '';
@@ -564,7 +595,7 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
                             CircularProgressIndicator(),
                             Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: Text('Getting location..'),
+                              child: Text('Fetching location..'),
                             )
                           ],
                         ))),
@@ -713,7 +744,7 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
     );
   }
 
-  double maxDistance = 100; // Maximum distance in meters
+  double maxDistance = 150; // Maximum distance in meters
 
   var lat, lng;
 
@@ -1099,7 +1130,8 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
         } else {
 
           Fluttertoast.showToast(msg: respo['message']);
-          alert(respo['message']);
+          showSimpleDialog( title: 'Alert!', msg: '${respo['message']}\n${response.statusCode}');
+
           setState(() {
             loading = false;
             showProgress = false;
@@ -1108,7 +1140,7 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
           selectedIssueList.clear();
         }
       } else {
-        alert("Something went wrong\nError Code ${response.statusCode}");
+        showSimpleDialog( title: 'Alert!', msg: 'Something went wrong\n${response.statusCode}');
 
         setState(() {
           loading = false;
@@ -1122,7 +1154,8 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
         showProgress = false;
       });
       Fluttertoast.showToast(msg: "Network issue occurred\nPlease try again");
-      alert("Network issue occurred\nPlease try again");
+      showSimpleDialog( title: 'Alert!', msg: 'Something went wrong\n$e');
+
       scroreController.clear();
       selectedIssueList.clear();
     }
@@ -1173,10 +1206,10 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
             showProgress = false;
           });
           Fluttertoast.showToast(msg: respo['message']);
-          alert(respo['message']);
+          // alert(respo['message']);
         } else {
           Fluttertoast.showToast(msg: respo['message']);
-          alert(respo['message']);
+          showSimpleDialog( title: 'Alert!', msg: '${respo['message']}');
 
           setState(() {
             loading = false;

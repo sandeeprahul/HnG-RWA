@@ -7,6 +7,7 @@ import 'package:hng_flutter/data/ActiveCheckListStoreAudit.dart';
 import 'package:hng_flutter/data/HeaderQuesStoreAudit.dart';
 import 'package:hng_flutter/data/LPDSection.dart';
 import 'package:hng_flutter/checkListScreen.dart';
+import 'package:hng_flutter/helper/simpleDialog.dart';
 import 'package:hng_flutter/submitCheckListScreen.dart';
 import 'package:hng_flutter/submitCheckListScreen_AM.dart';
 import 'package:hng_flutter/submitCheckListScreen_Lpd.dart';
@@ -50,9 +51,14 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
   void initState() {
     // TODO: implement initState
     super.initState();
-    // WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     getData();
+  }
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -145,7 +151,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                                   alignment: Alignment.topLeft,
                                   child: Text(
                                     'Outlet name : ${widget.activeCheckList.locationName}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 12,
                                     ),
                                   ),
@@ -159,19 +165,19 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                                       alignment: Alignment.topLeft,
                                       child: Text(
                                         'Checklist No : ${widget.activeCheckList.amChecklistAssignId} ',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 12,
                                         ),
                                       ),
                                     ),
-                                    Spacer(),
+                                    const Spacer(),
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
                                       child: Align(
                                         alignment: Alignment.topLeft,
                                         child: Text(
                                           '$outputTime - $enddTime',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 12,
                                           ),
                                         ),
@@ -191,30 +197,24 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
               Expanded(
                   child: Padding(
                 padding: const EdgeInsets.only(bottom: 50),
-                child: StreamBuilder<List<HeaderQuesStoreAM>>(
-                  stream: getData(),
-                  builder: (context, snapshot) {
+                child:
 
+                   ListView.builder(
+                      itemCount: headerQuestion.length,
+                      itemBuilder: (context, pos) {
+                        final checkList = headerQuestion[pos];
 
-                    if(snapshot.hasData){
-                      final checkListData = snapshot.data!;
-
-                      return ListView.builder(
-                          itemCount: headerQuestion.length,
-                          itemBuilder: (context, pos) {
-                            final checkList = checkListData[pos];
-
-                            /*  var time = snapshot.data[pos].endTime;
+                        /*  var time = snapshot.data[pos].endTime;
                                       int idx = time.indexOf("T");
                                       List parts = [
                                         time.substring(0, idx).trim(),
                                         time.substring(idx + 1).trim()
                                       ];*/
-                            // var time_ = parts[1];
-                            return InkWell(
-                              onTap: () {
-                                // checkLocation();
-                                /*  if (headerQuestion[pos]
+                        // var time_ = parts[1];
+                        return InkWell(
+                          onTap: () {
+                            // checkLocation();
+                            /*  if (headerQuestion[pos]
                                       .checklistEditStatus == //checklistProgressStatus
                                   "E") {
                                 // ||headerQuestion[pos].checklistEditStatus =="P"
@@ -231,32 +231,22 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                                   getData();
                                 });
                               }*/
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          submitCheckListScreen_AM(
-                                              checkList,
-                                              widget.activeCheckList,
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      submitCheckListScreen_AM(
+                                          checkList,
+                                          widget.activeCheckList,
 
-                                              0,widget.mLpdChecklist)),
-                                ).then((value) {
-                                  getData();
-                                });
-                              },
-                              child: listItem(pos,checkList),
-                            );
-                          });
-                    } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        return SizedBox(
-                            height: MediaQuery.of(context).size.height / 4,
-                            width: MediaQuery.of(context).size.width / 4,
-                            child: CircularProgressIndicator());
-                      }
-                    }
-                ),
+                                          0,widget.mLpdChecklist)),
+                            ).then((value) {
+                              getData();
+                            });
+                          },
+                          child: listItem(pos,checkList),
+                        );
+                      })
               ))
             ],
           ),
@@ -274,7 +264,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                   width: double.infinity,
                   height: 50,
                   color: Colors.blue,
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Submit',
                       style: TextStyle(
@@ -290,20 +280,20 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
           Visibility(
               visible: loading,
               child: Container(
-                color: Color(0x80000000),
+                color: const Color(0x80000000),
                 child: Center(
                     child: Container(
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(5)),
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         height: 115,
                         width: 150,
-                        child: Column(
+                        child: const Column(
                           children: [
                             CircularProgressIndicator(),
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: EdgeInsets.all(8.0),
                               child: Text('Please wait..'),
                             )
                           ],
@@ -413,7 +403,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                         const Text('Updated by : ',
                             style: TextStyle(fontSize: 13)),
                         Text(
-                            '${checkList.startTime}',
+                            checkList.startTime,
                             // '${headerQuestion[pos].startTime} ${headerQuestion[pos].employeeCode}',
                             style: const TextStyle(
                                 fontSize: 13, fontWeight: FontWeight.bold))
@@ -486,100 +476,58 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
   String checklist_Current_Stats = '';
   bool showsubmitBtn = false;
 
-  Stream<List<HeaderQuesStoreAM>> getData() async* {
+  void getData() async {
+    setState(() {
+      loading = true;
+    });
+
     try {
-
-      //replace your restFull API here.//api/CheckList/HeaderQuestion/46
       final prefs = await SharedPreferences.getInstance();
-
       var userID = prefs.getString('userCode') ?? '105060';
+      String url = "${Constants.apiHttpsUrl}/AreaManager/HeaderQuestion/${widget.activeCheckList.amChecklistAssignId}/${widget.mLpdChecklist.sectionId}/$userID";
 
-      String url =
-          "${Constants.apiHttpsUrl}/AreaManager/HeaderQuestion/${widget.activeCheckList.amChecklistAssignId}/${widget.mLpdChecklist.sectionId}/$userID";
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(milliseconds: 2500));
 
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(milliseconds: 2500));
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        Map<String, dynamic> map = responseData;
+        List<dynamic> data = map["checklist_Question_Header"];
 
-      var responseData = json.decode(response.body);
-      print(url);
-      print(responseData);
-
-      //Creating a list to store input data;
-      Map<String, dynamic> map = json.decode(response.body);
-
-
-      headerQuestion = [];
-      List<dynamic> data = map["checklist_Question_Header"];
-      print("checklist_Current_Statssssssss");
-
-      setState(() {
-        checklist_Header_Status = map['checklist_Header_Status']??'';
-        checklist_Current_Stats = map['checklist_Current_Stats']??'';
-      });
-      if (
-          checklist_Current_Stats == "Completed") {
         setState(() {
-          showsubmitBtn = true;
+          headerQuestion = data.map((e) => HeaderQuesStoreAM.fromJson(e)).toList();
+          checklist_Header_Status = map['checklist_Header_Status'] ?? '';
+          checklist_Current_Stats = map['checklist_Current_Stats'] ?? '';
+          showsubmitBtn = checklist_Current_Stats == "Completed";
+          loading = false;
         });
       } else {
-        setState(() {
-          showsubmitBtn = false;
-        });
+        throw Exception('Failed to load data');
       }
-      print(checklist_Header_Status);
-
-      data.forEach((element) {
-        headerQuestion.add(HeaderQuesStoreAM.fromJson(element));
-      });
-
-
-
-      // List<CustomModel> list = dynamicList.cast<CustomModel>();
-
-      print(data.length);
-
-      /*setState(() {
-      headerQuestion = data;
-
-    });*/
-
-
     } catch (e) {
-      print(e);
-
+      setState(() {
+        loading = false;
+        // hasError = true;
+      });
       _showRetryAlert();
     }
   }
 
-  Future<void> _showRetryAlert() async {
-    return showDialog<void>(
+  void _showRetryAlert() {
+    showDialog(
       context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Alert!'),
-            content: Text('Network issue\nPlease retry'),
-// Please retry?'),
-          actions: <Widget>[
-            Container(
-              padding: EdgeInsets.all(15),
-
-              decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    // _showRetryAlert();
-                    getData();
-                    // submitCheckList();
-                  },
-                  child: const Text('Retry',
-                      style: TextStyle(color: Colors.white))),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: const Text('Failed to fetch data. Please try again.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              getData();
+            },
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -588,48 +536,54 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
       loading = true;
     });
 
-    final payload =
-        '{"checklist_assign_id":${widget.activeCheckList.amChecklistAssignId}}';
+    try{
+      final payload =
+          '{"checklist_assign_id":${widget.activeCheckList.amChecklistAssignId}}';
 
-     var url = Uri.https(
+      var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
         '/RWASTAFFMOVEMENT_TEST/api/AreaManager/WorkFlowStatus',
-    );
+      );
 
-    var response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(
-          {"am_checklist_assign_id": widget.activeCheckList.amChecklistAssignId}),
-    );
+      var response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(
+            {"am_checklist_assign_id": widget.activeCheckList.amChecklistAssignId}),
+      );
 
-    print(response.body);
-    print(response.request);
-    print(response.statusCode);
-    var respo = jsonDecode(response.body);
-    if (response.statusCode == 200) {
-      setState(() {
-        loading = false;
-      });
-      if (respo['statusCode'] == "200") {
+      var respo = jsonDecode(response.body);
+      if (response.statusCode == 200) {
         setState(() {
           loading = false;
         });
+        if (respo['statusCode'] == "200") {
+          setState(() {
+            loading = false;
+          });
 
-        // if()
-        _showSuccessAlert('Checklist Successfully Submitted for Review');
-        // Navigator.pop(context);
-      } else {
-        /* setState(() {
+          // if()
+          _showSuccessAlert('Checklist Successfully Submitted for Review');
+          // Navigator.pop(context);
+        } else {
+          /* setState(() {
           loading = false;
         });*/
-        _showAlert(respo['message']);
-      }      // Navigator.pop(context);
-    } else {
-      _showAlert('Something went wrong\nPlease contact IT suport');
+          _showAlert(respo['message']);
+        }      // Navigator.pop(context);
+      } else {
+        _showAlert('Something went wrong\nPlease contact IT suport');
+      }
+    }catch(e){
+      print(e);
+    }finally{
+      setState(() {
+        loading = true;
+      });
     }
+
   }
 
   Future<void> _showSuccessAlert(String msg) async {
@@ -639,7 +593,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
       builder: (BuildContext contextt) {
         return AlertDialog(
           title: const Text('Info'),
-          content: Text('$msg'),
+          content: Text(msg),
           actions: <Widget>[
             InkWell(
               onTap: () {
@@ -650,7 +604,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 35, right: 35, top: 15, bottom: 15),
-                margin: EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 decoration: const BoxDecoration(
                     color: CupertinoColors.activeBlue,
                     borderRadius: BorderRadius.all(Radius.circular(30))),
@@ -671,7 +625,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
       builder: (BuildContext contextt) {
         return AlertDialog(
           title: const Text('Info'),
-          content: Text('$msg'),
+          content: Text(msg),
           actions: <Widget>[
             InkWell(
               onTap: () {
@@ -682,7 +636,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 35, right: 35, top: 15, bottom: 15),
-                margin: EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 decoration: const BoxDecoration(
                     color: CupertinoColors.activeBlue,
                     borderRadius: BorderRadius.all(Radius.circular(30))),

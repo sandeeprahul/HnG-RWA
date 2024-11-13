@@ -155,7 +155,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                           const Padding(
                             padding: EdgeInsets.only(left: 20),
                             child: Text(
-                              'Store Audit',
+                              'Area Manager',
                               style: TextStyle(color: Colors.black),
                             ),
                           ),
@@ -311,7 +311,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                                       //             'P'
                                       //         ? false
                                       //         : true,
-                                      decoration: InputDecoration(
+                                      decoration: const InputDecoration(
                                         isDense: true,
                                         contentPadding: EdgeInsets.zero,
                                         border: InputBorder.none,
@@ -330,17 +330,17 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                                 ? true
                                 : false,
                         child: Container(
-                          margin: EdgeInsets.only(top: 10),
+                          margin: const EdgeInsets.only(top: 10),
                           padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(5)),
+                                BorderRadius.all(Radius.circular(5)),
                             // border: Border.all(color: Colors.grey)
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Store Rating',
                                 style: TextStyle(
                                     fontSize: 16, color: Colors.black),
@@ -352,8 +352,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                                 allowHalfRating: true,
                                 itemCount: 5,
                                 itemPadding:
-                                    EdgeInsets.symmetric(horizontal: 4.0),
-                                itemBuilder: (context, _) => Icon(
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                itemBuilder: (context, _) => const Icon(
                                   Icons.star,
                                   color: Colors.amber,
                                 ),
@@ -374,17 +374,17 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                                 ? true
                                 : false,
                         child: Container(
-                          margin: EdgeInsets.only(top: 10),
+                          margin: const EdgeInsets.only(top: 10),
                           padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(5)),
+                                BorderRadius.all(Radius.circular(5)),
                             // border: Border.all(color: Colors.grey)
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Department Rating',
                                 style: TextStyle(
                                     fontSize: 16, color: Colors.black),
@@ -396,8 +396,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                                 allowHalfRating: true,
                                 itemCount: 5,
                                 itemPadding:
-                                    EdgeInsets.symmetric(horizontal: 4.0),
-                                itemBuilder: (context, _) => Icon(
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                itemBuilder: (context, _) => const Icon(
                                   Icons.star,
                                   color: Colors.amber,
                                 ),
@@ -411,7 +411,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                             ],
                           ),
                         )),
-                    SizedBox(
+                    const SizedBox(
                       height: 60,
                     )
                   ],
@@ -540,20 +540,20 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
               Visibility(
                   visible: loading,
                   child: Container(
-                    color: Color(0x80000000),
+                    color: const Color(0x80000000),
                     child: Center(
                         child: Container(
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(5)),
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             height: 115,
                             width: 150,
-                            child: Column(
+                            child: const Column(
                               children: [
                                 CircularProgressIndicator(),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: EdgeInsets.all(8.0),
                                   child: Text('Please wait..'),
                                 )
                               ],
@@ -792,13 +792,16 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       String url =
           "${Constants.apiHttpsUrl}/AreaManager/QuestionAnswers/${widget.checkList.am_checklist_assign_id}/${widget.checkList.checklisTItemMstId}/InProcess/$userId"; //
 
+      print(url);
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(milliseconds: 2500));
+          await http.get(Uri.parse(url)).timeout(const Duration(milliseconds: 5000));
+      print(response.body);
 
       var responseData = json.decode(response.body);
       final decodedJson = jsonDecode(response.body); // dynamic
 
       final data = decodedJson[0];
+      print(response.body);
 
       List<dynamic> list = json.decode(response.body);
 
@@ -898,6 +901,11 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       });
       _showRetryAlert__(0);
     }
+    finally{
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   Future<void> _showRetryAlert__(int i) async {
@@ -907,39 +915,25 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-            content: Text('Network issue\nPlease retry'),
+            content: const Text('Something went wrong'),
 // Please retry?'),
           actions: <Widget>[
             Container(
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+              BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
 
                     // submitCheckList();
                   },
-                  child: const Text('Cancel',
-                      style: TextStyle(color: Colors.white))),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16,vertical: 16),
+                    child: Text('Ok',
+                        style: TextStyle(color: Colors.white)),
+                  )),
             ),
-            Container(
-              decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    if (i == 0) {
-                      getData();
-                    } else if (i == 1) {
-                      questionCancel();
-                    } else if (i == 2) {
-                      submitCheckList();
-                    }
-                    // submitCheckList();
-                  },
-                  child: const Text('Retry',
-                      style: TextStyle(color: Colors.white))),
-            ),
+
           ],
         );
       },
@@ -972,9 +966,9 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    padding: EdgeInsets.only(
+                    padding: const EdgeInsets.only(
                         left: 35, right: 35, top: 15, bottom: 15),
-                    margin: EdgeInsets.only(left: 15, bottom: 10),
+                    margin: const EdgeInsets.only(left: 15, bottom: 10),
                     decoration: const BoxDecoration(
                         color: CupertinoColors.systemGrey3,
                         borderRadius: BorderRadius.all(Radius.circular(30))),
@@ -988,10 +982,10 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                     submitCheckList();
                   },
                   child: Container(
-                    padding: EdgeInsets.only(
+                    padding: const EdgeInsets.only(
                         left: 35, right: 35, top: 15, bottom: 15),
-                    margin: EdgeInsets.only(right: 15, bottom: 10),
-                    decoration: BoxDecoration(
+                    margin: const EdgeInsets.only(right: 15, bottom: 10),
+                    decoration: const BoxDecoration(
                         color: CupertinoColors.activeBlue,
                         borderRadius: BorderRadius.all(Radius.circular(30))),
                     child: const Text(
@@ -1037,7 +1031,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 35, right: 35, top: 15, bottom: 15),
-                margin: EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 decoration: const BoxDecoration(
                     color: CupertinoColors.activeBlue,
                     borderRadius: BorderRadius.all(Radius.circular(30))),
@@ -1061,9 +1055,9 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           // content: Text('$msg'),
           actions: <Widget>[
             Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(color: CupertinoColors.activeBlue),
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(color: CupertinoColors.activeBlue),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -1090,7 +1084,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           content: Text('$msg'),
           actions: <Widget>[
             Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               decoration:
                   const BoxDecoration(color: CupertinoColors.activeBlue),
               child: InkWell(
@@ -1168,8 +1162,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       _showRetryAlert__(1);
       // return false;
     }
-    print('goBack');
-    print(goBack);
+
     return goBack;
   }
 
@@ -1345,7 +1338,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
             },
             body: jsonEncode(sendJson),
           )
-          .timeout(Duration(seconds: 5));
+          .timeout(const Duration(seconds: 5));
       print(response.body);
       print(response.request);
       print(response.statusCode);
@@ -1559,8 +1552,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           content: Text(msg),
           actions: <Widget>[
             Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(10),
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: TextButton(
                 child:
                     const Text('Got it', style: TextStyle(color: Colors.blue)),
@@ -1582,11 +1575,11 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-            content: Text('Network issue\nPlease retry'),
+            content: const Text('Network issue\nPlease retry'),
 // Please retry?'),
           actions: <Widget>[
             Container(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               decoration:
                   const BoxDecoration(color: CupertinoColors.activeBlue),
               child: InkWell(
@@ -1598,7 +1591,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                       style: TextStyle(color: Colors.white))),
             ),
             Container(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               decoration:
                   const BoxDecoration(color: CupertinoColors.activeBlue),
               child: InkWell(

@@ -22,7 +22,7 @@ import '../../../widgets/employee_transfer_details_widget.dart';
 class StoreTransferPage extends ConsumerStatefulWidget {
   final bool isPermanent;
 
-  const StoreTransferPage(this.isPermanent, {Key? key}) : super(key: key);
+  const StoreTransferPage(this.isPermanent, {super.key});
 
   @override
   ConsumerState<StoreTransferPage> createState() => _StoreTransferPageState();
@@ -233,7 +233,7 @@ class _StoreTransferPageState extends ConsumerState<StoreTransferPage> {
       builder: (BuildContext contextt) {
         return AlertDialog(
           title: const Text('Info'),
-          content: Text('$msg'),
+          content: Text(msg),
           actions: <Widget>[
             InkWell(
               onTap: () {

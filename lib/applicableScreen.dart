@@ -71,7 +71,7 @@ class _applicableScreenState extends State<applicableScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       print("resumedCheckListScreen");
-      getAcitiveCheckListData();
+      getActiveCheckListData();
       //do your stuff
     }
   }
@@ -89,7 +89,7 @@ class _applicableScreenState extends State<applicableScreen>
     print("initState");
     WidgetsBinding.instance.addObserver(this);
 
-    getAcitiveCheckListData();
+    getActiveCheckListData();
   }
 
   @override
@@ -196,7 +196,7 @@ class _applicableScreenState extends State<applicableScreen>
                               ),
                         )).then((value) {
                       if (context.mounted) {
-                        getAcitiveCheckListData();
+                        getActiveCheckListData();
                       }
                     });
                     // Active_CheckList
@@ -212,7 +212,7 @@ class _applicableScreenState extends State<applicableScreen>
                               ),
                         )).then((value) {
                       if (context.mounted) {
-                        getAcitiveCheckListData();
+                        getActiveCheckListData();
                       }
                     });
                   }
@@ -260,7 +260,7 @@ class _applicableScreenState extends State<applicableScreen>
   List<ActiveCheckListLpd> activeCheckListLpd = [];
   List<ActiveCheckListAm> activeCheckListAm = [];
 
-  Future<void> getAcitiveCheckListData() async {
+  Future<void> getActiveCheckListData() async {
     try {
       setState(() {
         loading = true;
@@ -286,7 +286,7 @@ class _applicableScreenState extends State<applicableScreen>
         "${Constants.apiHttpsUrl}/Employee/GetChecklistId/${widget.mGetActvityTypes.auditId}";
       }
 
-      print("ACTIVEEEEEE " + url);
+      print(url + "ACTIVEEEEEE ");
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
       print(response.body);
@@ -343,7 +343,7 @@ class _applicableScreenState extends State<applicableScreen>
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
-                    getAcitiveCheckListData();
+                    getActiveCheckListData();
                     // submitCheckList();
                   },
                   child: const Text('Retry',
@@ -387,7 +387,7 @@ class _applicableScreenState extends State<applicableScreen>
                     widget.locationsList,
                   ),
               )).then((value) => () {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
         }
         // final lpdChecklist = lpdChecklistFromJson(responseData);
@@ -486,7 +486,7 @@ class _applicableScreenState extends State<applicableScreen>
                     widget.locationsList,
                    ),
               )).then((value) => () {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
         } else if (responseData['statusCode'] == "201") {
           showAlert(responseData['message']);
@@ -568,6 +568,7 @@ class _applicableScreenState extends State<applicableScreen>
       url =
           "${Constants.apiHttpsUrl}/AreaManager/CreateareamanagerChecklist?locationcode=$locationCode&createdby=$userID&checklistid=$id";
 
+      print(url);
       final response = await http.get(Uri.parse(url));
 
       var responseData = json.decode(response.body);
@@ -588,9 +589,10 @@ class _applicableScreenState extends State<applicableScreen>
                     widget.locationsList,
                     ),
               )).then((value) {
-            if (context.mounted) {
-              getAcitiveCheckListData();
-            }
+            getActiveCheckListData();
+
+         /*   if (context.mounted) {
+            }*/
           });
         } else if (responseData['statusCode'] == "201") {
           showAlert(responseData['message']);
@@ -695,7 +697,7 @@ class _applicableScreenState extends State<applicableScreen>
              ),
               )).then((value) {
             if (context.mounted) {
-              getAcitiveCheckListData();
+              getActiveCheckListData();
             }
           });
         } else if (responseData['statusCode'] == "201") {
