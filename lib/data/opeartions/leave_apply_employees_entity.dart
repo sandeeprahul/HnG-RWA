@@ -39,30 +39,48 @@ class Employee {
     );
   }
 }
+
+class Description {
+  final String code;
+  final String message;
+
+  Description({required this.message, required this.code});
+
+  factory Description.fromJson(Map<String, dynamic> json) {
+    return Description(
+        message: json['msg'] as String, code: json['code'] as String);
+  }
+}
+
 // Create a class to hold both leave types and employees
 class LeaveData {
   final List<LeaveType> leaveTypes;
   final List<Employee> employees;
+  final List<Description> description;
 
-  LeaveData({required this.leaveTypes, required this.employees});
+  LeaveData({
+    required this.leaveTypes,
+    required this.employees,
+    required this.description,
+  });
 
   // Factory method to create LeaveData from JSON
   factory LeaveData.fromJson(Map<String, dynamic> json) {
     var leaveList = json['leavetypelist'] as List;
     var empList = json['employeelist'] as List;
+    var descriptionList = json['descriptionmsg'] as List;
 
-    List<LeaveType> leaveTypes = leaveList
-        .map((leave) => LeaveType.fromJson(leave))
-        .toList();
+    List<LeaveType> leaveTypes =
+        leaveList.map((leave) => LeaveType.fromJson(leave)).toList();
 
-    List<Employee> employees = empList
-        .map((emp) => Employee.fromJson(emp))
+    List<Employee> employees =
+        empList.map((emp) => Employee.fromJson(emp)).toList();
+
+    List<Description> description = descriptionList
+        .map((description) => Description.fromJson(description))
         .toList();
 
     return LeaveData(
-      leaveTypes: leaveTypes,
-      employees: employees,
-    );
+        leaveTypes: leaveTypes, employees: employees, description: description);
   }
 }
-

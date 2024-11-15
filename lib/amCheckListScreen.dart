@@ -230,7 +230,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
   String checklist_completed_status = "";
 
   Widget checkListView() {
-    return mLpdChecklist.length == 0
+    return mLpdChecklist.isEmpty
         ? const Padding(
             padding: EdgeInsets.all(10.0),
             child: Text('No records found'),
