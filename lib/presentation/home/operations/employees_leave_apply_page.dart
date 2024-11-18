@@ -170,10 +170,10 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                             setState(() {
                                               selectedEmployees[employee
                                                   .empCode] = value ?? false;
-                                              selectAll = selectedEmployees
-                                                  .values
-                                                  .every((isSelected) =>
-                                                      isSelected);
+
+                                              selectAll = employees
+                                                  .where((emp) => emp.status.isEmpty)
+                                                  .every((emp) => selectedEmployees[emp.empCode] ?? false);
                                             });
                                           }
                                         : null,
@@ -220,11 +220,12 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                     onPressed: selectedLeaveType == null
                         ? null
                         : () {
-                            // Collect selected employees and print JSON
+                      printData();
+
+                      // Collect selected employees and print JSON
                             showConfirmDialog(
                                 onConfirmed: () {
-                                  // submitLeaves();
-                                  printData();
+                                  submitLeaves();
                                 },
                                 title: 'Alert!',
                                 msg: 'Confirm Submit?');
@@ -393,6 +394,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     String? locationCode = preferences.getString("locationCode");
 
     // Collect all employees, including selected and unselected, and prepare JSON output
+
+
     List<Map<String, String>> jsonOutput = employees.map((employee) {
       bool isSelected = selectedEmployees[employee.empCode] == true;
 
@@ -408,8 +411,32 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     }).toList();
 
     // Convert the JSON output to a string
-    final String jsonBody = json.encode(jsonOutput);
+    final String jsonBody = json.encode(result);
     print(jsonBody);
-    print(jsonOutput);
+    final String jsonBody2 = json.encode(jsonOutput);
+    print("jsonBody2: $jsonBody2");
   }
+
+  List<Map<String, dynamic>> prepareEmployeeData({
+    required List<Employee> employeeList,
+    required bool selectAll,
+    required Map<String, bool> selectedEmployees,
+    required String locationCode,
+    required String updatedBy,
+  }) {
+    return employeeList
+        .where((employee) =>
+    selectAll || (selectedEmployees[employee.empCode] ?? false))
+        .map((employee) {
+      return {
+        "empCode": employee.empCode ?? '',
+        "date": employee.date ?? '',
+        "leaveType": employee.status.isEmpty ? selectedEmployees['leaveType']??'' : employee.status,
+        "locationCode": locationCode,
+        "updatedby": updatedBy,
+      };
+    }).toList();
+  }
+
+
 }
