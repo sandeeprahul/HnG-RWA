@@ -1074,7 +1074,7 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Login/StoreVisit',
+      '/RWA_GROOMING_API/api/Login/StoreVisit',
       );
 
       List<Map<String, String>> jsonParamsList = [];
@@ -1173,7 +1173,7 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Login/StoreVisitcheckin',
+      '/RWA_GROOMING_API/api/Login/StoreVisitcheckin',
       );
 
       var response = await http

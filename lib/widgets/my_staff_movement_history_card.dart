@@ -144,10 +144,10 @@ class _StaffMovementHistoryCardState extends State<StaffMovementHistoryCard> {
     try {
       /*  var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        'RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffPost',
+        'RWA_GROOMING_API/api/StaffMovement/StaffPost',
       );*/
       final url =
-      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffInStore');
+      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/StaffInStore');
 
 
       var response = await http.post(
@@ -161,7 +161,7 @@ class _StaffMovementHistoryCardState extends State<StaffMovementHistoryCard> {
 /*
       final response = await http.post(
         Uri.parse(
-            'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffPost'),
+            'https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/StaffPost'),
         body: jsonEncode(postData),
         headers: {
           'Content-Type': 'application/json',
@@ -217,10 +217,10 @@ class _StaffMovementHistoryCardState extends State<StaffMovementHistoryCard> {
     try {
       /*  var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        'RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffPost',
+        'RWA_GROOMING_API/api/StaffMovement/StaffPost',
       );*/
       final url =
-      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffInStore');
+      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/StaffInStore');
 
 
       var response = await http.post(
@@ -234,7 +234,7 @@ class _StaffMovementHistoryCardState extends State<StaffMovementHistoryCard> {
 /*
       final response = await http.post(
         Uri.parse(
-            'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffPost'),
+            'https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/StaffPost'),
         body: jsonEncode(postData),
         headers: {
           'Content-Type': 'application/json',

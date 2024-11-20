@@ -1014,7 +1014,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
       });
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/CheckList/QuestionCancel',
+      '/RWA_GROOMING_API/api/CheckList/QuestionCancel',
       );
       var sendJson = {
         "vm_assign_id": widget.checkList.vm_assign_id,
@@ -1346,7 +1346,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
       // String url = staticUrlString + "Login/validateLogin";
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/CheckList/ImageUpload',
+      '/RWA_GROOMING_API/api/CheckList/ImageUpload',
       );
 
       var image = [];

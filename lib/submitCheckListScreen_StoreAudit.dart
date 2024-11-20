@@ -1138,7 +1138,7 @@ class _submitCheckListScreen_StoreAuditState
       });
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/QuestionCancel',
+      '/RWA_GROOMING_API/api/StoreAudit/QuestionCancel',
       );
       var sendJson = {
         "checklist_assign_id": widget.checkList.store_checklist_assign_id,
@@ -1205,7 +1205,7 @@ class _submitCheckListScreen_StoreAuditState
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/AddQuestionAnswer',
+      '/RWA_GROOMING_API/api/StoreAudit/AddQuestionAnswer',
       );
 
       var locationCode = prefs.getString('locationCode');
@@ -1545,7 +1545,7 @@ class _submitCheckListScreen_StoreAuditState
       // String url = staticUrlString + "Login/validateLogin";
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/ImageUpload',
+      '/RWA_GROOMING_API/api/StoreAudit/ImageUpload',
       );
 
       var image = [];

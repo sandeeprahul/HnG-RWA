@@ -278,7 +278,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     });
     var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff',
+      '/RWA_GROOMING_API/api/Login/weekoff',
     );
 
     try {

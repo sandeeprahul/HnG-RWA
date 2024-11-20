@@ -1015,7 +1015,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Login/ForgotPasssms', //
+      '/RWA_GROOMING_API/api/Login/ForgotPasssms', //
       );
       print(url);
 
@@ -1077,7 +1077,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       print("PARAMS->$params");
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Login/forgotpassword',
+      '/RWA_GROOMING_API/api/Login/forgotpassword',
       );
 
       var response = await http

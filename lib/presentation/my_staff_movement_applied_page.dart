@@ -88,9 +88,9 @@ class _MyStaffMovementAppliedPageState
         var locationCode = prefs.getString('locationCode') ?? '106';
         final response = await http.get(
           Uri.parse(
-              'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/GetStaff_IN_OUT_Details/$userId/$locationCode'),
+              'https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/GetStaff_IN_OUT_Details/$userId/$locationCode'),
         );
-        print('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/GetStaff_IN_OUT_Details/$userId/$locationCode');
+        print('https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/GetStaff_IN_OUT_Details/$userId/$locationCode');
 
         if (response.statusCode == 200) {
           final List<dynamic> data = json.decode(response.body);

@@ -1030,7 +1030,7 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
       });
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/QuestionCancel',
+      '/RWA_GROOMING_API/api/lpdaudit/QuestionCancel',
       );
       var sendJson = {
         "checklist_assign_id": widget.checkList.lpdChecklistAssignId,
@@ -1097,7 +1097,7 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/AddQuestionAnswer',
+      '/RWA_GROOMING_API/api/lpdaudit/AddQuestionAnswer',
       );
 
       var locationCode = prefs.getString('locationCode');

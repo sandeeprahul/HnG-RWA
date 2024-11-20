@@ -1846,7 +1846,7 @@ class _AmAcceptSelectionScreen_LPDState
       // String url = staticUrlString + "Login/validateLogin";
       var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/QuestionUpdate',
+        '/RWA_GROOMING_API/api/lpdaudit/QuestionUpdate',
       );
 
       var params = [];
@@ -2261,7 +2261,7 @@ class _AmAcceptSelectionScreen_LPDState
 
     var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/WorkFlowStatus',
+      '/RWA_GROOMING_API/api/lpdaudit/WorkFlowStatus',
     );
 
     var response = await http.post(

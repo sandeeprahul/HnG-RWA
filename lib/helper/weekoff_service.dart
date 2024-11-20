@@ -8,7 +8,7 @@ import '../data/opeartions/employee_weekoff_details.dart';
 
 class WeekoffService {
   Future<void> submitWeekOff(List<dynamic> params) async {
-    var url = Uri.https('RWAWEB.HEALTHANDGLOWONLINE.CO.IN', '/RWASTAFFMOVEMENT_TEST/api/Login/weekoff');
+    var url = Uri.https('RWAWEB.HEALTHANDGLOWONLINE.CO.IN', '/RWA_GROOMING_API/api/Login/weekoff');
     var response = await http.post(
       url,
       headers: {'Content-Type': 'application/json; charset=UTF-8'},

@@ -1042,11 +1042,11 @@ class _submitQesAnsCheckListScreenEmployeeState
   //     var empCode = pref.getString("userCode");
   //     var url = Uri.https(
   //       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-  //       '/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionCancel',
+  //       '/RWA_GROOMING_API/api/Employee/QuestionCancel',
   //     );
   //    /*  var url = Uri.https(
   //     'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-  //     '/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionCancel',
+  //     '/RWA_GROOMING_API/api/Employee/QuestionCancel',
   //     );*/
   //     var sendJson = {
   //       "checklist_assign_id": widget.checkList.empChecklistAssignId,
@@ -1118,7 +1118,7 @@ class _submitQesAnsCheckListScreenEmployeeState
 
     var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Employee/AddQuestionAnswer',
+      '/RWA_GROOMING_API/api/Employee/AddQuestionAnswer',
     );
 
     var locationCode = prefs.getString('locationCode');

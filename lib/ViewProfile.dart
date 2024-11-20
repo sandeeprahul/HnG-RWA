@@ -950,7 +950,7 @@ class _ViewProfileState extends State<ViewProfile> {
     try {
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Login/ProfilePhotoUpdate', //
+      '/RWA_GROOMING_API/api/Login/ProfilePhotoUpdate', //
       );
       print("=>");
       print(url);
@@ -1023,7 +1023,7 @@ class _ViewProfileState extends State<ViewProfile> {
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Login/changepassword', //
+      '/RWA_GROOMING_API/api/Login/changepassword', //
       );
 
       var response = await http

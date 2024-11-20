@@ -278,7 +278,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
     // Define the endpoint URL
     const String url =
-        "https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Login/attendanceupdate";
+        "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/attendanceupdate";
 
     try {
       // Make the POST request
@@ -356,7 +356,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     var userCode = '70002';
 
     final String url =
-        "https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/Login/GetLeaveTypesAndEmployess/$userCode"; // Replace with your actual URL
+        "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/GetLeaveTypesAndEmployess/$userCode"; // Replace with your actual URL
     print(url);
     try {
       final response = await http.get(Uri.parse(url));
@@ -411,8 +411,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     }).toList();
 
     // Convert the JSON output to a string
-    final String jsonBody = json.encode(result);
-    print(jsonBody);
+    // final String jsonBody = json.encode(result);
+    // print(jsonBody);
     final String jsonBody2 = json.encode(jsonOutput);
     print("jsonBody2: $jsonBody2");
   }

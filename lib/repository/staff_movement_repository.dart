@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 
 class StaffMovementReasonRepository {
-  final String baseUrl = 'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/GetStaffmovementreason';
+  final String baseUrl = 'https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/GetStaffmovementreason';
 
   Future<List<String>> getStaffMovementReasons() async {
     final response = await http.get(Uri.parse(baseUrl));

@@ -1092,7 +1092,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/lpdaudit/Lpd_CheckIn', //lpdaudit/AddCheckinHeader
+      '/RWA_GROOMING_API/api/lpdaudit/Lpd_CheckIn', //lpdaudit/AddCheckinHeader
       );
 
       var locationCode;

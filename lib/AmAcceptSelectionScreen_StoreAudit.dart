@@ -1672,7 +1672,7 @@ class _AmAcceptSelectionScreen_StoreAuditState
       // String url = staticUrlString + "Login/validateLogin";
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/QuestionUpdate',
+      '/RWA_GROOMING_API/api/StoreAudit/QuestionUpdate',
       );
 
       var params = [];
@@ -1954,7 +1954,7 @@ class _AmAcceptSelectionScreen_StoreAuditState
 
      var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/WorkFlowStatus',
+        '/RWA_GROOMING_API/api/StoreAudit/WorkFlowStatus',
     );
 
     var response = await http.post(

@@ -63,7 +63,7 @@ class _StaffMovementPageState extends ConsumerState<StaffMovementPage> {
 
   Future<List<StaffMovementReasonData>> fetchReasons() async {
     final response = await http.get(Uri.parse(
-        'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/GetStaffmovementreason'));
+        'https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/GetStaffmovementreason'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -79,7 +79,7 @@ class _StaffMovementPageState extends ConsumerState<StaffMovementPage> {
     var userId = prefs.getString("userCode");
 
     final response = await http.get(Uri.parse(
-        'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/Staff_In_Out_Detail/$userId'));
+        'https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/Staff_In_Out_Detail/$userId'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -355,10 +355,10 @@ class _StaffMovementPageState extends ConsumerState<StaffMovementPage> {
 
     /*  var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        'RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffPost',
+        'RWA_GROOMING_API/api/StaffMovement/StaffPost',
       );*/
       final url =
-      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffPost');
+      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/StaffPost');
 
 
       var response = await http.post(
@@ -372,7 +372,7 @@ class _StaffMovementPageState extends ConsumerState<StaffMovementPage> {
 /*
       final response = await http.post(
         Uri.parse(
-            'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/StaffMovement/StaffPost'),
+            'https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/StaffMovement/StaffPost'),
         body: jsonEncode(postData),
         headers: {
           'Content-Type': 'application/json',

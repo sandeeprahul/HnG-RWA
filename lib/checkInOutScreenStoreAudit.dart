@@ -1101,7 +1101,7 @@ class _checkInOutScreenStoreAuditState
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/StoreAudit/Store_CheckIn', //
+      '/RWA_GROOMING_API/api/StoreAudit/Store_CheckIn', //
       );
 
       var locationCode;

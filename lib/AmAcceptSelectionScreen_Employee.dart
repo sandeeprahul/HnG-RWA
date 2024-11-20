@@ -1787,7 +1787,7 @@ class _AmAcceptSelectionScreen_EmployeeState
       // String url = staticUrlString + "Login/validateLogin";
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/Employee/QuestionUpdate',
+      '/RWA_GROOMING_API/api/Employee/QuestionUpdate',
       );
 
       var params = [];
@@ -2032,7 +2032,7 @@ class _AmAcceptSelectionScreen_EmployeeState
 
      var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWASTAFFMOVEMENT_TEST/api/Employee/WorkFlowStatusEmp',
+        '/RWA_GROOMING_API/api/Employee/WorkFlowStatusEmp',
     );
 
     var response = await http.post(

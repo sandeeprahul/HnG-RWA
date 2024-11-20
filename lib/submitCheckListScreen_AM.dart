@@ -1114,7 +1114,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       });
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/AreaManager/QuestionCancel',
+      '/RWA_GROOMING_API/api/AreaManager/QuestionCancel',
       );
       var sendJson = {
         "checklist_assign_id": widget.checkList.am_checklist_assign_id,
@@ -1180,7 +1180,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
 
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/AreaManager/AddQuestionAnswer',
+      '/RWA_GROOMING_API/api/AreaManager/AddQuestionAnswer',
       );
 
       var locationCode = prefs.getString('locationCode');
@@ -1460,7 +1460,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       // String url = staticUrlString + "Login/validateLogin";
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/AreaManager/ImageUpload',
+      '/RWA_GROOMING_API/api/AreaManager/ImageUpload',
       );
 
       var image = [];
