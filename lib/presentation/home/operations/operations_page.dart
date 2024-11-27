@@ -60,10 +60,11 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                   return ElevatedButton(
                     onPressed: () {
                       if (audit.auditId == 101) {
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const EmployeeListScreen(),
+                            builder: (context) =>  EmployeeListScreen(formattedAuditName: formattedAuditName,),
                             // builder: (context) => const WeekOffEmployeeListPage(),
                           ),
                         );

@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'checkInOutScreenIOS.dart';
 import 'common/constants.dart';
 import 'common/permission_popup.dart';
+import 'controllers/taskCheckerController.dart';
 import 'core/light_theme.dart';
 import 'presentation/attendance/attendence_screen.dart';
 import 'data/GetProgressStatus.dart';
@@ -302,6 +303,7 @@ class _PageHomeState extends State<PageHome> {
   }
 
   bool showImage = false;
+  final TaskCheckerController taskCheckController = Get.put(TaskCheckerController());
 
   @override
   Widget build(BuildContext context) {
@@ -406,7 +408,7 @@ class _PageHomeState extends State<PageHome> {
                                     child: checkOutbnt
                                         ? checkoutBtnWidget()
                                         : checkInBool
-                                            ? checkInbtn()
+                                            ? checkInBtn()
                                             : const Text('')),
                               ],
                             ),
@@ -667,7 +669,7 @@ class _PageHomeState extends State<PageHome> {
     );
   }
 
-  Widget checkInbtn() {
+  Widget checkInBtn() {
     return InkWell(
       onTap: () {
         checkPermissions(0);
@@ -678,26 +680,35 @@ class _PageHomeState extends State<PageHome> {
           gotoCheckInOutScreen(0);
         }*/
       },
-      child: Container(
+      child:Container(
         margin: const EdgeInsets.only(top: 7),
         padding:
-            const EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10),
+        const EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10),
         decoration: BoxDecoration(
             color: Colors.green,
             borderRadius: const BorderRadius.all(Radius.circular(5)),
             border: Border.all(
               color: Colors.green,
             )),
-        child: Text(
-          'Check In',
-          style: lightTheme.textTheme.labelSmall!
-              .copyWith(fontSize: 13, color: Colors.white),
+        child: Obx((){
+          if (taskCheckController.isLoading.value) {
+            return const SizedBox(
+              width: 20,height: 20,
+              child: CircularProgressIndicator(),
+            );
+          }
+          return Text(
+            'Check In',
+            style: lightTheme.textTheme.labelSmall!
+                .copyWith(fontSize: 13, color: Colors.white),
 
-/*          style: TextStyle(
-              color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),*/
-        ),
-      ),
+          );
+        }),
+
+
+      )
     );
+
   }
 
   // var lat, lng;
@@ -1060,6 +1071,7 @@ class _PageHomeState extends State<PageHome> {
               checkOutbnt = true;
               startendTimeText = "You check in at ";
             });
+            taskCheckController.checkTaskStatus();
           } else if (responseData['checkin_flag'] == "N" &&
               responseData['checkiout_flag'] == "Y") {
             print('N&Y');
@@ -1075,6 +1087,8 @@ class _PageHomeState extends State<PageHome> {
 
               startendTimeText = "Your Shift time start at ";
             });
+            taskCheckController.checkTaskStatus();
+
           } else if (responseData['checkin_flag'] == "N" &&
               responseData['checkiout_flag'] == "N") {
             String date = responseData['chekout_time'];
@@ -1090,6 +1104,8 @@ class _PageHomeState extends State<PageHome> {
                 startendTimeText = "Your Shift time start at ";
               });
             }
+            taskCheckController.checkTaskStatus();
+
           }
         }
       } else {
@@ -1113,4 +1129,6 @@ class _PageHomeState extends State<PageHome> {
   }
 
   bool noInterNet = true;
+
+
 }

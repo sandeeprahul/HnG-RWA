@@ -10,7 +10,9 @@ import 'package:http/http.dart' as http;
 import '../../../data/opeartions/leave_apply_employees_entity.dart';
 
 class EmployeeListScreen extends StatefulWidget {
-  const EmployeeListScreen({super.key});
+  final String formattedAuditName;
+
+  const EmployeeListScreen({super.key, required this.formattedAuditName});
 
   @override
   State<EmployeeListScreen> createState() => _EmployeeListScreenState();
@@ -40,8 +42,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
-        title: const Text(
-          "Record WeekOff",
+        title: Text(
+          widget.formattedAuditName,
         ),
       ),
       body: loading
@@ -49,13 +51,37 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           : Column(
               children: [
                 // Dropdown for Leave Types
-                 Padding(padding: const EdgeInsets.only(top: 16,left: 16,bottom: 16),child: Row(
-                   children: [
-                     Text('Message: ${descriptionList[0].message}',style: const TextStyle(fontSize: 26, /*  decoration: TextDecoration.underline,    decorationColor: Colors.grey,*/ // Set the underline color here
+                Padding(
+                  padding: const EdgeInsets.only(top: 16, left: 16, bottom: 16,right: 16),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Message: ',
+                          style: TextStyle(
 
-                     ),),
-                   ],
-                 ),),
+                            fontSize: 18,
+                              decoration: TextDecoration.underline
+                            /*  decoration: TextDecoration.underline,    decorationColor: Colors.grey,*/ // Set the underline color here
+                          ),
+                        ),
+                      ),Expanded(
+                        flex: 2,
+                        child: Text(
+                          descriptionList[0].message,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 3,
+                          style: const TextStyle(
+
+                            fontSize: 18,
+                            color: Colors.red
+                            /*  decoration: TextDecoration.underline,    decorationColor: Colors.grey,*/ // Set the underline color here
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
                   child: DropdownButtonFormField<LeaveType>(
@@ -103,7 +129,6 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Card(
-
                           // elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -172,8 +197,12 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                                   .empCode] = value ?? false;
 
                                               selectAll = employees
-                                                  .where((emp) => emp.status.isEmpty)
-                                                  .every((emp) => selectedEmployees[emp.empCode] ?? false);
+                                                  .where((emp) =>
+                                                      emp.status.isEmpty)
+                                                  .every((emp) =>
+                                                      selectedEmployees[
+                                                          emp.empCode] ??
+                                                      false);
                                             });
                                           }
                                         : null,
@@ -220,9 +249,9 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                     onPressed: selectedLeaveType == null
                         ? null
                         : () {
-                      printData();
+                            printData();
 
-                      // Collect selected employees and print JSON
+                            // Collect selected employees and print JSON
                             showConfirmDialog(
                                 onConfirmed: () {
                                   submitLeaves();
@@ -352,8 +381,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
       loading = true;
     });
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    // String? userCode = preferences.getString("userCode");
-    var userCode = '70002';
+    String? userCode = preferences.getString("userCode");
+    // var userCode = '70002';
 
     final String url =
         "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/GetLeaveTypesAndEmployess/$userCode"; // Replace with your actual URL
@@ -395,7 +424,6 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
     // Collect all employees, including selected and unselected, and prepare JSON output
 
-
     List<Map<String, String>> jsonOutput = employees.map((employee) {
       bool isSelected = selectedEmployees[employee.empCode] == true;
 
@@ -403,7 +431,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         "empCode": employee.empCode,
         "date": employee.date,
         "leaveType":
-        isSelected ? selectedLeaveType!.leaveType : employee.status,
+            isSelected ? selectedLeaveType!.leaveType : employee.status,
         "locationCode": locationCode ?? '',
         "updatedby": userCode ?? '',
         // "isSelected": isSelected ? "true" : "false",  // Indicates if the employee was selected
@@ -426,17 +454,17 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   }) {
     return employeeList
         .where((employee) =>
-    selectAll || (selectedEmployees[employee.empCode] ?? false))
+            selectAll || (selectedEmployees[employee.empCode] ?? false))
         .map((employee) {
       return {
         "empCode": employee.empCode ?? '',
         "date": employee.date ?? '',
-        "leaveType": employee.status.isEmpty ? selectedEmployees['leaveType']??'' : employee.status,
+        "leaveType": employee.status.isEmpty
+            ? selectedEmployees['leaveType'] ?? ''
+            : employee.status,
         "locationCode": locationCode,
         "updatedby": updatedBy,
       };
     }).toList();
   }
-
-
 }
