@@ -311,16 +311,16 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
         content: const Text('Do you want to Close this Store Audit?'),
         actions: [
           TextButton(
-            child: const Text("Yes"),
+            child: const Text("Yes",style: TextStyle(color: Colors.white),),//
             onPressed: () {
               Get.back();
               Navigator.pop(context);
 
-              // submitAllDilo();
+              submitAllDilo();
             },
           ),
           TextButton(
-            child: const Text("No"),
+            child: const Text("No",style: TextStyle(color: Colors.white)),
             onPressed: (){
               Get.back();
             },
@@ -333,10 +333,11 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
 
 
   Widget listItem(int pos, HeaderQuesStoreAM checkList) {
+    //28-11-2024 11:19:10
     String startTime = checkList.startTime;
     DateTime parseDate = DateFormat("yyyy-MM-dd HH:mm:ss").parse(startTime);
     DateTime submitTimeDate = DateFormat("dd-MM-yyyy HH:mm:ss")
-        .parse(checkList.startTime);
+        .parse(checkList.updated_by_datetime);
     var inputDate = DateTime.parse(parseDate.toString());
     var subT = DateTime.parse(submitTimeDate.toString());
     var outputFormat = DateFormat('hh:mm a');
@@ -403,8 +404,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                         const Text('Updated by : ',
                             style: TextStyle(fontSize: 13)),
                         Text(
-                            checkList.startTime,
-                            // '${headerQuestion[pos].startTime} ${headerQuestion[pos].employeeCode}',
+                            '${checkList.updated_by}',
                             style: const TextStyle(
                                 fontSize: 13, fontWeight: FontWeight.bold))
                       ],
@@ -486,6 +486,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
       var userID = prefs.getString('userCode') ?? '105060';
       String url = "${Constants.apiHttpsUrl}/AreaManager/HeaderQuestion/${widget.activeCheckList.amChecklistAssignId}/${widget.mLpdChecklist.sectionId}/$userID";
 
+      print(url);
       final response = await http.get(Uri.parse(url)).timeout(const Duration(milliseconds: 2500));
 
       if (response.statusCode == 200) {
@@ -567,21 +568,26 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
           // if()
           _showSuccessAlert('Checklist Successfully Submitted for Review');
           // Navigator.pop(context);
-        } else {
+        }
+        else {
           /* setState(() {
           loading = false;
         });*/
           _showAlert(respo['message']);
         }      // Navigator.pop(context);
       } else {
-        _showAlert('Something went wrong\nPlease contact IT suport');
+    setState(() {
+    loading = false;
+    });
+        _showAlert('Something went wrong\nPlease contact IT support\nStatusCode:${response.statusCode}');
       }
     }catch(e){
-      print(e);
-    }finally{
       setState(() {
-        loading = true;
+        loading = false;
       });
+      _showAlert('Something went wrong\nPlease contact IT support\n$e');
+
+      print(e);
     }
 
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/helper/confirmDialog.dart';
 import 'package:hng_flutter/helper/simpleDialog.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -290,10 +291,15 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     // Collect all employees, including selected and unselected, and prepare JSON output
     List<Map<String, String>> jsonOutput = employees.map((employee) {
       bool isSelected = selectedEmployees[employee.empCode] == true;
+      // Parse the original string to a DateTime object
+      DateTime parsedDate = DateFormat("dd-MM-yyyy HH:mm:ss").parse(employee.date);
+
+      // Format the DateTime object to the desired format
+      String formattedDate = DateFormat("yyyy-MM-dd").format(parsedDate);
 
       return {
         "empCode": employee.empCode,
-        "date": employee.date,
+        "date": formattedDate,
         "leaveType":
             isSelected ? selectedLeaveType!.leaveType : employee.status,
         "locationCode": locationCode ?? '',
@@ -426,10 +432,13 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
     List<Map<String, String>> jsonOutput = employees.map((employee) {
       bool isSelected = selectedEmployees[employee.empCode] == true;
+      DateTime parsedDate = DateFormat("dd-MM-yyyy HH:mm:ss").parse(employee.date);
 
+      // Format the DateTime object to the desired format
+      String formattedDate = DateFormat("yyyy-MM-dd").format(parsedDate);
       return {
         "empCode": employee.empCode,
-        "date": employee.date,
+        "date": formattedDate,
         "leaveType":
             isSelected ? selectedLeaveType!.leaveType : employee.status,
         "locationCode": locationCode ?? '',

@@ -19,6 +19,8 @@ import 'package:hng_flutter/PageHome.dart';
 import 'package:hng_flutter/checkListItemScreen.dart';
 import 'package:hng_flutter/checkListItemScreen_Lpd.dart';
 import 'package:hng_flutter/checkListItemScreen_StoreAudit.dart';
+import 'package:hng_flutter/helper/confirmDialog.dart';
+import 'package:hng_flutter/helper/simpleDialog.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,13 +35,13 @@ import 'data/QuestionAnswers.dart';
 import 'checkListItemScreen_AM.dart';
 
 class submitCheckListScreen_AM extends StatefulWidget {
-  HeaderQuesStoreAM checkList;
-  ActiveCheckListAm activeCheckList;
-  int i;
-  LPDSection mLpdChecklist;
+ final HeaderQuesStoreAM checkList;
+ final ActiveCheckListAm activeCheckList;
+ final int i;
+ final LPDSection mLpdChecklist;
 
-  submitCheckListScreen_AM(
-      this.checkList, this.activeCheckList, this.i, this.mLpdChecklist);
+  const submitCheckListScreen_AM(
+      this.checkList, this.activeCheckList, this.i, this.mLpdChecklist, {super.key});
 
   // submitCheckListScreen({Key? key}) : super(key: key);
 
@@ -72,8 +74,8 @@ XFile? photo;
 bool loading = false;
 var _croppedFile;
 var imageList = [];
-var option_mandatory_Flags = [];
-var option_mandatory_Flag = "0";
+var optionMandatoryFlags = [];
+String optionMandatoryFlag = "0";
 
 class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
   HeaderQuesStoreAM checkList;
@@ -107,7 +109,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     imageList.clear();
     dropdownText = '';
     _croppedFile = null;
-    option_mandatory_Flag = "0";
+    optionMandatoryFlag = "0";
     rating_ = 0.0;
     rating2_ = 0.0;
   }
@@ -209,7 +211,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
 
                     //attach proof
                     Visibility(
-                        visible: option_mandatory_Flag == "-1"
+                        visible: optionMandatoryFlag == "-1"
                             ? false
                             : subQues.contains(3)
                                 ? true
@@ -286,7 +288,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
 
                     //
                     Visibility(
-                        visible: option_mandatory_Flag == "-1"
+                        visible: optionMandatoryFlag == "-1"
                             ? false
                             : subQues.contains(1)
                                 ? true
@@ -324,7 +326,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                         )),
 
                     Visibility(
-                        visible: option_mandatory_Flag == "-1"
+                        visible: optionMandatoryFlag == "-1"
                             ? false
                             : subQues.contains(5)
                                 ? true
@@ -368,7 +370,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                           ),
                         )),
                     Visibility(
-                        visible: option_mandatory_Flag == "-1"
+                        visible: optionMandatoryFlag == "-1"
                             ? false
                             : subQues.contains(5)
                                 ? true
@@ -456,7 +458,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                                               .checkListAnswerOptionId;
                                       non_Compliance_Flag =
                                           answerOptions[pos].nonComplianceFlag;
-                                      option_mandatory_Flag = answerOptions[pos]
+                                      optionMandatoryFlag = answerOptions[pos]
                                           .optionMandatoryFlag;
                                     });
                                     print('000000non_Compliance_Flag');
@@ -505,16 +507,19 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                     print("mandatoryasdfeasfadsfFlag==$mandy");*/
                     // print();
 
-                    if (option_mandatory_Flag == "1" ||
-                        option_mandatory_Flag == "0") {
+                    if (optionMandatoryFlag == "1" ||
+                        optionMandatoryFlag == "0") {
                       if (base64img_.isEmpty) {
-                        _showAlertWithMSG('Please take photo');
+                        showSimpleDialog(title: "Alert!", msg: "Please take photo");
+
                       } else if (sealnoCntrl.text.toString().isEmpty) {
-                        _showAlertWithMSG('Please fill all details');
+                        showSimpleDialog(title: "Alert!", msg: "Please enter comments");
                       } else if (rating_ == 0.0) {
-                        _showAlertWithMSG('Please fill all details');
+                        showSimpleDialog(title: "Alert!", msg: "Please give Store rating");
+
                       } else if (rating2_ == 0.0) {
-                        _showAlertWithMSG('Please fill all details');
+                        showSimpleDialog(title: "Alert!", msg: "Please give Department rating");
+
                       } else {
                         print('$rating2_ ,$rating_');
                         _showProceedAlert();
@@ -597,6 +602,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white,
                                   radius: 35,
+                                  child: Icon(Icons.camera),
                                 ),
                               ),
                             ))
@@ -880,7 +886,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           // options.add(inLoop['answer_Option']);
           nonCompFlag.add(inLoop['non_Compliance_Flag']);
           checkList_Answer_Option_Id.add(inLoop['checkList_Answer_Option_Id']);
-          option_mandatory_Flags.add(inLoop['option_mandatory_Flag']);
+          optionMandatoryFlags.add(inLoop['option_mandatory_Flag']);
         }
       }
 
@@ -899,7 +905,10 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       setState(() {
         loading = false;
       });
-      _showRetryAlert__(0);
+      _showAlert("Something went wrong\nPlease contact it support\n$e");
+     /* showConfirmDialog(onConfirmed: (){
+        Get.back();
+      }, title: 'Alert!', msg: 'Something went wrong\nPlease contact it support\n$e');*/
     }
     finally{
       setState(() {
@@ -1009,7 +1018,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       builder: (BuildContext contextt) {
         return AlertDialog(
           title: const Text('Info'),
-          content: Text('$msg'),
+          content: Text(msg),
           actions: <Widget>[
             InkWell(
               onTap: () {
@@ -1045,63 +1054,45 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     );
   }
 
-  Future<void> _showAlert() async {
+  Future<void> _showAlert(String message) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
+      builder: (BuildContext contextt) {
         return AlertDialog(
           title: const Text('Alert!'),
-          // content: Text('$msg'),
+          content: Text(message),
           actions: <Widget>[
-            Container(
-              margin: const EdgeInsets.all(10),
-              padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(color: CupertinoColors.activeBlue),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    // submitCheckList();
-                  },
-                  child: const Text(
-                    'Got it',
-                    style: TextStyle(color: Colors.white),
+
+
+            ElevatedButton(
+              onPressed: () {
+                // Close the dialog
+                // Get.back();
+                Navigator.of(contextt).pop();
+                Navigator.of(context).pop();
+                // Execute the callback function
+
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        16), // Adjust the radius for rounded corners
                   )),
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.white,fontSize: 18),
+              ),
             ),
+
           ],
         );
       },
     );
   }
 
-  Future<void> _showAlertWithMSG(String msg) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Alert!'),
-          content: Text('$msg'),
-          actions: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    // submitCheckList();
-                  },
-                  child: const Text('Got it',
-                      style: TextStyle(color: Colors.white))),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  int tried = 0;
 
 
 //QuestionCancel
@@ -1152,17 +1143,17 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           goBack = false;
         });
 
-        _showMyDialog("Something went wrong\nPlease contact it support ");
+        // _showMyDialog("Something went wrong\nPlease contact it support ");
+        showSimpleDialog(title: 'Alert!', msg: 'Something went wrong\nPlease contact it support');
+
       }
     } catch (w) {
       setState(() {
         loading = false;
         goBack = false;
       });
-      _showRetryAlert__(1);
-      // return false;
+      showSimpleDialog(title: 'Alert!', msg: 'Something went wrong\nPlease contact it support\n$w');
     }
-
     return goBack;
   }
 
@@ -1184,7 +1175,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       );
 
       var locationCode = prefs.getString('locationCode');
-      var usercode = int.tryParse(prefs.getString('userCode') ?? "");
+      var userCode = int.tryParse(prefs.getString('userCode') ?? "");
       String dateForEmpCode_ =
           DateFormat("yyyyMMddhhmmssS").format(DateTime.now());
       var userId = prefs.getString("userCode");
@@ -1220,11 +1211,10 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
             "order_flag": int.parse(quesAnsList[0].questions[i].orderFlag),
             "am_checklist_assign_id":
                 widget.activeCheckList.amChecklistAssignId,
-            "created_by": usercode,
-            // "empcode": usercode,
-            "created_datetime": "$datetime",
-            "updated_by": usercode,
-            "updated_by_datetime": "$datetime",
+            "created_by": userCode,
+            "created_datetime": datetime,
+            "updated_by": userCode,
+            "updated_by_datetime": datetime,
             "checklist_applicable_type":
                 widget.activeCheckList.checklistApplicableType,
             "checklist_progress_status": "",
@@ -1251,11 +1241,11 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
             "order_flag": int.parse(quesAnsList[0].questions[i].orderFlag),
             "am_checklist_assign_id":
                 widget.activeCheckList.amChecklistAssignId,
-            "created_by": usercode,
+            "created_by": userCode,
             // "empcode": usercode,
-            "created_datetime": "$datetime",
-            "updated_by": usercode,
-            "updated_by_datetime": "$datetime",
+            "created_datetime": datetime,
+            "updated_by": userCode,
+            "updated_by_datetime": datetime,
             "checklist_applicable_type":
                 widget.activeCheckList.checklistApplicableType,
             "checklist_progress_status": "",
@@ -1283,11 +1273,11 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
             "order_flag": int.parse(quesAnsList[0].questions[i].orderFlag),
             "am_checklist_assign_id":
                 widget.activeCheckList.amChecklistAssignId,
-            "created_by": usercode,
+            "created_by": userCode,
             // "empcode": usercode,
-            "created_datetime": "$datetime",
-            "updated_by": usercode,
-            "updated_by_datetime": "$datetime",
+            "created_datetime": datetime,
+            "updated_by": userCode,
+            "updated_by_datetime": datetime,
             "checklist_applicable_type":
                 widget.activeCheckList.checklistApplicableType,
             "checklist_progress_status": "",
@@ -1314,11 +1304,11 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
             "order_flag": int.parse(quesAnsList[0].questions[i].orderFlag),
             "am_checklist_assign_id":
                 widget.activeCheckList.amChecklistAssignId,
-            "created_by": usercode,
+            "created_by": userCode,
             // "empcode": usercode,
-            "created_datetime": "$datetime",
-            "updated_by": usercode,
-            "updated_by_datetime": "$datetime",
+            "created_datetime": datetime,
+            "updated_by": userCode,
+            "updated_by_datetime": datetime,
             "checklist_applicable_type":
                 widget.activeCheckList.checklistApplicableType,
             "checklist_progress_status": "",
@@ -1349,7 +1339,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
         setState(() {
           loading = false;
         });
-        if (option_mandatory_Flag == "1" && subQues.contains(3)) {
+        if (optionMandatoryFlag == "1" && subQues.contains(3)) {
           print('subQues.contains(3)');
           print(subQues.contains(3));
           if (base64img_.isNotEmpty) {
@@ -1362,7 +1352,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
               // uploadImage(0, usercode);
               cloudstorageRef(base64img_, empCode);
             } else {
-              _showAlertWithMSG("Please Upload photo");
+              showSimpleDialog(title: 'Alert!', msg: "Please Upload photo");
             }
           }
         } else {
@@ -1445,102 +1435,6 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     }
   }
 
-  Future<void> uploadImage(int imgs, var userCode) async {
-    try {
-      // cloudstorageRef(base64img_);
-      print('uploadImage');
-      setState(() {
-        loading = true;
-      });
-      String datetime_ = DateFormat("yyyyMMddhhmmssS").format(DateTime.now());
-      print('DATATIME $datetime_');
-
-      final prefs = await SharedPreferences.getInstance();
-
-      // String url = staticUrlString + "Login/validateLogin";
-       var url = Uri.https(
-      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWA_GROOMING_API/api/AreaManager/ImageUpload',
-      );
-
-      var image = [];
-      for (int i = 0; i < imageList.length; i++) {
-        image.add({
-          'id': i,
-          'imageFarmat': "jpg",
-          'fileName': "EMP$userCode$datetime_",
-          'imageBase64': "",
-          // 'imageBase64': base64Imgg.toString().replaceAll('+', ''),
-        });
-      }
-
-      var questionId = '', checklisT_ANSWER_OPTION_ID = '';
-      for (int i = 0; i < quesAnsList[0].questions.length; i++) {
-        if (quesAnsList[0].questions[i].answerTypeId == 3) {
-          questionId = quesAnsList[0].questions[i].checkListAnswerId;
-          checklisT_ANSWER_OPTION_ID = quesAnsList[0]
-              .questions[i]
-              .options[0]
-              .checkListAnswerOptionId
-              .toString();
-        }
-      }
-      print('questionId');
-      print(questionId);
-      print(checklisT_ANSWER_OPTION_ID);
-      // ?
-      var response = await http
-          .post(
-            url,
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
-            body: jsonEncode({
-              "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
-              "checklist_Id": checklist_id,
-              "CHECKLIST_ANSWER_OPTION_ID": checklisT_ANSWER_OPTION_ID,
-              "question": questionTitles[0],
-              "question_Id": questionId,
-              "answer_Type_Id": 3,
-              "am_checklist_assign_id":
-                  widget.activeCheckList.amChecklistAssignId,
-              "getImages": image,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
-
-      var json = jsonEncode({
-        "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
-        "checklist_Id": checklist_id,
-        "CHECKLIST_ANSWER_OPTION_ID": checklisT_ANSWER_OPTION_ID,
-        "question": questionTitles[0],
-        "question_Id": questionId,
-        "answer_Type_Id": "3",
-        "am_checklist_assign_id": widget.activeCheckList.amChecklistAssignId,
-        "getImages": image,
-      });
-      print(response.statusCode);
-      print(response.request);
-      print(json);
-      if (response.statusCode == 200) {
-        setState(() {
-          loading = false;
-        });
-        _showSuccessAlert("CheckList Item submitted successfully");
-      } else {
-        setState(() {
-          loading = false;
-        });
-        _showAlert();
-      }
-    } catch (e) {
-      _showRetryAlert(imgs, userCode);
-
-      setState(() {
-        loading = false;
-      });
-    }
-  }
 
   Future<void> _showMyDialog(String msg) async {
     return showDialog<void>(
@@ -1568,45 +1462,5 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     );
   }
 
-  Future<void> _showRetryAlert(int imgs, var userCode) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Alert!'),
-            content: const Text('Network issue\nPlease retry'),
-// Please retry?'),
-          actions: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    // submitCheckList();
-                  },
-                  child: const Text('Cancel',
-                      style: TextStyle(color: Colors.white))),
-            ),
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    uploadImage(imgs, userCode);
-                    // submitCheckList();
-                  },
-                  child: const Text('Retry',
-                      style: TextStyle(color: Colors.white))),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
 }

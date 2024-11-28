@@ -17,7 +17,9 @@ class HeaderQuesStoreAM {
         required this.createdBy,
         required this.checklistApplicableType,
         required this.checklistProgressStatus,
-        required this.checklistEditStatus
+        required this.checklistEditStatus,
+        required this.updated_by,
+        required this.updated_by_datetime
     });
 
 
@@ -36,8 +38,10 @@ class HeaderQuesStoreAM {
     int department;
     int sectionId;
     int createdBy;
+    int updated_by;
     String checklistApplicableType;
     String checklistProgressStatus;
+    String updated_by_datetime;
     String checklistEditStatus;
 
     factory HeaderQuesStoreAM.fromJson(Map<String, dynamic> json) => HeaderQuesStoreAM(
@@ -59,6 +63,8 @@ class HeaderQuesStoreAM {
         checklistApplicableType: json["checklist_applicable_type"]!,
         checklistProgressStatus: json["checklist_progress_status"]!,
         checklistEditStatus: json["checklist_edit_status"],
+        updated_by: json["updated_by"],
+        updated_by_datetime: json["updated_by_datetime"],
     );
 
     Map<String, dynamic> toJson() => {

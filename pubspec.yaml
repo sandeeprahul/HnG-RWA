@@ -60,9 +60,10 @@ dependencies:
   shimmer: ^3.0.0
   url_launcher: ^6.1.14
   path_provider: ^2.0.14
-  flutter_launcher_icons: ^0.14.0
   camera: ^0.11.0+2
   simple_barcode_scanner: ^0.2.3
+  flutter_launcher_icons: ^0.14.0
+
 
   #qr_code_scanner
 #  qr_code_scanner: ^1.0.1
@@ -74,12 +75,12 @@ dependencies:
   flutter_riverpod: ^2.3.6
 
 
-
-
 flutter_icons:
     android: true
     ios: true
-    image_path: "assets/app_icon.png"
+    image_path: "assets/icon_resturant.png"
+
+
 
 dev_dependencies:
   flutter_test:

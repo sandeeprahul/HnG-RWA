@@ -71,10 +71,11 @@ class _amCheckListScreenState extends State<amCheckListScreen>
   bool loading = false;
   var checkListId = '';
 
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       print("resumedCheckListScreen");
-      getAcitiveCheckListData();
+      getActiveCheckListData();
       //do your stuff
     }
   }
@@ -92,7 +93,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
     print("initState");
     WidgetsBinding.instance.addObserver(this);
 
-    getAcitiveCheckListData();
+    getActiveCheckListData();
   }
 
   @override
@@ -247,8 +248,8 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                       context,
                       MaterialPageRoute(
                           builder: (context) => AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value) => (){
-                      getAcitiveCheckListData();
+                    ).then((value) {
+                      getActiveCheckListData();
                     });
                   }else if(widget.activeCheckList.checklistEditStatus=="A"){
                     // Get.to(AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index]));
@@ -256,8 +257,8 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                       context,
                       MaterialPageRoute(
                           builder: (context) => AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value) => (){
-                      getAcitiveCheckListData();
+                    ).then((value) {
+                      getActiveCheckListData();
                     });
                   }else{
                     // Get.to(checkListItemScreen_AM(widget.activeCheckList,mLpdChecklist[index]));
@@ -265,8 +266,9 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                       context,
                       MaterialPageRoute(
                           builder: (context) => checkListItemScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value) => (){
-                      getAcitiveCheckListData();
+                    ).then((value) {
+                      print('resutnerddd');
+                      getActiveCheckListData();
                     });
                   }
 
@@ -333,9 +335,9 @@ class _amCheckListScreenState extends State<amCheckListScreen>
   }
 
   List<LPDSection> mLpdChecklist = [];
-  bool showsubmitBtn = false;
+  bool showSubmitBtn = false;
 
-  Future<void> getAcitiveCheckListData() async {
+  Future<void> getActiveCheckListData() async {
     try {
       setState(() {
         loading = true;
@@ -429,7 +431,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
-                    getAcitiveCheckListData();
+                    getActiveCheckListData();
                     // submitCheckList();
                   },
                   child: const Text('Retry',
@@ -511,7 +513,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
               builder: (context) => OutletSelectionScreen(
                 widget.mGetActvityTypes,
               )),
-        ).then((value) => (){getAcitiveCheckListData();});
+        ).then((value) => (){getActiveCheckListData();});
       } else {
         setState(() {
           loading = false;
