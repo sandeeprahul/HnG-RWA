@@ -272,20 +272,20 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                             .mGetActvityTypes.auditId ==
                                             "4") {
 
-                                          // Navigator.pushReplacement(
-                                          //     context,
-                                          //     MaterialPageRoute(
-                                          //       builder: (context) =>
-                                          //        CheckListPage(
-                                          //         activeCheckList: checkListEmployee[index_],
-                                          //         isEdit: 0,
-                                          //         locationsList: widget.locationsList,
-                                          //         mGetActivityTypes: widget.mGetActvityTypes,
-                                          //         sendingToEditAmHeaderQuestion: 0,
-                                          //         checkListItemMstId: "${checkListEmployee[index_].checklisTId}",),
-                                          //     )).then((value) {
-                                          //   getAcitiveCheckListData();
-                                          // });
+                                         /* Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                 CheckListPage(
+                                                  activeCheckList: checkListEmployee[index_],
+                                                  isEdit: 0,
+                                                  locationsList: widget.locationsList,
+                                                  mGetActivityTypes: widget.mGetActvityTypes,
+                                                  sendingToEditAmHeaderQuestion: 0,
+                                                  checkListItemMstId: "${checkListEmployee[index_].checklisTId}",),
+                                              )).then((value) {
+                                            getAcitiveCheckListData();
+                                          });*/
 
                                           Navigator.pushReplacement(
                                           context,
@@ -325,8 +325,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                                         widget.mGetActvityTypes,
                                                         widget.locationsList,
                                                         checkListAm[index_]),
-                                              )).then((value) =>
-                                              () {
+                                              )).then((value)  {
                                             getAcitiveCheckListData();
                                           });
                                         }
@@ -971,8 +970,8 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                             widget.mGetActvityTypes,
                             widget.locationsList,
                             checkListAm[index]),
-                  )).then((value) =>
-                  () {
+                  )).then((value)
+                   {
                 getAcitiveCheckListData();
               });
             } else if (checkListAm[index].checklistEditStatus == "R") {

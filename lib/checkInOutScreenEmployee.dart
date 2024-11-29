@@ -162,10 +162,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
     var datetime = DateTime.now();
     var datetime_ = DateFormat("hh:mm a").format(DateTime.now());
 
-    print(datetime_);
-    print(datetime.minute);
     setState(() {
-      // timeMin = datetime.hour.toString() + ':' + datetime.minute.toString();
       timeMin = datetime_;
     });
   }
@@ -658,106 +655,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                     ),
                   ),
 
-                  /*      InkWell(
-                  onTap: () async {
-                    String? deviceId = await PlatformDeviceId.getDeviceId;
-                    print("DeviceID");
-                    print(deviceId);
-                    setState(() {
-                      deviceID = deviceId!;
-                    });
-                    final ImagePicker _picker = ImagePicker();
-                    photo = await _picker.pickImage(source: ImageSource.camera);
-                    _cropImage(photo);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: Colors.blue),
-                    child: Text(
-                      'Take Photo',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  )),
-              Text(
-                'Your location : lat=' +
-                    lat.toString() +
-                    ",lng = " +
-                    lng.toString(),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Locked location:",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontStyle: FontStyle.italic,
-                      )),
-                  Text("  lat:12.9111277,lng: 77.6267444",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-              Text(
-                status_,
-                style: TextStyle(
-                    fontStyle: FontStyle.italic, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Your DeviceID:',
-              ),
-              Text(deviceID,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.bold)),*/
-
-                  /*Center(
-                child: InkWell(
-
-                    onTap: () async {
-                      Position position = await Geolocator.getCurrentPosition(
-                          desiredAccuracy: LocationAccuracy.high);
-                      print("_determinePosition");
-                      print(position.latitude);
-                      print(position.longitude);
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setDouble('lat', position.latitude);
-                      await prefs.setDouble('lng', position.longitude);
-                    },
-                    child: Text(
-                      'GET LOCATION',
-                      style: TextStyle(
-                        fontSize: 40,
-                      ),
-                    )),
-              ),
-              InkWell(
-                  onTap: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    final double? lat = prefs.getDouble('lat');
-                    final double? lng = prefs.getDouble('lng');
-
-                    Position position = await Geolocator.getCurrentPosition(
-                        desiredAccuracy: LocationAccuracy.high);
-
-                    if (lat != position.latitude || lng != position.longitude) {
-                      print("not there");
-                      print("$lat,$lng");
-                      print(position.longitude);
-                      print(position.latitude);
-                    }
-                  },
-                  child: Text(
-                    'Check LOCATION',
-                    style: TextStyle(
-                      fontSize: 45,
-                    ),
-                  )),*/
-
-                  // _body(),
                 ],
               ),
               Align(
@@ -1336,76 +1233,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
     }
   }
 
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
 
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
-  }
-
-  Future<void> findUserGeoLoc(int firstTime) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    //remove in production
-    // var json = jsonDecode(prefs.getString('loginResponse') ?? '');
-
-    getPhoto(firstTime);
-
-    /*  geofenceStatusStream ??=
-        EasyGeofencing.getGeofenceStream()!.listen((GeofenceStatus status) {
-      // print(status.toString());
-
-      var stat = status.toString().split('.');
-
-      if (stat.contains('init')) {
-        status_ = 1.obs;
-        getPhoto(firstTime);
-        prefs.setInt('status', 1);
-      } else if (stat.contains('exit')) {
-        status_ = 0.obs;
-        prefs.setInt('status', 0);
-        alert('You are outside of store');
-      }
-    });*/
-  }
-
-  Future<void> getlocStatus(int firstTime) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    if (prefs.getInt('status') == 1) {
-      getPhoto(firstTime);
-    } else {
-      Get.defaultDialog(middleText: 'You are outside of store');
-    }
-  }
 }

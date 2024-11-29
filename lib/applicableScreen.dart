@@ -286,7 +286,7 @@ class _applicableScreenState extends State<applicableScreen>
         "${Constants.apiHttpsUrl}/Employee/GetChecklistId/${widget.mGetActvityTypes.auditId}";
       }
 
-      print(url + "ACTIVEEEEEE ");
+      print(url + " ACTIVEEEEEE ");
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
       print(response.body);
@@ -674,6 +674,7 @@ class _applicableScreenState extends State<applicableScreen>
       url =
           "${Constants.apiHttpsUrl}/Employee/CreateareamanagerChecklist?locationcode=$locationCode&createdby=$userID&checklistid=$id";
 
+      print(url);
       final response = await http.get(Uri.parse(url));
       // print(response);
 

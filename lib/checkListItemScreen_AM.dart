@@ -576,9 +576,6 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
           _showAlert(respo['message']);
         }      // Navigator.pop(context);
       } else {
-    setState(() {
-    loading = false;
-    });
         _showAlert('Something went wrong\nPlease contact IT support\nStatusCode:${response.statusCode}');
       }
     }catch(e){

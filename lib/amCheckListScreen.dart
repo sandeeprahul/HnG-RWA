@@ -1,48 +1,27 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:hng_flutter/data/ActiveCheckListLpd.dart';
-import 'package:hng_flutter/data/ActiveCheckListStoreAudit.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
-import 'package:hng_flutter/data/Locations.dart';
 import 'package:hng_flutter/checkListItemScreen_AM.dart';
-import 'package:hng_flutter/checkListItemScreen_StoreAudit.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'AmAcceptSelectionScreen.dart';
 import 'AmAcceptSelectionScreen_AM.dart';
-import 'AmAcceptSelectionScreen_LPD.dart';
-import 'AmAcceptSelectionScreen_StoreAudit.dart';
 import 'common/constants.dart';
 import 'data/ActiveCheckListAm.dart';
-import 'data/ActiveCheckListModel.dart';
-import 'data/GetChecklist.dart';
 import 'data/LPDSection.dart';
 import 'OutletSelectScreen.dart';
-import 'PageHome.dart';
-import 'checkInOutScreenDilo.dart';
-import 'checkListItemScreen.dart';
-import 'checkListItemScreen_Lpd.dart';
-import 'checkListScreen.dart';
 import 'checkListScreen_lpd.dart';
-import 'imageUploadScreen.dart';
-import 'mainCntrl.dart';
+
 
 class amCheckListScreen extends StatefulWidget {
-  // const checkListScreen({Key? key}) : super(key: key);
 
 final  int type;
  final GetActvityTypes mGetActvityTypes;
  final String locationsList;
 final  ActiveCheckListAm activeCheckList;
-
-  //0=DILO,1=LPD,2=STORE AUDIT
-  // ActiveCheckList activeCheckList;
 
   amCheckListScreen(
       this.type, this.mGetActvityTypes, this.locationsList, this. activeCheckList);
@@ -248,7 +227,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                       context,
                       MaterialPageRoute(
                           builder: (context) => AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value) {
+                    ).then((value) => (){
                       getActiveCheckListData();
                     });
                   }else if(widget.activeCheckList.checklistEditStatus=="A"){
@@ -257,7 +236,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                       context,
                       MaterialPageRoute(
                           builder: (context) => AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value) {
+                    ).then((value) => (){
                       getActiveCheckListData();
                     });
                   }else{
@@ -266,13 +245,10 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                       context,
                       MaterialPageRoute(
                           builder: (context) => checkListItemScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value) {
-                      print('resutnerddd');
+                    ).then((value){
                       getActiveCheckListData();
                     });
                   }
-
-
 
                 },
                 child: Container(
@@ -342,9 +318,6 @@ class _amCheckListScreenState extends State<amCheckListScreen>
       setState(() {
         loading = true;
       });
-      final prefs = await SharedPreferences.getInstance();
-      var locationCode = widget.locationsList;
-      var userID = prefs.getString('userCode') ?? '105060';
       String url;
 
       url =
@@ -355,7 +328,6 @@ class _amCheckListScreenState extends State<amCheckListScreen>
 
       // print(urdl);
 
-      var responseData = json.decode(response.body);
       // final lpdChecklist = lpdChecklistFromJson(responseData);
 
       Map<String, dynamic> map = json.decode(response.body);
