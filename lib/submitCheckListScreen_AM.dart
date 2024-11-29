@@ -370,11 +370,12 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                           ),
                         )),
                     Visibility(
-                        visible: optionMandatoryFlag == "-1"
-                            ? false
-                            : subQues.contains(5)
-                                ? true
-                                : false,
+                      visible: false,
+                        // visible: optionMandatoryFlag == "-1"
+                        //     ? false
+                        //     : subQues.contains(5)
+                        //         ? true
+                        //         : false,
                         child: Container(
                           margin: const EdgeInsets.only(top: 10),
                           padding: const EdgeInsets.all(5),
@@ -517,10 +518,10 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                       } else if (rating_ == 0.0) {
                         showSimpleDialog(title: "Alert!", msg: "Please give Store rating");
 
-                      } else if (rating2_ == 0.0) {
+                      } /*else if (rating2_ == 0.0) {
                         showSimpleDialog(title: "Alert!", msg: "Please give Department rating");
 
-                      } else {
+                      }*/ else {
                         print('$rating2_ ,$rating_');
                         _showProceedAlert();
                       }

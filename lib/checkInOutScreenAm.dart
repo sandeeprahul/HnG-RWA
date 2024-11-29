@@ -6,6 +6,8 @@ import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:hng_flutter/amCheckListScreen.dart';
+import 'package:hng_flutter/checkListItemScreen_AM.dart';
 import 'package:hng_flutter/data/ActiveCheckListEmployee.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/data/GetChecklist.dart';
@@ -25,36 +27,36 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'checkListItemScreenExmployee.dart';
 import 'checkListScreen_lpd.dart';
 import 'common/constants.dart';
+import 'data/ActiveCheckListAm.dart';
 import 'helper/permission_helper.dart';
 
-class checkInOutScreenEmployee extends StatefulWidget {
+class checkInOutScreenAm extends StatefulWidget {
   // int chekassignId_;
-  final ActiveCheckListEmployee activeCheckList;
+  final ActiveCheckListAm activeCheckList;
   final GetActvityTypes mGetActvityTypes;
   final String locationsList;
 
   // LPDSection mLpdChecklist;
 
-  checkInOutScreenEmployee(
+  checkInOutScreenAm(
     this.activeCheckList,
     this.mGetActvityTypes,
     this.locationsList,
   );
 
   @override
-  State<checkInOutScreenEmployee> createState() =>
-      _checkInOutScreenEmployeeState(
-          this.activeCheckList, this.mGetActvityTypes, this.locationsList);
+  State<checkInOutScreenAm> createState() => _checkInOutScreenAmState(
+      this.activeCheckList, this.mGetActvityTypes, this.locationsList);
 }
 
-class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
-  ActiveCheckListEmployee activeCheckList;
+class _checkInOutScreenAmState extends State<checkInOutScreenAm> {
+  ActiveCheckListAm activeCheckList;
   GetActvityTypes mGetActvityTypes;
   String locationsList;
 
   // LPDSection mLpdChecklist;
 
-  _checkInOutScreenEmployeeState(
+  _checkInOutScreenAmState(
     this.activeCheckList,
     this.mGetActvityTypes,
     this.locationsList,
@@ -109,7 +111,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
 
     if (status.isGranted) {
       // Permission granted, proceed with your logic
-      if (widget.activeCheckList.locationValidateFlag == "Y") {
+      if (widget.activeCheckList.location_Validate_flag == "Y") {
         getLocation(0);
       } else {
         getPhoto(0);
@@ -231,7 +233,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       print(distanceInMeters);
       var mts = distanceInMeters.toString().split('.');
       var meters = mts[0];
-      if (double.parse(meters) <= 150) {
+      if (double.parse(meters) >= 150) {
         setState(() {
           loading = false;
           takePhoto = true;
@@ -484,8 +486,8 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                                 // getlocStatus(1);
                                 // findUserGeoLoc(1);
 
-                                if (widget
-                                        .activeCheckList.locationValidateFlag ==
+                                if (widget.activeCheckList
+                                        .location_Validate_flag ==
                                     "Y") {
                                   getLocation(1);
                                 } else {
@@ -598,7 +600,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                                 const Align(
                                   alignment: Alignment.topLeft,
                                   child: Text(
-                                    'Dilo Employee',
+                                    'Am Store Audit',
                                     style: TextStyle(
                                         fontSize: 16,
                                         color: Colors.black,
@@ -654,7 +656,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                       ),
                     ),
                   ),
-
                 ],
               ),
               Align(
@@ -916,7 +917,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
     // var locationCode = prefs.getString('locationCode') ?? '106';
     var locationCode = widget.activeCheckList.locationCode;
 
-    final imagesRef = storageRef.child("$locationCode/StoreAudit/$empCode.jpg");
+    final imagesRef = storageRef.child("$locationCode/AmStoreAudit/$empCode.jpg");
 
     // String dataUrl = base64img;
 // Create a reference to "mountains.jpg"
@@ -929,7 +930,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
               format: PutStringFormat.base64,
               metadata: SettableMetadata(contentType: 'image/png'))
           .then((p0) => print('uploaded to firebase storage successfully'));
-      String downloadUrl = (await FirebaseStorage.instanceFor(
+      String downloadUrl = (FirebaseStorage.instanceFor(
                   bucket: "gs://hng-offline-marketing.appspot.com")
               .ref())
           .toString();
@@ -974,7 +975,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       print(prefs.getString('locationCode'));
 
       var params = {
-        "emp_checklist_assign_id": activeCheckList.empChecklistAssignId,
+        "emp_checklist_assign_id": activeCheckList.amChecklistAssignId,
         "userId": userId,
         "check_in_lat": '$lat_',
         "check_in_long": '$lng_',
@@ -999,18 +1000,8 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           )
           .timeout(const Duration(milliseconds: 5000));
 
-      var forlog = jsonEncode(params);
-      print('forlog' + forlog);
-      print(response.body);
-      print(response.statusCode);
-      print(response.toString());
       var respo = jsonDecode(response.body);
 
-      print(response.body);
-      print(response.statusCode);
-      print(response.toString());
-
-      print(respo['statusCode']);
       if (respo['statusCode'] == '200') {
         setState(() {
           loading = false;
@@ -1021,30 +1012,23 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
         Future.delayed(const Duration(milliseconds: 1500), () {
           // Navigator.pop(context, 1);
 
-          if (widget.activeCheckList.list_type == "Y") {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>  CheckListPage(
-                    activeCheckList: widget.activeCheckList,
-                    isEdit: 0,
-                    locationsList: widget.locationsList,
-                    mGetActivityTypes: widget.mGetActvityTypes,
-                    sendingToEditAmHeaderQuestion: 0,
-                    checkListItemMstId: "${widget.activeCheckList.checklisTId}",
-                  ),
-                ));
-          } else if (widget.activeCheckList.list_type == "N") {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => checkListItemScreenEmployee(
-                      widget.activeCheckList,
-                      widget.mGetActvityTypes,
-                      widget.locationsList,
-                      0),
-                ));
-          }
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => amCheckListScreen(
+                  1,
+                  widget.mGetActvityTypes,
+                  widget.locationsList,
+                  widget.activeCheckList,
+                ),
+              ));
+          /*   Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => checkListItemScreen_AM(
+                    widget.activeCheckList,
+                ),
+              ));*/
         });
       } else {
         setState(() {
@@ -1232,7 +1216,4 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       return const SizedBox.shrink();
     }
   }
-
-
-
 }

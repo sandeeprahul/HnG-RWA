@@ -2,42 +2,30 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:hng_flutter/data/ActiveCheckListLpd.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
-import 'package:hng_flutter/data/GetChecklist.dart';
 import 'package:hng_flutter/storeAuditCheckListScreen.dart';
-import 'package:hng_flutter/tem.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'AmAcceptSelectionScreen.dart';
 import 'AmAcceptSelectionScreen_Employee.dart';
-import 'AmAcceptSelectionScreen_LPD.dart';
-import 'checkListItemScreenExmployee.dart';
+import 'checkInOutScreenAm.dart';
 import 'common/constants.dart';
 import 'data/ActiveCheckListAm.dart';
 import 'data/ActiveCheckListEmployee.dart';
-import 'data/ActiveCheckListModel.dart';
 import 'data/ActiveCheckListStoreAudit.dart';
-import 'PageHome.dart';
 import 'amCheckListScreen.dart';
-import 'checkInOutScreenDilo.dart';
 import 'checkInOutScreenEmployee.dart';
 import 'checkInOutScreenLPD.dart';
 import 'checkInOutScreenStoreAudit.dart';
-import 'checkListItemScreen.dart';
-import 'checkListItemScreen_Lpd.dart';
-import 'imageUploadScreen.dart';
+
 import 'lpdCheckListScreen.dart';
-import 'mainCntrl.dart';
 
 class checkListScreen_lpd extends StatefulWidget {
   // const checkListScreen({Key? key}) : super(key: key);
 
   final int type;
-  final GetActvityTypes mGetActvityTypes;
+  final GetActvityTypes mGetActivityTypes;
   final String locationsList;
 
   // LPDSection mLpdChecklist;
@@ -45,14 +33,14 @@ class checkListScreen_lpd extends StatefulWidget {
   //0=DILO,1=LPD,2=STORE AUDIT
   // ActiveCheckList activeCheckList;
 
-  checkListScreen_lpd(this.type, this.mGetActvityTypes, this.locationsList);
+  const checkListScreen_lpd(this.type, this.mGetActivityTypes, this.locationsList, {super.key});
 
   // checkListScreen_lpd(this.type, this.mGetActvityTypes, this.locationsList, this. mLpdChecklist);
 
   @override
   State<checkListScreen_lpd> createState() =>
       _checkListScreen_lpdState(
-          this.type, this.mGetActvityTypes, this.locationsList);
+          this.type, this.mGetActivityTypes, this.locationsList);
 }
 
 class _checkListScreen_lpdState extends State<checkListScreen_lpd>
@@ -74,7 +62,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       print("resumedCheckListScreen");
-      getAcitiveCheckListData();
+      getActiveCheckListData();
       //do your stuff
     }
   }
@@ -92,7 +80,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
     print("initState");
     WidgetsBinding.instance.addObserver(this);
 
-    getAcitiveCheckListData();
+    getActiveCheckListData();
   }
 
   @override
@@ -119,7 +107,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                         Padding(
                           padding: const EdgeInsets.only(left: 20),
                           child: Text(
-                            widget.mGetActvityTypes.auditName,
+                            widget.mGetActivityTypes.auditName,
                             style: const TextStyle(color: Colors.black),
                           ),
                         ),
@@ -239,7 +227,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                           popupVisible = false;
                                         });
 
-                                        if (widget.mGetActvityTypes.auditId ==
+                                        if (widget.mGetActivityTypes.auditId ==
                                             "3") {
                                           Navigator.pushReplacement(
                                               context,
@@ -247,14 +235,14 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                                 builder: (context) =>
                                                     checkInOutScreenLPD(
                                                       checkListLpd[index_],
-                                                      widget.mGetActvityTypes,
+                                                      widget.mGetActivityTypes,
                                                       widget.locationsList,
                                                     ),
                                               )).then((value) {
-                                            getAcitiveCheckListData();
+                                            getActiveCheckListData();
                                           });
                                         } else if (widget
-                                            .mGetActvityTypes.auditId ==
+                                            .mGetActivityTypes.auditId ==
                                             "2") {
                                           Navigator.pushReplacement(
                                               context,
@@ -262,14 +250,14 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                                 builder: (context) =>
                                                     checkInOutScreenStoreAudit(
                                                       checkListStoreAudit[index_],
-                                                      widget.mGetActvityTypes,
+                                                      widget.mGetActivityTypes,
                                                       widget.locationsList,
                                                     ),
                                               )).then((value) {
-                                            getAcitiveCheckListData();
+                                            getActiveCheckListData();
                                           });
                                         } else if (widget
-                                            .mGetActvityTypes.auditId ==
+                                            .mGetActivityTypes.auditId ==
                                             "4") {
 
                                          /* Navigator.pushReplacement(
@@ -293,30 +281,29 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                             builder: (context) =>
                                                 checkInOutScreenEmployee(
                                                     checkListEmployee[index_],
-                                                    widget.mGetActvityTypes,
+                                                    widget.mGetActivityTypes,
                                                     widget.locationsList,
                                                     ),
                                           )).then((value) {
-                                        getAcitiveCheckListData();
+                                        getActiveCheckListData();
                                       });
-                                          //106042324000002
                                         } else if (widget
-                                            .mGetActvityTypes.auditId ==
+                                            .mGetActivityTypes.auditId ==
                                             "5") {
-                                          /*  Navigator.push(
+                                            Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     checkInOutScreenAm(
                                                         checkListAm[index_],
-                                                        widget.mGetActvityTypes,
+                                                        widget.mGetActivityTypes,
                                                         widget.locationsList,
-                                                        widget.checkList),
+                                                       ),
                                               )).then((value) {
-                                            getAcitiveCheckListData();
-                                          });*/
+                                            getActiveCheckListData();
+                                          });
 
-                                          Navigator.pushReplacement(
+                                        /*  Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
@@ -327,7 +314,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                                         checkListAm[index_]),
                                               )).then((value)  {
                                             getAcitiveCheckListData();
-                                          });
+                                          });*/
                                         }
                                       },
                                       child: Container(
@@ -386,14 +373,14 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
 
   Widget checkListViewLpd() {
     print(" widget.mGetActvityTypes.auditId");
-    print(widget.mGetActvityTypes.auditId);
-    return widget.mGetActvityTypes.auditId == "3"
+    print(widget.mGetActivityTypes.auditId);
+    return widget.mGetActivityTypes.auditId == "3"
         ? lpdList()
-        : widget.mGetActvityTypes.auditId == "2"
+        : widget.mGetActivityTypes.auditId == "2"
         ? storeAuditList()
-        : widget.mGetActvityTypes.auditId == "5"
+        : widget.mGetActivityTypes.auditId == "5"
         ? amList()
-        : widget.mGetActvityTypes.auditId == "4"
+        : widget.mGetActivityTypes.auditId == "4"
         ? empList()
         : const Text('Something went wrong');
   }
@@ -444,12 +431,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                     builder: (context) =>
                         lpdCheckListScreen(
                             1,
-                            widget.mGetActvityTypes,
+                            widget.mGetActivityTypes,
                             widget.locationsList,
                             checkListLpd[index]),
                   )).then((value) =>
                   () {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
             } else if (checkListLpd[index].checklistEditStatus == "R") {
               // checklist_edit_status=="R" = edit
@@ -460,12 +447,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                     builder: (context) =>
                         lpdCheckListScreen(
                             1,
-                            widget.mGetActvityTypes,
+                            widget.mGetActivityTypes,
                             widget.locationsList,
                             checkListLpd[index]),
                   )).then((value) =>
                   () {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
             } else {
               if (checkListLpd[index].check_In_Flag == "1") {
@@ -618,13 +605,13 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                     builder: (context) =>
                         AmAcceptSelectionScreen_Employee(
                           checkListEmployee[index],
-                          widget.mGetActvityTypes,
+                          widget.mGetActivityTypes,
                           widget.locationsList,
                           widget.type,
                         ),
                   )).then((value) =>
                   () {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
             } else if (checkListEmployee[index].checklistEditStatus ==
                 "R") {
@@ -634,12 +621,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                     builder: (context) =>
                         AmAcceptSelectionScreen_Employee(
                             checkListEmployee[index],
-                            widget.mGetActvityTypes,
+                            widget.mGetActivityTypes,
                             widget.locationsList,
                             widget.type),
                   )).then((value) =>
                   () {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
             } else {
               if (checkListEmployee[index].checkinFlag == "1") {
@@ -792,12 +779,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                     builder: (context) =>
                         storeAuditCheckListScreen(
                             1,
-                            widget.mGetActvityTypes,
+                            widget.mGetActivityTypes,
                             widget.locationsList,
                             checkListStoreAudit[index]),
                   )).then((value) =>
                   () {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
             } else if (checkListStoreAudit[index].checklistEditStatus ==
                 "R") {
@@ -809,12 +796,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                     builder: (context) =>
                         storeAuditCheckListScreen(
                             1,
-                            widget.mGetActvityTypes,
+                            widget.mGetActivityTypes,
                             widget.locationsList,
                             checkListStoreAudit[index]),
                   )).then((value) =>
                   () {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
             } else {
               if (checkListStoreAudit[index].check_In_Flag == "1") {
@@ -967,12 +954,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                     builder: (context) =>
                         amCheckListScreen(
                             1,
-                            widget.mGetActvityTypes,
+                            widget.mGetActivityTypes,
                             widget.locationsList,
                             checkListAm[index]),
                   )).then((value)
                    {
-                getAcitiveCheckListData();
+                getActiveCheckListData();
               });
             } else if (checkListAm[index].checklistEditStatus == "R") {
               // checklist_edit_status=="R" = edit
@@ -983,12 +970,11 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                     builder: (context) =>
                         amCheckListScreen(
                             1,
-                            widget.mGetActvityTypes,
+                            widget.mGetActivityTypes,
                             widget.locationsList,
                             checkListAm[index]),
-                  )).then((value) =>
-                  () {
-                getAcitiveCheckListData();
+                  )).then((value)  {
+                getActiveCheckListData();
               });
             } else {
               if (checkListAm[index].check_In_Flag == "1") {
@@ -1103,7 +1089,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
 
   // List<ActiveCheckListLpd> activeCheckListLpd = [];
 
-  Future<void> getAcitiveCheckListData() async {
+  Future<void> getActiveCheckListData() async {
     try {
       setState(() {
         loading = true;
@@ -1114,26 +1100,26 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       var url;
       //replace your restFull API here.
 
-      if (widget.mGetActvityTypes.auditId == "3") {
+      if (widget.mGetActivityTypes.auditId == "3") {
         url =
         "${Constants
             .apiHttpsUrl}/lpdaudit/Active_CheckList/$locationCode/${widget
-            .mGetActvityTypes.auditId}/$userID";
-      } else if (widget.mGetActvityTypes.auditId == "2") {
+            .mGetActivityTypes.auditId}/$userID";
+      } else if (widget.mGetActivityTypes.auditId == "2") {
         url =
         "${Constants
             .apiHttpsUrl}/StoreAudit/Active_CheckList/$locationCode/${widget
-            .mGetActvityTypes.auditId}/$userID";
-      } else if (widget.mGetActvityTypes.auditId == "5") {
+            .mGetActivityTypes.auditId}/$userID";
+      } else if (widget.mGetActivityTypes.auditId == "5") {
         url =
         "${Constants
             .apiHttpsUrl}/AreaManager/Active_CheckList/$locationCode/${widget
-            .mGetActvityTypes.auditId}/$userID";
-      } else if (widget.mGetActvityTypes.auditId == "4") {
+            .mGetActivityTypes.auditId}/$userID";
+      } else if (widget.mGetActivityTypes.auditId == "4") {
         url =
         "${Constants
             .apiHttpsUrl}/Employee/Active_CheckList/$locationCode/${widget
-            .mGetActvityTypes.auditId}/$userID";
+            .mGetActivityTypes.auditId}/$userID";
       }
 
       final response =
@@ -1149,16 +1135,16 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       checkListEmployee = [];
 
       Iterable l = json.decode(response.body);
-      if (widget.mGetActvityTypes.auditId == "3") {
+      if (widget.mGetActivityTypes.auditId == "3") {
         checkListLpd = List<ActiveCheckListLpd>.from(
             l.map((model) => ActiveCheckListLpd.fromJson(model)));
-      } else if (widget.mGetActvityTypes.auditId == "2") {
+      } else if (widget.mGetActivityTypes.auditId == "2") {
         checkListStoreAudit = List<ActiveCheckListStoreAudit>.from(
             l.map((model) => ActiveCheckListStoreAudit.fromJson(model)));
-      } else if (widget.mGetActvityTypes.auditId == "5") {
+      } else if (widget.mGetActivityTypes.auditId == "5") {
         checkListAm = List<ActiveCheckListAm>.from(
             l.map((model) => ActiveCheckListAm.fromJson(model)));
-      } else if (widget.mGetActvityTypes.auditId == "4") {
+      } else if (widget.mGetActivityTypes.auditId == "4") {
         checkListEmployee = List<ActiveCheckListEmployee>.from(
             l.map((model) => ActiveCheckListEmployee.fromJson(model)));
       }
@@ -1206,7 +1192,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
-                    getAcitiveCheckListData();
+                    getActiveCheckListData();
                     // submitCheckList();
                   },
                   child: const Text('Retry',
