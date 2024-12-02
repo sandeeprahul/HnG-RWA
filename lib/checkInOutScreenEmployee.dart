@@ -964,6 +964,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       var deviceid = prefs.getString("deviceid");
 
       String url = "${Constants.apiHttpsUrl}/Employee/Emp_CheckIn";
+
       /*  var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
       '/RWA_GROOMING_API/api/Employee/Emp_CheckIn', //

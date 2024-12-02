@@ -233,7 +233,7 @@ class _checkInOutScreenAmState extends State<checkInOutScreenAm> {
       print(distanceInMeters);
       var mts = distanceInMeters.toString().split('.');
       var meters = mts[0];
-      if (double.parse(meters) >= 150) {
+      if (double.parse(meters) <= 150) {
         setState(() {
           loading = false;
           takePhoto = true;
@@ -964,7 +964,7 @@ class _checkInOutScreenAmState extends State<checkInOutScreenAm> {
       String empCode = "EMP$userId$dateForEmpCode_";
       var deviceid = prefs.getString("deviceid");
 
-      String url = "${Constants.apiHttpsUrl}/Employee/Emp_CheckIn";
+      String url = "${Constants.apiHttpsUrl}/AreaManager/Areamanager_CheckIn";
       /*  var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
       '/RWA_GROOMING_API/api/Employee/Emp_CheckIn', //
@@ -975,7 +975,7 @@ class _checkInOutScreenAmState extends State<checkInOutScreenAm> {
       print(prefs.getString('locationCode'));
 
       var params = {
-        "emp_checklist_assign_id": activeCheckList.amChecklistAssignId,
+        "am_checklist_assign_id": activeCheckList.amChecklistAssignId,
         "userId": userId,
         "check_in_lat": '$lat_',
         "check_in_long": '$lng_',
