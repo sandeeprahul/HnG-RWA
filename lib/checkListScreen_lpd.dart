@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hng_flutter/data/ActiveCheckListLpd.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/storeAuditCheckListScreen.dart';
+import 'package:hng_flutter/tem.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -268,11 +269,12 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                                   activeCheckList: checkListEmployee[index_],
                                                   isEdit: 0,
                                                   locationsList: widget.locationsList,
-                                                  mGetActivityTypes: widget.mGetActvityTypes,
+                                                  mGetActivityTypes: widget.mGetActivityTypes,
                                                   sendingToEditAmHeaderQuestion: 0,
                                                   checkListItemMstId: "${checkListEmployee[index_].checklisTId}",),
                                               )).then((value) {
-                                            getAcitiveCheckListData();
+                                            getActiveCheckListData();
+
                                           });*/
 
                                           Navigator.pushReplacement(
@@ -287,6 +289,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                                           )).then((value) {
                                         getActiveCheckListData();
                                       });
+
                                         } else if (widget
                                             .mGetActivityTypes.auditId ==
                                             "5") {

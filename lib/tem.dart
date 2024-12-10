@@ -113,6 +113,7 @@ class _CheckListPageState extends State<CheckListPage> {
     // _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     submittedItems.clear();
+    cameraPageController.clearCroppedImageFile();
     super.dispose();
   }
 
@@ -292,6 +293,9 @@ class _CheckListPageState extends State<CheckListPage> {
                                       if (question.answerTypeId == 3)
                                         buildAttachProofWidget(
                                             question),
+
+                                      /*if(question.answerTypeId==8)
+                                        buildAttachMultipleProofWidget(question),*/
 
                                       // if (question.answerTypeId == 7) buildImageWidget(question),
                                       // Separate each question visually
@@ -498,6 +502,80 @@ class _CheckListPageState extends State<CheckListPage> {
     );
   }
 
+
+  Widget buildAttachMultipleProofWidget(Question question) {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+           Text(
+            question.questionText ?? '',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Obx(() {
+            return Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                // Display captured images
+                ...cameraPageController.croppedImageFiles.map((image) {
+                  return Stack(
+                    children: [
+                      Image.file(
+                        File(image.path),
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: InkWell(
+                          onTap: () {
+                            cameraPageController.croppedImageFiles.remove(image);
+                          },
+                          child: const Icon(
+                            Icons.cancel,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+                // Add new image button
+                InkWell(
+                  onTap: () {
+                    cameraPageController.captureAndCropImage();
+                  },
+                  child: Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: const Icon(Icons.add_a_photo, size: 50),
+                  ),
+                ),
+              ],
+            );
+          }),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              print("Captured Images: ${cameraPageController.croppedImageFiles.length}");
+            },
+            child: const Text("Submit Images"),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   Widget buildImageWidget(Question question) {
     return Align(
       alignment: Alignment.center,
@@ -650,10 +728,8 @@ class _CheckListPageState extends State<CheckListPage> {
 
     final cameraPageController = Get.find<CameraPageController>();
 
-    String dateForEmpCode_ =
-        DateFormat("yyyyMMddhhmmssS").format(DateTime.now());
+
     var userId = prefs.getString("userCode");
-    String empCode = "EMP$userId$dateForEmpCode_";
     String datetime = DateFormat("yyyy-MM-dd hh:mm:ss").format(DateTime.now());
 
     List<Map<String, dynamic>> sendJson = [];
@@ -713,7 +789,7 @@ class _CheckListPageState extends State<CheckListPage> {
         // If photo is provided or not mandatory, proceed with posting data
         if (currentQuestion.answerTypeId == 3 &&
             cameraPageController.base64img.value.isNotEmpty) {
-          cloudstorageRef(cameraPageController.base64img.value, empCode,
+          cloudstorageRef(cameraPageController.base64img.value, imageName,
               sendJson, checkListItem, questionIndex);
         } else {
           final apiResponse = await checklistRepo.postChecklistData(sendJson);
@@ -781,12 +857,12 @@ class _CheckListPageState extends State<CheckListPage> {
     final storageRef = FirebaseStorage.instanceFor(
             bucket: "gs://hng-offline-marketing.appspot.com")
         .ref();
-    //gs://loghng-942e6.appspot.com
-    //gs://hng-offline-marketing.appspot.com//original
+    //gs://loghng-942e6.appspot.com //testing
+    //gs://hng-offline-marketing.appspot.com //original
 
     var locationCode = widget.activeCheckList.locationCode;
 
-    final imagesRef = storageRef.child("$locationCode/QuesAns/$empCode.jpg");
+    final imagesRef = storageRef.child("$locationCode/QuesAns/$empCode");
     progressController.show();
     try {
      /* setState(() {

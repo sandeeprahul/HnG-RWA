@@ -218,7 +218,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
 
       var mts = distanceInMeters.toString().split('.');
       var meters = mts[0];
-      if (double.parse(meters) <= 100) {
+      if (double.parse(meters) <= 150) {
         setState(() {
           loading = false;
           takePhoto = true;
@@ -411,8 +411,8 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                             onTap: () {
                               Navigator.pop(context);
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 15),
+                            child: const Padding(
+                              padding: EdgeInsets.only(left: 15),
                               child: Icon(Icons.arrow_back),
                             ),
                           ),
@@ -422,7 +422,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                           child: Padding(
                               padding: const EdgeInsets.only(left: 20),
                               child: RichText(
-                                text: TextSpan(children: <TextSpan>[
+                                text: const TextSpan(children: <TextSpan>[
                                   TextSpan(
                                       text: 'Activity Check In',
                                       style: TextStyle(
@@ -461,7 +461,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                     myLocationEnabled: true,
                                     markers: Set<Marker>.of([
                                       Marker(
-                                        markerId: MarkerId('1'),
+                                        markerId: const MarkerId('1'),
                                         position: LatLng(lat_, lng_),
                                         /*infoWindow: InfoWindow(
                                             title: 'My Position',
@@ -475,10 +475,10 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                   child: InkWell(
                                     onTap: () {},
                                     child: Container(
-                                      margin: EdgeInsets.all(10),
-                                      padding: EdgeInsets.all(5),
+                                      margin: const EdgeInsets.all(10),
+                                      padding: const EdgeInsets.all(5),
                                       width: 80,
-                                      child: Row(
+                                      child: const Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
@@ -492,7 +492,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                           )
                                         ],
                                       ),
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(5)),
@@ -528,10 +528,10 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                       color: Colors.white,
                                       child: _body(),
                                     ),
-                                    Align(
+                                    const Align(
                                       alignment: Alignment.topRight,
                                       child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
+                                        padding: EdgeInsets.all(5.0),
                                         child: Icon(
                                           Icons.camera_alt,
                                           color: Colors.white,
@@ -551,7 +551,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                           const EdgeInsets.only(top: 10, left: 15, right: 10),
                       child: Column(
                         children: [
-                          Padding(
+                          const Padding(
                             padding: EdgeInsets.only(top: 5, bottom: 5),
                             child: Text(
                               'Check In time',
@@ -563,12 +563,12 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                           ),
                           Text(
                             timeMin,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
                                 fontSize: 16),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           /*   Row(
@@ -609,11 +609,11 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                               ),
                             ],
                           ),*/
-                          SizedBox(
+                          const SizedBox(
                             height: 7,
                           ),
-                          Divider(),
-                          SizedBox(
+                          const Divider(),
+                          const SizedBox(
                             height: 7,
                           ),
                           Visibility(
@@ -621,7 +621,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                             child: Column(
                               // mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Align(
+                                const Align(
                                   alignment: Alignment.topLeft,
                                   child: Text(
                                     'DILO',
@@ -631,7 +631,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 7,
                                 ),
                                 Row(
@@ -650,7 +650,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                               alignment: Alignment.topLeft,
                                               child: Text(
                                                 'Time : $outputTime - $enddTime',
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontSize: 12,
                                                 ),
                                               ),
@@ -803,7 +803,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                   child: Container(
                     height: 50,
                     color: Colors.blue,
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         'Check In',
                         style: TextStyle(
@@ -818,29 +818,29 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
               Visibility(
                 visible: false,
                 child: Container(
-                  color: Color(0x80000000),
+                  color: const Color(0x80000000),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        margin: EdgeInsets.all(10),
-                        padding: EdgeInsets.only(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.only(
                             left: 15, top: 10, bottom: 15, right: 15),
                         color: Colors.white,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Align(
+                            const Align(
                                 alignment: Alignment.center,
                                 child: Padding(
-                                  padding: const EdgeInsets.all(5),
+                                  padding: EdgeInsets.all(5),
                                   child: Text(
                                     'Select Attendence Type',
                                     style: TextStyle(
                                         fontSize: 18, color: Colors.black),
                                   ),
                                 )),
-                            Divider(),
+                            const Divider(),
                             ListView.separated(
                               shrinkWrap: true,
                               itemCount: typeAttencenceList.length,
@@ -857,7 +857,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                       print(typeAttencenceList[pos]);
                                     },
                                     child: Text(typeAttencenceList[pos],
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           color: Colors.black87,
                                         )),
@@ -866,7 +866,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                               },
                               separatorBuilder:
                                   (BuildContext context, int index) {
-                                return Divider();
+                                return const Divider();
                               },
                             ),
                           ],
@@ -880,20 +880,20 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
               Visibility(
                   visible: loading,
                   child: Container(
-                    color: Color(0x80000000),
+                    color: const Color(0x80000000),
                     child: Center(
                         child: Container(
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(5)),
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             height: 115,
                             width: 150,
-                            child: Column(
+                            child: const Column(
                               children: [
                                 CircularProgressIndicator(),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: EdgeInsets.all(8.0),
                                   child: Text('Please wait..'),
                                 )
                               ],
@@ -957,7 +957,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
         compressFormat: ImageCompressFormat.jpg,
-        // compressQuality: 5,//1280 x 720//1920 x 1080
+        compressQuality : 40,//1280 x 720//1920 x 1080
         maxWidth: 1920,
         maxHeight: 1080,
         uiSettings: [
@@ -1139,7 +1139,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
         //{"statusCode":"200","message":"Attendance Add Successfully","errerMessage":null}
 
         if (respo['message'] == 'Dilo Check In is Completed') {
-          Future.delayed(Duration(milliseconds: 1500), () {
+          Future.delayed(const Duration(milliseconds: 1500), () {
             // Navigator.pop(context, 1);
 
             Navigator.pushReplacement(
@@ -1176,18 +1176,18 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
       setState(() {
         loading = false;
       });
-      _showRetryAlert(base64img);
+      _showRetryAlert(base64img,e);
     }
   }
 
-  Future<void> _showRetryAlert(var image) async {
+  Future<void> _showRetryAlert(var image, var e) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
+      builder: (BuildContext context_) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content: Text('Network issue\nPlease retry'),
+          content:  Text('Something went wrong\nPlease contact it support\n$e'),
           actions: <Widget>[
             // Container(
             //   padding: EdgeInsets.all(15),
@@ -1202,14 +1202,19 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
             //           style: TextStyle(color: Colors.white))),
             // ),
             Container(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
-                    Navigator.of(context).pop();
-                    checkInUser(image);
-                    // submitCheckList();
+                    Navigator.of(context_).pop();
+                    // Navigator.pop(context_);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => checkListScreen(
+                              1, widget.mGetActvityTypes, widget.locationsList)),
+                    );                    // submitCheckList();
                   },
                   child: const Text('Retry',
                       style: TextStyle(color: Colors.white))),
@@ -1275,7 +1280,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
     if (_croppedFile != null) {
       return _imageCard();
     } else {
-      return SizedBox(
+      return const SizedBox(
         width: 120,
         height: 110,
         child: Icon(
@@ -1289,11 +1294,11 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
   Widget loginSuccess() {
     return Container(
       width: double.infinity,
-      color: Color(0x80000000),
+      color: const Color(0x80000000),
       child: Container(
-        margin: EdgeInsets.only(left: 30, right: 30, top: 100, bottom: 100),
+        margin: const EdgeInsets.only(left: 30, right: 30, top: 100, bottom: 100),
         color: Colors.white,
-        child: Column(
+        child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
@@ -1302,7 +1307,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
               color: Colors.green,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, top: 10),
+              padding: EdgeInsets.only(left: 15, right: 15, top: 10),
               child: Text(
                 'Successfully Checked In',
                 style: TextStyle(

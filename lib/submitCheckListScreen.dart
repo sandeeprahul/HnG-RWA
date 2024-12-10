@@ -556,7 +556,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
         compressFormat: ImageCompressFormat.jpg,
-        // compressQuality: 5,//1280 x 720//1920 x 1080
+        compressQuality : 40,//1280 x 720//1920 x 1080
         maxWidth: 1920,
         maxHeight: 1080,
         uiSettings: [
@@ -1262,6 +1262,8 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
     final storageRef = FirebaseStorage.instanceFor(
             bucket: "gs://hng-offline-marketing.appspot.com")
         .ref();
+    //gs://loghng-942e6.appspot.com
+    //gs://hng-offline-marketing.appspot.com
 
     var locationCode = widget.activeCheckList.locationCode;
     // var locationCode = prefs.getString('locationCode') ?? '106';

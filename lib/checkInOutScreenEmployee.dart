@@ -654,7 +654,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                       ),
                     ),
                   ),
-
                 ],
               ),
               Align(
@@ -831,7 +830,8 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
         compressFormat: ImageCompressFormat.jpg,
-        // compressQuality: 5,//1280 x 720//1920 x 1080
+        compressQuality: 40,
+        //1280 x 720//1920 x 1080
         maxWidth: 1920,
         maxHeight: 1080,
         uiSettings: [
@@ -912,11 +912,11 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
     final storageRef = FirebaseStorage.instanceFor(
             bucket: "gs://hng-offline-marketing.appspot.com")
         .ref();
-
-    // var locationCode = prefs.getString('locationCode') ?? '106';
+    //gs://loghng-942e6.appspot.com
+    //gs://hng-offline-marketing.appspot.com
     var locationCode = widget.activeCheckList.locationCode;
 
-    final imagesRef = storageRef.child("$locationCode/StoreAudit/$empCode.jpg");
+    final imagesRef = storageRef.child("$locationCode/Employee/$empCode.jpg");
 
     // String dataUrl = base64img;
 // Create a reference to "mountains.jpg"
@@ -1026,7 +1026,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>  CheckListPage(
+                  builder: (context) => CheckListPage(
                     activeCheckList: widget.activeCheckList,
                     isEdit: 0,
                     locationsList: widget.locationsList,
@@ -1233,7 +1233,4 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       return const SizedBox.shrink();
     }
   }
-
-
-
 }

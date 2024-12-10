@@ -11,6 +11,8 @@ class CameraPageController extends GetxController {
   var camVisible = false.obs; // Observable for camera visibility
   var imagePath = ''.obs;
   var croppedImageFile = Rx<XFile?>(null); // Observable for cropped image
+  var croppedImageFiles = <XFile>[].obs;
+
 
   var cameraOpen = false.obs; // Flag to track camera open status
 
@@ -40,8 +42,10 @@ class CameraPageController extends GetxController {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo.path : photo.path,
         compressFormat: ImageCompressFormat.jpg,
+
         maxWidth: 1920,
         maxHeight: 1080,
+        compressQuality: 50,
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Cropper',
@@ -56,12 +60,18 @@ class CameraPageController extends GetxController {
       if (croppedFile != null) {
         final imageBytes = await File(croppedFile.path).readAsBytes();
         croppedImageFile.value = XFile(croppedFile.path);
+        croppedImageFiles.add(XFile(croppedFile.path)); // Add to the list
         base64img.value = base64.encode(imageBytes); // Update base64 image
         print("Base64 Image: ${base64img.value}");
       }
     }
   }
 
+  void clearCroppedImageFile() {
+    croppedImageFile.value = null; // Set the value to null
+    croppedImageFiles.clear();
+
+  }
   @override
   void onClose() {
     super.onClose();

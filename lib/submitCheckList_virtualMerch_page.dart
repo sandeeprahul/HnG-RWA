@@ -559,7 +559,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
         compressFormat: ImageCompressFormat.jpg,
-        // compressQuality: 5,//1280 x 720//1920 x 1080
+        compressQuality :40,//1280 x 720//1920 x 1080
         maxWidth: 1920,
         maxHeight: 1080,
         uiSettings: [
