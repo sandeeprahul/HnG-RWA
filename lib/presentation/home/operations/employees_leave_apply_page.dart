@@ -286,7 +286,10 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     });
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? userCode = preferences.getString("userCode");
+    // var userCode = '70002';
+
     String? locationCode = preferences.getString("locationCode");
+
 
     // Collect all employees, including selected and unselected, and prepare JSON output
     List<Map<String, String>> jsonOutput = employees.map((employee) {
@@ -310,6 +313,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
     // Convert the JSON output to a string
     final String jsonBody = json.encode(jsonOutput);
+    print("UPLOADINUG:$jsonBody");
+    // final String jsonBody = json.encode(employeesTestData);
 
     // Define the endpoint URL
     const String url =

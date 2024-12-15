@@ -1080,9 +1080,8 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
 
       final prefs = await SharedPreferences.getInstance();
 
-      var url = Uri.https(
-         ' ${Constants.apiHttpsUrl}/CheckList/AddQuestionAnswer',
-      );
+      var url =
+         ' ${Constants.apiHttpsUrl}/CheckList/AddQuestionAnswer';
 
       var locationCode = prefs.getString('locationCode');
       var usercode = int.tryParse(prefs.getString('userCode') ?? "");
@@ -1219,7 +1218,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
 
       var response = await http
           .post(
-            url,
+            Uri.parse(url),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },

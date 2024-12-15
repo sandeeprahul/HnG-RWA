@@ -17,6 +17,7 @@ import '../../../provider/store_transfer_provider.dart';
 import '../../../provider/week_off_provider.dart';
 import 'package:http/http.dart' as http;
 
+import '../../dashboard_page.dart';
 import '../../week_off_employee_list_page.dart';
 import 'employees_leave_apply_page.dart';
 
@@ -89,6 +90,14 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                                   1)), //true permanent//false temporary
                         );
                       }
+                      else if (audit.auditId == 107) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            // fullscreenDialog: true,
+                              builder: (context) => const WebViewExample()),
+                        );
+                      }
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -128,7 +137,20 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                             Icons.store,
                             // color: Colors.white,
                             size: 60,
-                          )),
+                          ))  else if (audit.auditId == 106)
+                          const Center(
+                              child: Icon(
+                            Icons.map_outlined,
+                            // color: Colors.white,
+                            size: 60,
+                          ))  else if (audit.auditId == 107)
+                                    const Center(
+                                        child: Icon(
+                                          Icons.dashboard,
+                                          // color: Colors.white,
+                                          size: 60,
+                                        )),
+
                         const SizedBox(
                           height: 5,
                         ),

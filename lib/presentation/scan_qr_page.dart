@@ -149,14 +149,6 @@ class _ScanQrPageState extends State<ScanQrPage> {
       delayMillis: 2000,
       cameraFace: CameraFace.back,
     );
-
-    // var res = await Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //       builder: (context) =>  const SimpleBarcodeScannerPage(),
-    //     ));
-    // print("res: $res");
-    // callApi();
     showAlert(res!, phone);
   }
 

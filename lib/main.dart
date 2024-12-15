@@ -23,6 +23,7 @@ import 'package:hng_flutter/core/light_theme.dart';
 import 'package:hng_flutter/loginBinding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/DeviceIdentifier.dart';
 import 'presentation/login/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -67,6 +68,7 @@ class _GifScreenState extends State<GifScreen> {
     // TODO: implement initState
     super.initState();
     getDeviceId();
+
     Future.delayed(const Duration(seconds: 4), () {
       Navigator.pushReplacement(
           context,
@@ -77,21 +79,20 @@ class _GifScreenState extends State<GifScreen> {
   }
 
   getDeviceId() async {
+
+    String id = await DeviceIdentifier.getUniqueId();
+
+
     final prefs = await SharedPreferences.getInstance();
     String? deviceId;
 
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    print("device id: $id");
 
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      print('Device ID: ${androidInfo.id}'); // Unique ID for Android
-      deviceId = androidInfo.id;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      print('Device ID: ${iosInfo.identifierForVendor}'); // Unique ID for iOS
-      deviceId = iosInfo.identifierForVendor;
+    setState(() {
+      deviceId = id;  // Update the UI with the fetched device ID
+    });
 
-    }
+
 
     FirebaseMessaging.instance.getToken().then((value) {
       var token = value;
@@ -100,16 +101,13 @@ class _GifScreenState extends State<GifScreen> {
     });
     prefs.setString("deviceid", deviceId!);
 
-    var MYYDEVICEID;
-    var MYYDEVICEIDANother;
 
     setState(() {
       prefs.setString("deviceidDDDD", deviceId!);
-      MYYDEVICEID = prefs.getString("deviceid");
     });
 
     Fluttertoast.showToast(
-        msg: "DeviceId->${deviceId}", toastLength: Toast.LENGTH_LONG);
+        msg: "DeviceId->$deviceId", toastLength: Toast.LENGTH_LONG);
 
     FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 

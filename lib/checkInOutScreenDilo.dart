@@ -957,7 +957,8 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
         compressFormat: ImageCompressFormat.jpg,
-        compressQuality : 40,//1280 x 720//1920 x 1080
+        compressQuality: 40,
+        //1280 x 720//1920 x 1080
         maxWidth: 1920,
         maxHeight: 1080,
         uiSettings: [
@@ -1053,13 +1054,9 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
       String empCode = "EMP$userId$dateForEmpCode_";
       cloudstorageRef(imageEncoded, empCode);
 
-      var url = Uri.https(
-          '${Constants.apiHttpsUrl}/CheckList/Dilo_CheckIn');
+      String url = '${Constants.apiHttpsUrl}/CheckList/Dilo_CheckIn';
       print(url);
 
-      var locationCode;
-      locationCode = prefs.getString('locationCode');
-      print(prefs.getString('locationCode'));
       var deviceid = prefs.getString("deviceid");
 
       var params = {
@@ -1076,41 +1073,11 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
           "imageFormat": "jpg",
           "imagebase64": ""
         },
-        /*   "attendance_date": "$date_",
-        //remove in production
-        "attendance_store_code": "$locationCode",
-        // "attendance_store_code": '106',
-        "attendance_sto_geo_lat": lat,
-        "attendance_sto_geo_long": lng,
-        "employee_code": prefs.getString('userCode') ?? '105060',
-        "check_date_time_in": "$datetime_",
-        "check_in_selfie_url": "",
-        "check_date_time_out": "$datetime_",
-        "check_out_selfie_url": "",
-        "check_in_store_geo_lat": lat,
-        "check_in_store_geo_long": lng,
-        "check_out_store_geo_long": 0,
-        "check_out_exception_status": 0,
-        "created_by": "string",
-        "created_datetime": "$datetime_",
-        "attendance_current_status": "Present",
-        "roaster_id": "10",
-        "check_out_store_geo_lat": "10",
-        "check_in_exception_status": "10",
-        "modiified_datetime": "2023-02-20",
-        "modified_by": "",
-        "check_in_Image": base64img,
-        // "check_in_Image_FileName": "EMPCD106" + datetime_,
-        "check_in_Image_FileName": "$empCode",
-        "check_in_Image_FileName_Format": "jpg",
-        "check_out_image": "",
-        "check_out_image_FileName": "",
-        "check_out_Image_FileName_Format": "",*/
       };
 
       var response = await http
           .post(
-            url,
+            Uri.parse(url),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -1176,7 +1143,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
       setState(() {
         loading = false;
       });
-      _showRetryAlert(base64img,e);
+      _showRetryAlert(base64img, e);
     }
   }
 
@@ -1187,7 +1154,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
       builder: (BuildContext context_) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content:  Text('Something went wrong\nPlease contact it support\n$e'),
+          content: Text('Something went wrong\nPlease contact it support\n$e'),
           actions: <Widget>[
             // Container(
             //   padding: EdgeInsets.all(15),
@@ -1203,8 +1170,9 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
             // ),
             Container(
               padding: const EdgeInsets.all(15),
-              decoration:
-                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context_).pop();
@@ -1212,9 +1180,9 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => checkListScreen(
-                              1, widget.mGetActvityTypes, widget.locationsList)),
-                    );                    // submitCheckList();
+                          builder: (context) => checkListScreen(1,
+                              widget.mGetActvityTypes, widget.locationsList)),
+                    ); // submitCheckList();
                   },
                   child: const Text('Retry',
                       style: TextStyle(color: Colors.white))),
@@ -1296,7 +1264,8 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
       width: double.infinity,
       color: const Color(0x80000000),
       child: Container(
-        margin: const EdgeInsets.only(left: 30, right: 30, top: 100, bottom: 100),
+        margin:
+            const EdgeInsets.only(left: 30, right: 30, top: 100, bottom: 100),
         color: Colors.white,
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -308,7 +308,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                     ),
                     SizedBox(
                       height:
-                          MediaQuery.of(context).size.height > 600 ? 120 : 75,
+                          MediaQuery.of(context).size.height > 600 ? 100 : 50,
                     ),
                     Column(
                       // mainAxisSize: MainAxisSize.min,
@@ -321,29 +321,18 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                         const SizedBox(
                           height: 5,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              height: 50,
-                              width: 200,
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: [
-                                  SelectableText(
-                                    'DeviceId: $deviceId',
-                                    textAlign: TextAlign.center,
-
-                                    style: const TextStyle(color: Colors.grey),
-                                    // key: _selectableTextKey,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        SizedBox(
+                          height: 50,
+                          width: double.infinity,
+                          child: SelectableText(
+                            'DeviceId: $deviceId',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.grey),
+                            // key: _selectableTextKey,
+                          ),
                         ),
                         const SizedBox(
-                          height: 10,
+                          height: 20,
                         ),
                       ],
                     ),
@@ -589,7 +578,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     }*/
     final SharedPreferences pref = await SharedPreferences.getInstance();
 
-    String? id = await pref.getString(
+    String? id = pref.getString(
       "deviceid",
     );
 

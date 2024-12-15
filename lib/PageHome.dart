@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
+import 'package:hng_flutter/widgets/product_quick_enquiry_widget.dart';
 import 'package:hng_flutter/widgets/scan_qr_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
@@ -476,6 +477,8 @@ class _PageHomeState extends State<PageHome> {
               ),
             ),
 
+            const ProductQuickEnquiryWidget(),
+
             const ScanQrWidget(),
             const Divider(),
 
@@ -483,7 +486,7 @@ class _PageHomeState extends State<PageHome> {
               alignment: Alignment.topLeft,
               child: Padding(
                 padding:
-                    EdgeInsets.only(left: 15, top: 10, right: 10, bottom: 15),
+                    const EdgeInsets.only(left: 15, top: 10, right: 10, bottom: 15),
                 child: Text(
                   'Explore Company',
                   // style: TextStyle(fontSize: 15),

@@ -607,12 +607,12 @@ class _checkListItemScreen_StoreAuditState
         '{"store_checklist_assign_id":${widget.activeCheckList.store_checklist_assign_id}}';
     print(payload);
 
-    var url = Uri.https(
-     '${Constants.apiHttpsUrl}/StoreAudit/WorkFlowStatus',
-    );
+    String url =
+     '${Constants.apiHttpsUrl}/StoreAudit/WorkFlowStatus'
+    ;
 
     var response = await http.post(
-      url,
+      Uri.parse(url),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
