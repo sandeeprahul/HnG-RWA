@@ -1,14 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hng_flutter/helper/simpleDialog.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
+
+import '../common/zoomable_image.dart';
 
 class ProductQuickEnquiryPage extends StatefulWidget {
   const ProductQuickEnquiryPage({super.key});
 
   @override
-  State<ProductQuickEnquiryPage> createState() => _ProductQuickEnquiryPageState();
+  State<ProductQuickEnquiryPage> createState() =>
+      _ProductQuickEnquiryPageState();
 }
 
 class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
@@ -18,31 +26,44 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
   String? stockOnHand;
   String? averageDailySales;
   String? promotion;
+  Map<String, dynamic>? productData;
 
   Future<void> fetchProductDetails(String code) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var locationCode = pref.getString('locationCode');
+    // var locationCode = "106";
     final url = Uri.parse(
-        "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Coupon/productenquiry/$code");
+        "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Coupon/productenquiry/$code/$locationCode");
 
+    print(
+        "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Coupon/productenquiry/$code/$locationCode");
     setState(() {
       _isLoading = true;
+      productData = null;
     });
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException('The connection has timed out. Please try again.');
+      });
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print(data);
-        setState(() {
-          skuName = data['skuName'];
-          stockOnHand = data['soh'];
-          averageDailySales = data['avarageDailySales'];
-          promotion = data['promotion'];
-        });
+        if (data['status'] == 'Success') {
+          setState(() {
+            productData = data['product'][0];
+          });
+        } else {
+          _showError(data['status']);
+        }
       } else {
-        _showError('Failed to fetch product details.');
+        _showError('Failed to fetch product details.${response.statusCode}');
       }
     } catch (e) {
-      _showError('An error occurred: $e');
+      if (e is TimeoutException) {
+        _showError('Request timed out. Please check your connection and try again.');
+      } else {
+        _showError('An error occurred: $e');
+      }
     } finally {
       setState(() {
         _isLoading = false;
@@ -51,16 +72,15 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    showSimpleDialog(title: 'Alert!', msg: message);
+    _codeController.clear();
   }
 
   Future<void> _scanProduct() async {
     // Replace this with your QR scanning function.
     String? scannedCode = await goToQrPage("your-phone-number");
     if (scannedCode != null) {
-     /* setState(() {
+      /* setState(() {
 
       });*/
       _codeController.text = scannedCode;
@@ -69,90 +89,251 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
     }
   }
 
+
+
+  Widget _buildDetailRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Function to display all rows
+  Widget _buildProductDetails(Map<String, dynamic> productData) {
+    final details = [
+      // ["SKU Code", productData['skU_CODE']],
+      // ["SKU Name", productData['skU_NAME']],
+      // ["Location Code", productData['locatioN_CODE']],
+      // ["HSN Code", productData['hsN_CODE']],
+      // ["HSN Description", productData['hsN_DESCRIPTION']],
+      // ["Tax Code", productData['taX_CODE']],
+      // ["Tax Rate", "${productData['taX_RATE']}%"],
+      // ["EAN Code", productData['ean_code']],
+      // ["Stock On Hand", productData['soh']],
+      // ["Availability", productData['availability']],
+      // ["Average Daily Sales", productData['avarageDailySales']],
+      // ["Promotion", productData['promotion']],
+    ];
+
+    return SingleChildScrollView(
+      child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Product Image
+          Center(
+            child: InkWell(
+              onTap: (){
+                Get.to(ZoomableImage(
+                    imageUrl:
+                    productData!['productImageUrl']));
+              },
+              child: Image.network(
+                productData['productImageUrl'] ?? '', // Image URL
+                height: 150,
+                width: 150,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.broken_image,
+                  size: 150,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16), // Add some spacing after the image
+          Text(
+            textAlign: TextAlign.center,
+            '${productData['skU_NAME']}\n',
+            style: const TextStyle(fontSize: 16,color: Colors.black),
+            // overflow: TextOverflow.ellipsis,
+          ),
+          Container(
+            color:Colors.white   , // Alternate background
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Availability',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Flexible(
+                  child: Text(
+                      '${productData['availability']}',
+                    style:  TextStyle(fontSize: 14,fontWeight: FontWeight.bold,color: productData['availability']=="Available"?Colors.green:Colors.red),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            color: Colors.grey[200] , // Alternate background
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Average Daily Sales',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Flexible(
+                  child: Text(
+                      '${productData['avarageDailySales']}',
+                    style:  const TextStyle(fontSize: 14,fontWeight: FontWeight.bold,),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+            // padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Text(
+                  textAlign: TextAlign.start,
+                  'Promotion:',
+                  style: TextStyle(fontSize: 16,color: Colors.black),
+                  // overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 6),
+            color: Colors.yellow,
+            child: Text(
+              '${productData['promotion']}',
+              style: const TextStyle(fontSize: 16,color: Colors.black),
+              // overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          // Product Details Rows
+          ...List.generate(details.length, (index) {
+            return _buildDetailRowWithBackground(
+              details[index][0],
+              details[index][1] ?? "N/A",
+              index % 2 == 0, // Grey background for even rows
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+// Function to build rows with alternating background color
+  Widget _buildDetailRowWithBackground(
+      String label, String value, bool isGrey) {
+    return Container(
+      color: isGrey ? Colors.grey[200] : Colors.white, // Alternate background
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+          Flexible(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 14),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.deepOrangeAccent,
+        elevation: 2,
+        title: const Text(
+          "Product Quick Enquiry",
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ),
+      /* appBar: AppBar(
         title: const Text('Product Quick Enquiry Screen',style: TextStyle(fontSize: 16),),
         backgroundColor: Colors.orange,
-      ),
+      ),*/
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             Row(
               children: [
-                const Text(
-                  'Scan Product',
-                  style: TextStyle(fontSize: 16),
-                ),
+                // const Text(
+                //   'Scan Product',
+                //   style: TextStyle(fontSize: 16),
+                // ),
+
                 const SizedBox(width: 8.0),
                 Expanded(
                   child: TextField(
                     controller: _codeController,
-                    onTapOutside: (h){
+                    onTapOutside: (h) {
                       // _scanProduct();
-                      fetchProductDetails(_codeController.text);
-                      print("onTapOutside:$h");
-
+                      if (_codeController.text.isNotEmpty) {
+                        fetchProductDetails(_codeController.text);
+                        print("onTapOutside:$h");
+                      }
                     },
-                    onSubmitted: (d){
-                      fetchProductDetails(_codeController.text);
-
-                      print("onSubmitted:$d");
+                    onSubmitted: (d) {
+                      if (d.isNotEmpty) {
+                        fetchProductDetails(_codeController.text);
+                        print("onSubmitted:$d");
+                      }
                     },
-                    decoration:  InputDecoration(
-                      // labelText: 'Scan Product',
-                      border:const OutlineInputBorder(),
-                      suffixIcon:     IconButton(
-                        icon:  const Icon(Icons.qr_code_scanner),
+                    decoration: InputDecoration(
+                      hintText: 'Enter Code or Scan Product',
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.qr_code_scanner),
                         onPressed: _scanProduct,
                       ),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
-
                   ),
                 ),
-              /*  const SizedBox(width: 8.0),
-                IconButton(
-                  icon: const Icon(Icons.qr_code_scanner),
-                  onPressed: _scanProduct,
-                ),*/
               ],
             ),
-            const SizedBox(height: 16.0),
-
-              const Text(
-                'Sku Name',
-                style: TextStyle(fontSize: 16,),
-              ),
-              Text(skuName??'', style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 16)),
-              const SizedBox(height: 8.0),
-              const Text(
-                '\nStock On Hand',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(stockOnHand ?? '',style: const TextStyle(color: Colors.green,fontSize: 16),),
-              const SizedBox(height: 8.0),
-              const Text(
-                '\nAverage Daily Sales',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(averageDailySales ?? '', style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.green)),
-              const SizedBox(height: 8.0),
-              const Text(
-                '\nPromotion',
-                style: TextStyle(fontSize: 16),
-              ),
-              Container(
-                  color: Colors.yellow,
-                  child: Text(promotion ?? '', style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 16))),
-              const SizedBox(height: 8.0),
-              const Text(
-                '\nNote: This Functionality will work only when the staff is inside the store',
-                style: TextStyle(fontStyle: FontStyle.italic),
-              ),
-
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Expanded(
+                    child: productData == null
+                        ? const Center(
+                            child: Text(
+                                'No product data available. Please search or scan.'),
+                          )
+                        : _buildProductDetails(productData!)),
+            const Text(
+              '\nNote: This Functionality will work only when the staff is inside the store',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
           ],
         ),
       ),
@@ -177,6 +358,4 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
 
     return res; // Replace with scanned code.
   }
-
 }
-

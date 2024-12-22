@@ -1139,7 +1139,7 @@ class _submitCheckListScreenEmployeeState
     );
 
     var locationCode = prefs.getString('locationCode');
-    var usercode = int.tryParse(prefs.getString('userCode') ?? "");
+    var usercode = prefs.getString('userCode') ?? "";
 
     String dateForEmpCode_ =
         DateFormat("yyyyMMddhhmmssS").format(DateTime.now());
@@ -1159,7 +1159,7 @@ class _submitCheckListScreenEmployeeState
         "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
         "checklist_Id": widget.checkList.checklistId,
         "empcode": widget.isEdit == 1
-            ? widget.sendingToEditAmHeaderQuestion
+            ? widget.checkList.employeeCode
             : usercode,
         "item_name": quesAnsList[0].itemName,
         "checkList_Answer_Id": quesAnsList[0].questions[0].checkListAnswerId,
@@ -1197,7 +1197,7 @@ class _submitCheckListScreenEmployeeState
             "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
             "checklist_Id": widget.checkList.checklistId,
             "empcode": widget.isEdit == 1
-                ?widget.sendingToEditAmHeaderQuestion
+                ? widget.checkList.employeeCode
                 : usercode,
             "item_name": quesAnsList[i].itemName,
             "checkList_Answer_Id":
@@ -1232,7 +1232,7 @@ class _submitCheckListScreenEmployeeState
             "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
             "checklist_Id": widget.checkList.checklistId,
             "empcode": widget.isEdit == 1
-                ?widget.sendingToEditAmHeaderQuestion
+                ? widget.checkList.employeeCode
                 : usercode,
             "item_name": quesAnsList[0].itemName,
             "checkList_Answer_Id":
@@ -1268,7 +1268,7 @@ class _submitCheckListScreenEmployeeState
             "checkList_Item_Mst_Id":widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
             "checklist_Id": widget.checkList.checklistId,
             "empcode": widget.isEdit == 1
-                ? widget.sendingToEditAmHeaderQuestion
+                ?  widget.checkList.employeeCode
                 : usercode,
             "item_name": quesAnsList[i].itemName,
             "checkList_Answer_Id":

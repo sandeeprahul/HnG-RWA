@@ -739,8 +739,7 @@ class _CheckListPageState extends State<CheckListPage> {
           ? checkListItem.checkListItemId
           : checkListItem.checkListItemId,
       "checklist_Id": widget.activeCheckList.checklisTId,
-      "empcode":
-          widget.isEdit == 1 ? widget.sendingToEditAmHeaderQuestion : userId,
+      "empcode": userId,
       "item_name": itemName,
       "checkList_Answer_Id": checkListAnswerId,
       "question": question,
