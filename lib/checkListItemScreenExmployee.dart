@@ -226,13 +226,12 @@ class _checkListItemScreenEmployeeState
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   submitCheckListScreenEmployee(
-                                                      headerQuestion[pos],
                                                       widget.activeCheckList,
                                                       0,
                                                       widget.locationsList,
                                                       widget.mGetActvityTypes,
                                                       0,
-                                                      '')), ////for non edit
+                                                      '', empChecklistAssignId: "${headerQuestion[pos].empChecklistAssignId}", checklisTItemMstId: "${headerQuestion[pos].checklisTItemMstId}", checklistId: "${headerQuestion[pos].checklistId}",)), ////for non edit
                                         ).then((value) {
                                           getData();
                                         });

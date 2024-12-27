@@ -61,11 +61,12 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                   return ElevatedButton(
                     onPressed: () {
                       if (audit.auditId == 101) {
-
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>  EmployeeListScreen(formattedAuditName: formattedAuditName,),
+                            builder: (context) => EmployeeListScreen(
+                              formattedAuditName: formattedAuditName,
+                            ),
                             // builder: (context) => const WeekOffEmployeeListPage(),
                           ),
                         );
@@ -89,12 +90,11 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                               builder: (context) => StoreVisitPage(
                                   1)), //true permanent//false temporary
                         );
-                      }
-                      else if (audit.auditId == 107) {
+                      } else if (audit.auditId == 107) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            // fullscreenDialog: true,
+                              // fullscreenDialog: true,
                               builder: (context) => const WebViewExample()),
                         );
                       }
@@ -137,20 +137,21 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                             Icons.store,
                             // color: Colors.white,
                             size: 60,
-                          ))  else if (audit.auditId == 106)
+                          ))
+                        else if (audit.auditId == 106)
                           const Center(
                               child: Icon(
                             Icons.map_outlined,
                             // color: Colors.white,
                             size: 60,
-                          ))  else if (audit.auditId == 107)
-                                    const Center(
-                                        child: Icon(
-                                          Icons.dashboard,
-                                          // color: Colors.white,
-                                          size: 60,
-                                        )),
-
+                          ))
+                        else if (audit.auditId == 107)
+                          const Center(
+                              child: Icon(
+                            Icons.dashboard,
+                            // color: Colors.white,
+                            size: 60,
+                          )),
                         const SizedBox(
                           height: 5,
                         ),
@@ -224,15 +225,17 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
         throw Exception('Failed to load data');
       }
     } catch (e) {
-      showAlert(context, 'Network Error', Constants.networkIssue);
-      isLoading = false; // Data has been fetched, loading is complete
-
-      print(e);
-      throw Exception('Failed to load data');
+      if (mounted) {
+        showAlert(context, 'Network Error', Constants.networkIssue);
+        isLoading = false; // Data has been fetched, loading is complete
+        throw Exception('Failed to load data');
+      }
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

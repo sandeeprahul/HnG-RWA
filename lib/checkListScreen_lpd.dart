@@ -1099,7 +1099,8 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       });
       final prefs = await SharedPreferences.getInstance();
       var locationCode = widget.locationsList;
-      var userID = prefs.getString('userCode') ?? '105060';
+      // var userID ='70002';
+      var userID = prefs.getString('userCode') ?? '';
       var url;
       //replace your restFull API here.
 

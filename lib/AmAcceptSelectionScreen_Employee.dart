@@ -79,7 +79,6 @@ class _AmAcceptSelectionScreen_EmployeeState
     // myFuture  = getData();
     print("AmAcceptSelectionScreenEmployee");
     getData();
-    getDataCheckList();
     nonCompFlag_O.clear();
     nonCompFlag.clear();
     setState(() {
@@ -93,7 +92,7 @@ class _AmAcceptSelectionScreen_EmployeeState
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       getData();
-      getDataCheckList();
+      // getDataCheckList();
       //do your stuff
     }
   }
@@ -194,10 +193,10 @@ class _AmAcceptSelectionScreen_EmployeeState
                   context,
                   MaterialPageRoute(
                     builder: (context) => checkListScreen_lpd(
-                        1,
-                        widget.mGetActvityTypes,
-                        widget.locationsList,
-                       ),
+                      1,
+                      widget.mGetActvityTypes,
+                      widget.locationsList,
+                    ),
                   ));
             }
 
@@ -218,10 +217,10 @@ class _AmAcceptSelectionScreen_EmployeeState
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => checkListScreen_lpd(
-                                        1,
-                                        widget.mGetActvityTypes,
-                                        widget.locationsList,
-                                       ),
+                                      1,
+                                      widget.mGetActvityTypes,
+                                      widget.locationsList,
+                                    ),
                                   ));
                             },
                             child: const Padding(
@@ -426,10 +425,8 @@ class _AmAcceptSelectionScreen_EmployeeState
                                                 .add(i);
                                           });
                                         }
-
                                       });
-                                    }
-                                    else {
+                                    } else {
                                       setState(() {
                                         showcheckBox = true;
 
@@ -573,19 +570,23 @@ class _AmAcceptSelectionScreen_EmployeeState
                                 key: _listKey,
                                 itemCount: mAmHeaderQuestion.length,
                                 itemBuilder: (context, pos) {
+                                  final String dateTime = mAmHeaderQuestion[pos]
+                                          .checkListDetails
+                                          .isNotEmpty
+                                      ? mAmHeaderQuestion[pos]
+                                          .checkListDetails[0]
+                                          .updatedByDatetime
+                                      : mAmHeaderQuestion[pos]
+                                          .updatedByDatetime;
+                                  //check_list_details
                                   DateTime parseDate =
-                                      DateFormat("dd-MM-yyyy hh:mm:ss").parse(
-                                          mAmHeaderQuestion[pos]
-                                              .updatedByDatetime
-                                              .toString());
+                                      DateFormat("dd-MM-yyyy hh:mm:ss")
+                                          .parse(dateTime);
                                   var inputDate =
                                       DateTime.parse(parseDate.toString());
-                                  var outputFormat_ =
-                                      DateFormat('hh:mm a'); // hh:mm a
 
                                   var outputFormat = DateFormat(
                                       'dd MMM yyyy hh:mm a'); // hh:mm a
-                                  var time_ = outputFormat_.format(inputDate);
                                   var date_ = outputFormat.format(inputDate);
 
                                   // var time_ = 'timw';
@@ -1053,7 +1054,6 @@ class _AmAcceptSelectionScreen_EmployeeState
                                             ],
                                           ),
                                         )),
-
                                     Visibility(
                                         visible: attachProof, //answer_type_id
                                         child: Container(
@@ -1063,8 +1063,8 @@ class _AmAcceptSelectionScreen_EmployeeState
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                               Text(
-                                                 attachProofTitle,
+                                              Text(
+                                                attachProofTitle,
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                 ), //fontWeight: FontWeight.bold
@@ -1098,7 +1098,6 @@ class _AmAcceptSelectionScreen_EmployeeState
                                           ),
                                         )),
                                     const Divider(),
-
                                     Visibility(
                                         visible: answer_TypeId,
                                         //answer_type_id
@@ -1148,7 +1147,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       submitCheckListScreenEmployee(
-                                                          headerQuestion[0],
+
                                                           widget
                                                               .activeCheckList,
                                                           1,
@@ -1157,11 +1156,11 @@ class _AmAcceptSelectionScreen_EmployeeState
                                                           widget
                                                               .mGetActvityTypes,
                                                           sendingToEditAmHeaderQuestion
-                                                              .updatedBy,
-                                                          "${selectedAmHeaderQuestion!.checklisTItemMstId}")),
+                                                              .employeeCode,
+                                                          "${selectedAmHeaderQuestion!.checklisTItemMstId}", empChecklistAssignId: "${sendingToEditAmHeaderQuestion.empChecklistAssignId}", checklisTItemMstId:  "${sendingToEditAmHeaderQuestion.checklisTItemMstId}", checklistId:  "${headerQuestion[0].checklistId}",)),
                                             ).then((value) {
                                               getData();
-                                              getDataCheckList();
+                                              // getDataCheckList();
                                             });
                                           },
                                           child: Container(
@@ -1621,6 +1620,8 @@ class _AmAcceptSelectionScreen_EmployeeState
       setState(() {
         loading = false;
       });
+      getDataCheckList(mAmHeaderQuestion[0].employeeCode);
+
     } catch (e) {
       setState(() {
         loading = false;
@@ -1633,7 +1634,7 @@ class _AmAcceptSelectionScreen_EmployeeState
   String checklist_Question_header_Total_Count = '';
   String checklist_Question_header_Completed_Count = '';
 
-  Future<void> getDataCheckList() async {
+  Future<void> getDataCheckList(int employeeCode) async {
     try {
       setState(() {
         loading = true;
@@ -1642,7 +1643,7 @@ class _AmAcceptSelectionScreen_EmployeeState
 
       var userID = prefs.getString('userCode') ?? '105060';
       String url =
-          "${Constants.apiHttpsUrl}/Employee/HeaderQuestion/${widget.activeCheckList.empChecklistAssignId}/$userID";
+          "${Constants.apiHttpsUrl}/Employee/HeaderQuestion/${widget.activeCheckList.empChecklistAssignId}/$employeeCode";
 
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
@@ -1679,7 +1680,8 @@ class _AmAcceptSelectionScreen_EmployeeState
   }
 
   bool loading = false;
- String  attachProofTitle='';
+  String attachProofTitle = '';
+
   setData(int pos) async {
     attachProofImg = '';
     answer_TypeId_answer = '';
@@ -1687,6 +1689,7 @@ class _AmAcceptSelectionScreen_EmployeeState
     attachProof = false;
     answer_TypeId = false;
     chooseTheAns = false;
+    index_ = pos;
 
     updatedByDatetime = '';
     checkListName = '';
@@ -1728,9 +1731,8 @@ class _AmAcceptSelectionScreen_EmployeeState
           var locationCode = widget.activeCheckList.locationCode;
 
           setState(() {
-
-            attachProofTitle = mAmHeaderQuestion[i].checkListDetails[j].question;
-
+            attachProofTitle =
+                mAmHeaderQuestion[i].checkListDetails[j].question;
           });
           try {
             final storageRef = FirebaseStorage.instanceFor(
@@ -1785,12 +1787,14 @@ class _AmAcceptSelectionScreen_EmployeeState
 
       var userId = prefs.getString('userCode');
       // String url = staticUrlString + "Login/validateLogin";
-       var url = Uri.https(
-      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWA_GROOMING_API/api/Employee/QuestionUpdate',
+      var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWA_GROOMING_API/api/Employee/QuestionUpdate',
       );
 
       var params = [];
+      print("mAmHeaderQuestion.length");
+      print(mAmHeaderQuestion.length);
 
       if (selectedAll) {
         for (int i = 0; i < mAmHeaderQuestion.length; i++) {
@@ -1802,9 +1806,9 @@ class _AmAcceptSelectionScreen_EmployeeState
             "checklist_item_mst_id": mAmHeaderQuestion.isEmpty
                 ? 0
                 : mAmHeaderQuestion[i].checklisTItemMstId,
-            "checklist_Answer_Id": /* mAmHeaderQuestion[i].checkListDetails.isEmpty
+            "checklist_Answer_Id":  mAmHeaderQuestion[i].checkListDetails.isEmpty
                 ? 0
-                : */
+                :
                 mAmHeaderQuestion[i].checkListDetails[0].checklisTAnswerId,
             "checklist_answer_option_id":
                 mAmHeaderQuestion[i].checkListDetails.isEmpty
@@ -1838,9 +1842,9 @@ class _AmAcceptSelectionScreen_EmployeeState
             "checklist_item_mst_id": mAmHeaderQuestion.isEmpty
                 ? 0
                 : mAmHeaderQuestion[i].checklisTItemMstId,
-            "checklist_Answer_Id": /* mAmHeaderQuestion[i].checkListDetails.isEmpty
+            "checklist_Answer_Id":  mAmHeaderQuestion[i].checkListDetails.isEmpty
                 ? 0
-                : */
+                :
                 mAmHeaderQuestion[i].checkListDetails[0].checklisTAnswerId,
             "checklist_answer_option_id":
                 mAmHeaderQuestion[i].checkListDetails.isEmpty
@@ -1872,9 +1876,9 @@ class _AmAcceptSelectionScreen_EmployeeState
               "checklist_item_mst_id": mAmHeaderQuestion.isEmpty
                   ? 0
                   : mAmHeaderQuestion[pos].checklisTItemMstId,
-              "checklist_Answer_Id": /* mAmHeaderQuestion[i].checkListDetails.isEmpty
+              "checklist_Answer_Id":  mAmHeaderQuestion[i].checkListDetails.isEmpty
                 ? 0
-                : */
+                :
                   mAmHeaderQuestion[pos].checkListDetails[0].checklisTAnswerId,
               "checklist_answer_option_id":
                   mAmHeaderQuestion[pos].checkListDetails.isEmpty
@@ -1906,11 +1910,11 @@ class _AmAcceptSelectionScreen_EmployeeState
               "checklist_item_mst_id": mAmHeaderQuestion.isEmpty
                   ? 0
                   : mAmHeaderQuestion[pos].checklisTItemMstId,
-              "checklist_Answer_Id": /*mAmHeaderQuestion[pos]
+              "checklist_Answer_Id": mAmHeaderQuestion[pos]
                     .checkListDetails
                     .isEmpty
                 ? 0
-                :*/
+                :
                   mAmHeaderQuestion[pos].checkListDetails[0].checklisTAnswerId,
               "checklist_answer_option_id":
                   mAmHeaderQuestion[pos].checkListDetails.isEmpty
@@ -1932,6 +1936,7 @@ class _AmAcceptSelectionScreen_EmployeeState
         }
       }
 
+      print("$params");
       var response = await http
           .post(
             url,
@@ -1973,7 +1978,7 @@ class _AmAcceptSelectionScreen_EmployeeState
         });
         sendData__();
       }*/
-      _showRetryAlert(Constants.networkIssue);
+      _showRetryAlert("Something went wrong\nPlease Contact IT support");
     }
   }
 
@@ -2024,15 +2029,15 @@ class _AmAcceptSelectionScreen_EmployeeState
       loading = true;
     });
 
-    SharedPreferences preferences  = await SharedPreferences.getInstance();
+    SharedPreferences preferences = await SharedPreferences.getInstance();
     final empCode = preferences.getString("userCode");
 
     final payload =
         '{"emp_checklist_assign_id":${widget.activeCheckList.empChecklistAssignId}}';
 
-     var url = Uri.https(
-        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWA_GROOMING_API/api/Employee/WorkFlowStatusEmp',
+    var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWA_GROOMING_API/api/Employee/WorkFlowStatusEmp',
     );
 
     var response = await http.post(
@@ -2050,7 +2055,8 @@ class _AmAcceptSelectionScreen_EmployeeState
     print(response.request);
     print(url);
     print(response.statusCode);
-    print('emp_checklist_assign_id:${widget.activeCheckList.empChecklistAssignId},employee_code:${empCode}');
+    print(
+        'emp_checklist_assign_id:${widget.activeCheckList.empChecklistAssignId},employee_code:${empCode}');
     var respo = jsonDecode(response.body);
     if (response.statusCode == 200) {
       setState(() {
@@ -2090,10 +2096,10 @@ class _AmAcceptSelectionScreen_EmployeeState
                     context,
                     MaterialPageRoute(
                       builder: (context) => checkListScreen_lpd(
-                          1,
-                          widget.mGetActvityTypes,
-                          widget.locationsList,
-                          ),
+                        1,
+                        widget.mGetActvityTypes,
+                        widget.locationsList,
+                      ),
                     ));
               },
               child: Container(

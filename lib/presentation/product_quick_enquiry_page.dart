@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/helper/simpleDialog.dart';
+import 'package:hng_flutter/widgets/location_display_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -198,6 +199,25 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                 ),
               ],
             ),
+          ),  Container(
+            color: Colors.grey[200] , // Alternate background
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Range Status',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Flexible(
+                  child: Text(
+                      '${productData['rangeStatus']}',
+                    style:  const TextStyle(fontSize: 14,fontWeight: FontWeight.bold,),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const Padding(
@@ -261,6 +281,21 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
     );
   }
 
+  String locationCode = '';
+  String locationName = '';
+  @override
+  void initState() {
+    super.initState();
+    loadLocationCode();
+  }
+  Future<void> loadLocationCode() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      locationCode = prefs.getString('locationCode') ?? 'No Code Found';
+      locationName = prefs.getString('location_name') ?? 'No Name Found';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -278,19 +313,15 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
         backgroundColor: Colors.orange,
       ),*/
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(18.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
+            // const SizedBox(height: 8,),
             Row(
               children: [
-                // const Text(
-                //   'Scan Product',
-                //   style: TextStyle(fontSize: 16),
-                // ),
 
-                const SizedBox(width: 8.0),
+
                 Expanded(
                   child: TextField(
                     controller: _codeController,
@@ -321,6 +352,14 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                 ),
               ],
             ),
+            const SizedBox(height: 8,),
+
+            LocationDisplay(
+              locationCode: locationCode,
+              locationName: locationName,
+            ),
+
+
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : Expanded(
@@ -330,10 +369,10 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                                 'No product data available. Please search or scan.'),
                           )
                         : _buildProductDetails(productData!)),
-            const Text(
+           /* const Text(
               '\nNote: This Functionality will work only when the staff is inside the store',
               style: TextStyle(fontStyle: FontStyle.italic),
-            ),
+            ),*/
           ],
         ),
       ),

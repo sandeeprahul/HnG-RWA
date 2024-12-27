@@ -30,30 +30,30 @@ import 'data/HeaderQuestionEmployee.dart';
 import 'data/QuestionAnswers.dart';
 
 class submitCheckListScreenEmployee extends StatefulWidget {
-  final HeaderQuestionEmployee checkList;
   final ActiveCheckListEmployee activeCheckList;
   final int isEdit;
   final String locationsList;
   final GetActvityTypes mGetActivityTypes;
   final int sendingToEditAmHeaderQuestion;
   final String  checkListItemMstId;
+  final String  empChecklistAssignId;
+  final String  checklisTItemMstId;
+  final String  checklistId;
 
   const submitCheckListScreenEmployee(
-      this.checkList,
       this.activeCheckList,
       this.isEdit,
       this.locationsList,
       this.mGetActivityTypes,
       this.sendingToEditAmHeaderQuestion, this. checkListItemMstId
       ,
-      {super.key});
+      {super.key, required this.empChecklistAssignId, required this.checklisTItemMstId, required this.checklistId});
 
   // submitCheckListScreen({Key? key}) : super(key: key);
 
   @override
   State<submitCheckListScreenEmployee> createState() =>
       _submitCheckListScreenEmployeeState(
-          this.checkList,
           this.activeCheckList,
           this.isEdit,
           this.locationsList,
@@ -92,14 +92,13 @@ List<Answeroption> answerOptionsComment_1 = [];
 
 class _submitCheckListScreenEmployeeState
     extends State<submitCheckListScreenEmployee> {
-  HeaderQuestionEmployee checkList;
   ActiveCheckListEmployee activeCheckList;
   String locationsList;
   int i;
   GetActvityTypes mGetActvityTypes;
   String checklisTItemMstId;
 
-  _submitCheckListScreenEmployeeState(this.checkList, this.activeCheckList,
+  _submitCheckListScreenEmployeeState( this.activeCheckList,
       this.i, this.locationsList, this.mGetActvityTypes,this.checklisTItemMstId);
 
   var mandy;
@@ -115,7 +114,7 @@ class _submitCheckListScreenEmployeeState
     _croppedFile = null;
     // imageList.clear();
     options.clear();
-
+    print(widget.sendingToEditAmHeaderQuestion);
     item_name = "Loading....";
     checklist_id = "Loading....";
   }
@@ -214,11 +213,7 @@ class _submitCheckListScreenEmployeeState
                               setState(() {
                                 showpopup = true;
                               });
-                              /* if (widget.checkList.checklistEditStatus == 'E') {
-                                setState(() {
-                                  showpopup = true;
-                                });
-                              }*/
+
                             },
                             child: Row(
                               children: [
@@ -291,12 +286,7 @@ class _submitCheckListScreenEmployeeState
                                         });
                                         getPhoto();
 
-                                        if (widget.checkList
-                                                .checklistEditStatus ==
-                                            'E') {
-                                          // getPhoto();
-                                          // checkList_Answer_Option_Id_ = checkList_Answer_Option_Id[pos];
-                                        }
+
                                       },
                                     ),
                                   ],
@@ -328,11 +318,7 @@ class _submitCheckListScreenEmployeeState
                                   child: Center(
                                     child: TextField(
                                       controller: sealnoCntrl,
-                                      // enabled:
-                                      //     widget.checkList.checklistEditStatus ==
-                                      //             'P'
-                                      //         ? false
-                                      //         : true,
+
                                       decoration: const InputDecoration(
                                         isDense: true,
                                         contentPadding: EdgeInsets.zero,
@@ -376,8 +362,7 @@ class _submitCheckListScreenEmployeeState
                             itemBuilder: (context, pos) {
                               return InkWell(
                                 onTap: () {
-                                  if (widget.checkList.checklistEditStatus ==
-                                      'E') {}
+
                                   setState(() {
                                     showpopup = false;
                                     dropdownText =
@@ -709,13 +694,13 @@ class _submitCheckListScreenEmployeeState
 
       String mstId = '';
       if(widget.isEdit==1){
-        mstId = widget.checkListItemMstId;
+        mstId = widget.checklisTItemMstId;
       }else{
-      mstId=  "${widget.checkList.checklisTItemMstId}";
+      mstId=  widget.checklisTItemMstId;
       }
       //remove in prodcution
       String url =
-          "${Constants.apiHttpsUrl}/Employee/QuestionAnswers/${widget.checkList.empChecklistAssignId}/$mstId/InProcess/$userId/$userId"; //
+          "${Constants.apiHttpsUrl}/Employee/QuestionAnswers/${widget.empChecklistAssignId}/$mstId/InProcess/$userId/$userId"; //
 
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
@@ -837,7 +822,7 @@ class _submitCheckListScreenEmployeeState
             Container(
               padding: const EdgeInsets.all(10),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -849,7 +834,7 @@ class _submitCheckListScreenEmployeeState
             Container(
               padding: const EdgeInsets.all(10),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+              BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -1066,8 +1051,8 @@ class _submitCheckListScreenEmployeeState
       '/RWA_GROOMING_API/api/Employee/QuestionCancel',
       );*/
       var sendJson = {
-        "checklist_assign_id": widget.checkList.empChecklistAssignId,
-        "checklist_mst_item_id":widget.isEdit==0? widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
+        "checklist_assign_id": widget.empChecklistAssignId,
+        "checklist_mst_item_id":widget.isEdit==0? widget.checklisTItemMstId:widget.checkListItemMstId,
         "employeeCode": empCode,
       };
       print(sendJson);
@@ -1079,8 +1064,8 @@ class _submitCheckListScreenEmployeeState
               'Content-Type': 'application/json; charset=UTF-8',
             },
             body: jsonEncode({
-              "checklist_assign_id": widget.checkList.empChecklistAssignId,
-              "checklist_mst_item_id": widget.checkList.checklisTItemMstId,
+              "checklist_assign_id": widget.empChecklistAssignId,
+              "checklist_mst_item_id": widget.checklisTItemMstId,
               "employeeCode": empCode,
             }),
           )
@@ -1128,7 +1113,7 @@ class _submitCheckListScreenEmployeeState
     });
     String datetime_ =
         DateFormat("yyyy-MM-dd'T'hh:mm:ss.S'Z'").format(DateTime.now());
-    String datetime = DateFormat("yyyy-MM-dd hh:mm:ss")
+    String datetime = DateFormat("yyyy-MM-dd HH:mm:ss")
         .format(DateTime.now()); //2023-02-25 10:30:10
 
     final prefs = await SharedPreferences.getInstance();
@@ -1155,11 +1140,11 @@ class _submitCheckListScreenEmployeeState
 
     if (option_mandatory_Flag == "-1") {
       sendJson.add({
-        "emp_checklist_assign_id": widget.checkList.empChecklistAssignId,
-        "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
-        "checklist_Id": widget.checkList.checklistId,
+        "emp_checklist_assign_id": widget.empChecklistAssignId,
+        "checkList_Item_Mst_Id": widget. isEdit==0?widget.checklisTItemMstId:widget.checkListItemMstId,
+        "checklist_Id": widget.checklistId,
         "empcode": widget.isEdit == 1
-            ? widget.checkList.employeeCode
+            ?widget.sendingToEditAmHeaderQuestion
             : usercode,
         "item_name": quesAnsList[0].itemName,
         "checkList_Answer_Id": quesAnsList[0].questions[0].checkListAnswerId,
@@ -1193,11 +1178,11 @@ class _submitCheckListScreenEmployeeState
       for (int i = 0; i < quesAnsList[0].questions.length; i++) {
         if (quesAnsList[0].questions[i].answerTypeId == 4) {
           sendJson.add({
-            "emp_checklist_assign_id": widget.checkList.empChecklistAssignId,
-            "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
-            "checklist_Id": widget.checkList.checklistId,
+            "emp_checklist_assign_id": widget.empChecklistAssignId,
+            "checkList_Item_Mst_Id": widget. isEdit==0?widget.checklisTItemMstId:widget.checkListItemMstId,
+            "checklist_Id": widget.checklistId,
             "empcode": widget.isEdit == 1
-                ? widget.checkList.employeeCode
+                ? widget.sendingToEditAmHeaderQuestion
                 : usercode,
             "item_name": quesAnsList[i].itemName,
             "checkList_Answer_Id":
@@ -1228,11 +1213,11 @@ class _submitCheckListScreenEmployeeState
           });
         } else if (quesAnsList[0].questions[i].answerTypeId == 1) {
           sendJson.add({
-            "emp_checklist_assign_id": widget.checkList.empChecklistAssignId,
-            "checkList_Item_Mst_Id": widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
-            "checklist_Id": widget.checkList.checklistId,
+            "emp_checklist_assign_id": widget.empChecklistAssignId,
+            "checkList_Item_Mst_Id": widget. isEdit==0?widget.checklisTItemMstId:widget.checkListItemMstId,
+            "checklist_Id": widget.checklistId,
             "empcode": widget.isEdit == 1
-                ? widget.checkList.employeeCode
+                ? widget.sendingToEditAmHeaderQuestion
                 : usercode,
             "item_name": quesAnsList[0].itemName,
             "checkList_Answer_Id":
@@ -1264,11 +1249,11 @@ class _submitCheckListScreenEmployeeState
           });
         } else if (quesAnsList[0].questions[i].answerTypeId == 3) {
           sendJson.add({
-            "emp_checklist_assign_id": widget.checkList.empChecklistAssignId,
-            "checkList_Item_Mst_Id":widget. isEdit==0?widget.checkList.checklisTItemMstId:widget.checkListItemMstId,
-            "checklist_Id": widget.checkList.checklistId,
+            "emp_checklist_assign_id": widget.empChecklistAssignId,
+            "checkList_Item_Mst_Id":widget. isEdit==0?widget.checklisTItemMstId:widget.checkListItemMstId,
+            "checklist_Id": widget.checklistId,
             "empcode": widget.isEdit == 1
-                ?  widget.checkList.employeeCode
+                ? widget.sendingToEditAmHeaderQuestion
                 : usercode,
             "item_name": quesAnsList[i].itemName,
             "checkList_Answer_Id":
