@@ -676,12 +676,13 @@ class _CheckListPageState extends State<CheckListPage> {
       print('Question: ${question.questionText}');
       print('Answer: ${question.answer ?? question.selectedOption}');
     }
-    showConfirmDialog(
+    handleChecklistSubmission(checkListItem, questionIndex);
+
+/*    showConfirmDialog(
         onConfirmed: () {
-          handleChecklistSubmission(checkListItem, questionIndex);
         },
         title: 'Alert!',
-        msg: "Are you sure you want to proceed?");
+        msg: "Are you sure you want to proceed?");*/
   }
 
 
@@ -794,8 +795,9 @@ class _CheckListPageState extends State<CheckListPage> {
           final apiResponse = await checklistRepo.postChecklistData(sendJson);
 
           if (apiResponse.statusCode == "200") {
-            showSimpleDialog(
-                title: 'Alert!', msg: 'Checklist posted successfully!');
+            Get.snackbar("Success", "Checklist posted successfully!",duration: const Duration(seconds: 1));
+          /*  showSimpleDialog(
+                title: 'Alert!', msg: 'Checklist posted successfully!');*/
 
             // Add to submittedItems if successful
             if (!submittedItems.contains(checkListItem.checkListItemId)) {
@@ -876,19 +878,20 @@ class _CheckListPageState extends State<CheckListPage> {
         print('uploaded to firebase storage successfully$p0');
       });
 
-      Get.defaultDialog(
-          title: "Info",
-          middleText: "Image post success",
-          backgroundColor: Colors.white,
-          titleStyle: const TextStyle(color: Colors.black),
-          middleTextStyle: const TextStyle(color: Colors.black),
-          confirmTextColor: Colors.white,
-          onConfirm: () {
-            Get.back();
-            // Navigator.pop(context);
-            // Navigator.pop(context);
-          },
-          radius: 15);
+      // Get.defaultDialog(
+      //     title: "Info",
+      //     middleText: "Image post success",
+      //     backgroundColor: Colors.white,
+      //     titleStyle: const TextStyle(color: Colors.black),
+      //     middleTextStyle: const TextStyle(color: Colors.black),
+      //     confirmTextColor: Colors.white,
+      //     onConfirm: () {
+      //       Get.back();
+      //       // Navigator.pop(context);
+      //       // Navigator.pop(context);
+      //     },
+      //     radius: 15);
+      Get.snackbar('Info', "Image post success",duration: const Duration(seconds: 1));
       final sharedPreferences = await SharedPreferences.getInstance();
 
       ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
@@ -899,7 +902,7 @@ class _CheckListPageState extends State<CheckListPage> {
         final response = await checklistRepo.postChecklistData(sendJson);
         if (response.statusCode == "200") {
 
-          showSimpleDialog(title: 'Alert!', msg: response.message);
+          Get.snackbar('Alert!',  response.message,duration: const Duration(seconds: 1));
           // Add to submittedItems if successful
           if (!submittedItems.contains(checkListItem.checkListItemId)) {
             setState(() {
