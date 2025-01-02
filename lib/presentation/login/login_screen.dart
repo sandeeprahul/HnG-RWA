@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../common/constants.dart';
 import '../../common/my_cusotm_clipper.dart';
@@ -100,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                 visible: false,
                 child: ClipPath(
                   clipper: MyCustomClipper(),
-                  child: Container(
+                  child: SizedBox(
                     width: 200,
                     height: 200,
                     child: CustomPaint(
@@ -276,6 +277,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                             ),
                           ),
                           onPressed: () {
+                            // clearAllPref();
+
                             if (uname.text.toString().isEmpty) {
                               /*  ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('Enter Username')),
@@ -560,7 +563,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
   bool camVisible = false;
 
-  var deviceId = "";
+  var deviceId   = "";
 
   Future<String> _getId() async {
     /* if (Platform.isIOS) {
@@ -586,6 +589,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
     setState(() {
       deviceId = id!;
+      devideId = id;
       // deviceId = "55ec53ccf5a40648";
     });
 
@@ -726,7 +730,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           'deviceid': deviceId,
           'osVersion': '$release',
           'osType': Platform.isAndroid ? 'Android' : 'Ios',
-          "appVersion": Constants.appVersionString, //(1.0.59)
+          "appVersion": Constants.appVersionString, //(1.0.60)
           // "appVersion": "$number",
           "fcmToken": "$tokenFCM"
           // 'deviceid': '123',
@@ -1158,5 +1162,19 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       content: Text("${_selectableTextKey.}"),
     ));*/
   }
+
+  Future<void> clearAllPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    await clearAllDatabase();
+  }
+  Future<void> clearAllDatabase() async {
+    final databasePath = await getDatabasesPath();
+    final path = '$databasePath/app_database.db'; // Replace with your database name// my_database
+
+    // Delete the database file
+    await deleteDatabase(path);
+
+    print('Database cleared: $path');
+  }
 }
-//2002698 am // 2002905 user

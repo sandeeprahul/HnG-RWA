@@ -693,7 +693,7 @@ class _ViewProfileState extends State<ViewProfile> {
                 Fluttertoast.showToast(
                     msg: "Please wait while logging out user");
                 final prefs = await SharedPreferences.getInstance();
-                prefs.clear(); // ose the dialog
+                prefs.clear(); // close the dialog
                 await SystemChannels.platform
                     .invokeMethod('SystemNavigator.pop');
                 if (Platform.isIOS) {

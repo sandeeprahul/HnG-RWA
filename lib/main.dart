@@ -1,18 +1,14 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hng_flutter/AppPages.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
-// import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:hng_flutter/HomeScreen.dart';
@@ -22,8 +18,10 @@ import 'package:hng_flutter/ThemeData_.dart';
 import 'package:hng_flutter/core/light_theme.dart';
 import 'package:hng_flutter/loginBinding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'core/DeviceIdentifier.dart';
+import 'helper/DatabaseHelper.dart';
 import 'presentation/login/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -38,7 +36,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  final dbPath = await getDatabasesPath();
+  print('Database path: $dbPath');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -56,7 +55,7 @@ Future<void> main() async {
 }
 
 class GifScreen extends StatefulWidget {
-  const GifScreen({Key? key}) : super(key: key);
+  const GifScreen({super.key});
 
   @override
   State<GifScreen> createState() => _GifScreenState();
@@ -79,38 +78,69 @@ class _GifScreenState extends State<GifScreen> {
   }
 
   getDeviceId() async {
-
-    String id = await DeviceIdentifier.getUniqueId();
+    String id = await getOrGenerateDeviceId();
+    print("Generated Device ID: $id");
 
 
     final prefs = await SharedPreferences.getInstance();
+
     String? deviceId;
 
-    print("device id: $id");
-
     setState(() {
-      deviceId = id;  // Update the UI with the fetched device ID
+      deviceId = id; // Update the UI with the fetched device ID
     });
-
-
+    prefs.setString("deviceid", deviceId!);
 
     FirebaseMessaging.instance.getToken().then((value) {
       var token = value;
       prefs.setString('tokenFCM', token!);
-      print('tokenFCM$token');
-    });
-    prefs.setString("deviceid", deviceId!);
-
-
-    setState(() {
-      prefs.setString("deviceidDDDD", deviceId!);
     });
 
     Fluttertoast.showToast(
         msg: "DeviceId->$deviceId", toastLength: Toast.LENGTH_LONG);
 
     FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  }
 
+  Future<String> getOrGenerateDeviceId() async {
+    const String deviceIdKey = 'device_id';
+
+    // Access SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+
+    // Check if a device ID already exists
+    String? deviceId = prefs.getString(deviceIdKey);
+    final dbHelper = DatabaseHelper();
+
+    if (deviceId == null) {
+      deviceId = await dbHelper.getDeviceId();
+
+      if(deviceId == null){
+
+        // Generate a new Device ID
+        DateTime now = DateTime.now();
+
+        // Base milliseconds since epoch
+        String timestamp = now.millisecondsSinceEpoch.toString();
+
+        // Append time (hour, minute, second, millisecond)
+        String additionalTime = now.hour.toString().padLeft(2, '0') +
+            now.minute.toString().padLeft(2, '0') +
+            now.second.toString().padLeft(2, '0') +
+            now.millisecond.toString().padLeft(3, '0');
+
+        // Combine to form the unique Device ID
+        deviceId = timestamp + additionalTime;
+
+        // Save it in SharedPreferences
+        await prefs.setString(deviceIdKey, deviceId);
+        await dbHelper.insertDeviceId(deviceId);
+
+      }
+
+    }
+
+    return deviceId;
   }
 
   @override
@@ -138,7 +168,6 @@ bool am = false;
 FirebaseMessaging? messaging;
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     // TODO: implement initState
@@ -146,8 +175,6 @@ class _SplashScreenState extends State<SplashScreen> {
     messaging = FirebaseMessaging.instance;
     loggedIn();
   }
-
-
 
   Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
@@ -157,8 +184,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
     print("Handling a background message: ${message.messageId}");
   }
-
-
 
   bool loggedIIn = false;
   String flag = '';
