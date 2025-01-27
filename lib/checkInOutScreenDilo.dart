@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hng_flutter/checkListItemScreen.dart';
 import 'package:hng_flutter/common/constants.dart';
 import 'package:hng_flutter/submitCheckListScreen.dart';
@@ -447,29 +446,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                               fit: BoxFit.cover,
                               width: MediaQuery.of(context).size.width,
                             ),*/
-                                Container(
-                                  color: Colors.black26,
-                                  child: GoogleMap(
-                                    initialCameraPosition: CameraPosition(
-                                      target: LatLng(lat_, lng_),
-                                      zoom: 14.4746,
-                                    ),
-                                    onMapCreated:
-                                        (GoogleMapController controller) {
-                                      // _controller.complete(controller);
-                                    },
-                                    myLocationEnabled: true,
-                                    markers: Set<Marker>.of([
-                                      Marker(
-                                        markerId: const MarkerId('1'),
-                                        position: LatLng(lat_, lng_),
-                                        /*infoWindow: InfoWindow(
-                                            title: 'My Position',
-                                          )*/
-                                      ),
-                                    ]),
-                                  ),
-                                ),
+
                                 Align(
                                   alignment: Alignment.bottomRight,
                                   child: InkWell(
@@ -478,6 +455,11 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                       margin: const EdgeInsets.all(10),
                                       padding: const EdgeInsets.all(5),
                                       width: 80,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5)),
+                                      ),
                                       child: const Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -491,11 +473,6 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                             style: TextStyle(fontSize: 12),
                                           )
                                         ],
-                                      ),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5)),
                                       ),
                                     ),
                                   ),
@@ -937,8 +914,8 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                                 padding: EdgeInsets.all(15.0),
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white,
-                                  child: Icon(Icons.camera),
                                   radius: 35,
+                                  child: Icon(Icons.camera),
                                 ),
                               ),
                             ))
