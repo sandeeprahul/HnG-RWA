@@ -1115,9 +1115,14 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
             .apiHttpsUrl}/StoreAudit/Active_CheckList/$locationCode/${widget
             .mGetActivityTypes.auditId}/$userID";
       } else if (widget.mGetActivityTypes.auditId == "5") {
-        url =
+     /*   url =
         "${Constants
-            .apiHttpsUrl}/AreaManager/Active_CheckList/$locationCode/${widget
+            .apiHttpsUrlTest}/AreaManager/Active_CheckList/$locationCode/${widget
+            .mGetActivityTypes.auditId}/70001";*/
+
+         url =
+        "${Constants
+            .apiHttpsUrlTest}/AreaManager/Active_CheckList/$locationCode/${widget
             .mGetActivityTypes.auditId}/$userID";
       } else if (widget.mGetActivityTypes.auditId == "4") {
         url =
@@ -1160,10 +1165,15 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
         loading = false;
       });
     } catch (e) {
+     /* setState(() {
+        loading = false;
+      });*/
+      _showRetryAlert();
+    }
+    finally{
       setState(() {
         loading = false;
       });
-      _showRetryAlert();
     }
   }
 

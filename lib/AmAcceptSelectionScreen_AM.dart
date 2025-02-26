@@ -957,7 +957,7 @@ class _AmAcceptSelectionScreen_AMState
                                                                 .activeCheckList,
                                                             1,
                                                             widget
-                                                                .mLpdChecklist)),
+                                                                .mLpdChecklist,headerQuestion, position: index_,)),
                                               ).then((value) {
                                                 getData();
                                                 getDataCheckList();
@@ -1337,7 +1337,7 @@ class _AmAcceptSelectionScreen_AMState
         });
       }
       String url =
-          "${Constants.apiHttpsUrl}/AreaManager/$type/${widget.activeCheckList.amChecklistAssignId}";
+          "${Constants.apiHttpsUrlTest}/AreaManager/$type/${widget.activeCheckList.amChecklistAssignId}";
       final response = await http.get(Uri.parse(url));
 
       var responseData = json.decode(response.body);
@@ -1402,7 +1402,7 @@ class _AmAcceptSelectionScreen_AMState
 
       var userID = prefs.getString('userCode') ?? '105060';
       String url =
-          "${Constants.apiHttpsUrl}/AreaManager/HeaderQuestion/${widget.activeCheckList.amChecklistAssignId}/${widget.mLpdChecklist.sectionId}/$userID";
+          "${Constants.apiHttpsUrlTest}/AreaManager/HeaderQuestion/${widget.activeCheckList.amChecklistAssignId}/${widget.mLpdChecklist.sectionId}/$userID";
 
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
@@ -1578,9 +1578,10 @@ class _AmAcceptSelectionScreen_AMState
 
       var userId = prefs.getString('userCode');
       // String url = staticUrlString + "Login/validateLogin";
+      //RWASTAFFMOVEMENT_TEST/api/
        var url = Uri.https(
       'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWA_GROOMING_API/api/AreaManager/QuestionUpdate',
+      '/RWASTAFFMOVEMENT_TEST/api/AreaManager/QuestionUpdate',
       );
 
       var params = [];
@@ -1997,7 +1998,7 @@ class _AmAcceptSelectionScreen_AMState
 
      var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWA_GROOMING_API/api/AreaManager/WorkFlowStatus',
+        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/WorkFlowStatus',
     );
 
     var response = await http.post(

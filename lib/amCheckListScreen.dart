@@ -321,7 +321,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
       String url;
 
       url =
-          "${Constants.apiHttpsUrl}/AreaManager/GetAreamanagerChecklistSection/${widget.activeCheckList.amChecklistAssignId}";
+          "${Constants.apiHttpsUrlTest}/AreaManager/GetAreamanagerChecklistSection/${widget.activeCheckList.amChecklistAssignId}";
 
       final response = await http.get(Uri.parse(url));
       print(response);
@@ -448,7 +448,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
 
      var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWA_GROOMING_API/api/AreaManager/WorkFlowStatus',
+        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/WorkFlowStatus',
     );
 
     var response = await http.post(

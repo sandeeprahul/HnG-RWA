@@ -83,7 +83,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Flutter WebView"),
+        title: const Text("DashBoard"),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

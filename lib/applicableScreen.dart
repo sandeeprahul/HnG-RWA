@@ -9,6 +9,7 @@ import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/data/Locations.dart';
 import 'package:hng_flutter/amCheckListScreen.dart';
 import 'package:hng_flutter/lpdCheckListScreen.dart';
+import 'package:hng_flutter/presentation/area_manager_checklist_screen.dart';
 import 'package:hng_flutter/presentation/virtualMerch_CheckList_Page.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -183,6 +184,9 @@ class _applicableScreenState extends State<applicableScreen>
                         checkList[index].checklistId, index);
                   } else if (widget.mGetActvityTypes.auditId == "5") {
                     callCreateAMCheckList(checkList[index].checklistId, index);
+
+                    // Get.to(() => AreaManagerChecklistScreen());
+
                   } else if (widget.mGetActvityTypes.auditId == "4") {
                     // callCreateEmployeCheckList(checkList[index].checklistId,index);
 
@@ -565,9 +569,10 @@ class _applicableScreenState extends State<applicableScreen>
       var userID = prefs.getString('userCode') ?? '105060';
       String url;
 
-      url =
-          "${Constants.apiHttpsUrl}/AreaManager/CreateareamanagerChecklist?locationcode=$locationCode&createdby=$userID&checklistid=$id";
-
+      /*url =
+          "${Constants.apiHttpsUrlTest}/AreaManager/CreateareamanagerChecklist?locationcode=$locationCode&createdby=70001&checklistid=$id";
+    */  url =
+          "${Constants.apiHttpsUrlTest}/AreaManager/CreateareamanagerChecklist?locationcode=$locationCode&createdby=$userID&checklistid=$id";
       print(url);
       final response = await http.get(Uri.parse(url));
 
@@ -673,8 +678,7 @@ class _applicableScreenState extends State<applicableScreen>
 
       url =
           "${Constants.apiHttpsUrl}/Employee/CreateareamanagerChecklist?locationcode=$locationCode&createdby=$userID&checklistid=$id";
-
-      print(url);
+     print(url);
       final response = await http.get(Uri.parse(url));
       // print(response);
 

@@ -1177,11 +1177,12 @@ class _checkInOutScreenAmState extends State<checkInOutScreenAm> {
             Padding(
               padding: EdgeInsets.only(left: 15, right: 15, top: 10),
               child: Text(
+                textAlign: TextAlign.center,
                 'Successfully Checked In',
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
-                    fontSize: 24),
+                    fontSize: 22),
               ),
             ),
           ],

@@ -767,8 +767,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
             await prefs.setString('logFlag', '1');
             await prefs.setString('userType', '0');
-            // await prefs.setString('userCode', '70002');
             await prefs.setString('userCode', uname.text.toString());
+            // await prefs.setString('userCode', "70003");
 
             await prefs.setString(
                 'locationCode', respo['location']['location_code'].toString());

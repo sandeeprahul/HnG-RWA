@@ -501,8 +501,8 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
       final prefs = await SharedPreferences.getInstance();
       var locationCode = prefs.getString('locationCode') ?? '106';
       var userID = prefs.getString('userCode') ?? '105060';
-      String url =
-          "${Constants.apiHttpsUrl}/Login/GetLocationApplicable/$userID/${widget.checkList.auditId}";
+      // String url ="${Constants.apiHttpsUrl}/Login/GetLocationApplicable/70001/${widget.checkList.auditId}";
+      String url =  "${Constants.apiHttpsUrl}/Login/GetLocationApplicable/$userID/${widget.checkList.auditId}";
 
       print(url);
       final response =

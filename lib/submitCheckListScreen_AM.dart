@@ -35,13 +35,16 @@ import 'data/QuestionAnswers.dart';
 import 'checkListItemScreen_AM.dart';
 
 class submitCheckListScreen_AM extends StatefulWidget {
- final HeaderQuesStoreAM checkList;
- final ActiveCheckListAm activeCheckList;
- final int i;
- final LPDSection mLpdChecklist;
+  final HeaderQuesStoreAM checkList;
+  final ActiveCheckListAm activeCheckList;
+  final int i;
+  final LPDSection mLpdChecklist;
+  final List<HeaderQuesStoreAM> headerQuestion;
+  final int position;
 
-  const submitCheckListScreen_AM(
-      this.checkList, this.activeCheckList, this.i, this.mLpdChecklist, {super.key});
+  const submitCheckListScreen_AM(this.checkList, this.activeCheckList, this.i,
+      this.mLpdChecklist, this.headerQuestion,
+      {super.key, required this.position});
 
   // submitCheckListScreen({Key? key}) : super(key: key);
 
@@ -65,7 +68,7 @@ List<QuestionAnswers> quesAnsList = [];
 var options = [];
 var nonCompFlag = [];
 var checkList_Answer_Option_Id = [];
-var checkList_Answer_Option_Id_;
+int checkList_Answer_Option_Id_ = -1;
 var non_Compliance_Flag;
 var checkList_Answer_Id;
 
@@ -75,7 +78,7 @@ bool loading = false;
 var _croppedFile;
 var imageList = [];
 var optionMandatoryFlags = [];
-String optionMandatoryFlag = "0";
+String optionMandatoryFlag = "-1";
 
 class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
   HeaderQuesStoreAM checkList;
@@ -88,11 +91,16 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
   var mandy;
   TextEditingController sealnoCntrl = TextEditingController();
 
+  // String position='';
+  late int currentPosition;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getData();
+    // getData();
+    currentPosition = widget.position; // Store initial position in state
+    fetchQuestionData();
     dropdownText = "";
     _croppedFile = null;
     // imageList.clear();
@@ -102,6 +110,10 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     checklist_id = "Loading....";
   }
 
+  void fetchQuestionData() async {
+    await getData(widget.position); // Ensure proper async handling
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -109,7 +121,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     imageList.clear();
     dropdownText = '';
     _croppedFile = null;
-    optionMandatoryFlag = "0";
+    optionMandatoryFlag = "-1";
     rating_ = 0.0;
     rating2_ = 0.0;
   }
@@ -158,7 +170,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                             padding: EdgeInsets.only(left: 20),
                             child: Text(
                               'Area Manager',
-                              style: TextStyle(color: Colors.black),
+                              style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18),
                             ),
                           ),
                         ],
@@ -181,7 +193,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                     //choose the answer
                     Visibility(
                         // visible: quesAnsList[0].questions[0].answerTypeId==4?true:false,
-                        visible: subQues.contains(4) ? true : false,
+                        visible: false,
+                        // visible: subQues.contains(8) ? true : false,
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 15),
                           padding: const EdgeInsets.all(5),
@@ -208,7 +221,73 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                             ),
                           ),
                         )),
+        ListView.separated(
+          shrinkWrap: true,
+          itemCount: answerOptions.length,
+          itemBuilder: (context, pos) {
+            return RadioListTile<int>(
+              title: Text(
+                maxLines: 3,
+                answerOptions[pos].answerOption,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              value: answerOptions[pos].checkListAnswerOptionId,
+              groupValue: checkList_Answer_Option_Id_,
+              onChanged: (value) {
+                setState(() {
+                  checkList_Answer_Option_Id_ = value!;
+                  non_Compliance_Flag = answerOptions[pos].nonComplianceFlag;
+                  optionMandatoryFlag = answerOptions[pos].optionMandatoryFlag;
+                });
+              },
+            );
+          },
+          separatorBuilder: (BuildContext context, int index) {
+            return const Divider();
+          },
+        ),
 
+                    Visibility(
+                      visible: false,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount:
+                        options.length, // subQues.contains(4) ? 4 :
+                        itemBuilder: (context, pos) {
+                          return InkWell(
+                            onTap: () {
+                              if (widget.checkList.checklistEditStatus ==
+                                  'E') {}
+                              setState(() {
+                                showpopup = false;
+                                dropdownText =
+                                    answerOptions[pos].answerOption;
+                                checkList_Answer_Option_Id_ =
+                                    answerOptions[pos]
+                                        .checkListAnswerOptionId;
+                                non_Compliance_Flag =
+                                    answerOptions[pos].nonComplianceFlag;
+                                optionMandatoryFlag = answerOptions[pos]
+                                    .optionMandatoryFlag;
+                              });
+                              print('000000non_Compliance_Flag');
+                              print(non_Compliance_Flag);
+                              print(checkList_Answer_Option_Id_);
+                            },
+                            child: Text(
+                              answerOptions[pos].answerOption,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
+                            ),
+                          );
+                        },
+                        separatorBuilder:
+                            (BuildContext context, int index) {
+                          return const Divider();
+                        },
+                      ),
+                    ),
                     //attach proof
                     Visibility(
                         visible: optionMandatoryFlag == "-1"
@@ -335,8 +414,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                           margin: const EdgeInsets.only(top: 10),
                           padding: const EdgeInsets.all(5),
                           decoration: const BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5)),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
                             // border: Border.all(color: Colors.grey)
                           ),
                           child: Column(
@@ -370,7 +448,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                           ),
                         )),
                     Visibility(
-                      visible: false,
+                        visible: false,
                         // visible: optionMandatoryFlag == "-1"
                         //     ? false
                         //     : subQues.contains(5)
@@ -380,8 +458,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                           margin: const EdgeInsets.only(top: 10),
                           padding: const EdgeInsets.all(5),
                           decoration: const BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5)),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
                             // border: Border.all(color: Colors.grey)
                           ),
                           child: Column(
@@ -421,7 +498,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                 ),
               ),
               Visibility(
-                visible: showpopup,
+                visible: false,
+                // visible: showpopup,
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   color: Colors.black26,
@@ -464,6 +542,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                                     });
                                     print('000000non_Compliance_Flag');
                                     print(non_Compliance_Flag);
+                                    print(checkList_Answer_Option_Id_);
                                   },
                                   child: Text(
                                     answerOptions[pos].answerOption,
@@ -487,60 +566,139 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: InkWell(
-                  onTap: () {
-                    // if (widget.checkList.checklistEditStatus == 'E') {
-                    // submitCheckList();
-                    /*  for (int i = 0; i < quesAnsList[0].questions.length; i++) {
-                      if (subQues.contains(3) &&
-                          quesAnsList[0].questions[i].mandatoryFlag == '1') {
-                        print("mandatoryFlag==1");
-                        setState(() {
-                          mandy = 1;
-                        });
-                      } else {
-                        print("mandatoryFlag==0");
-                        setState(() {
-                          mandy = 0;
-                        });
-                      }
-                    }
-                    print("mandatoryasdfeasfadsfFlag==$mandy");*/
-                    // print();
+                child: Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          // if (widget.checkList.checklistEditStatus == 'E') {
+                          // submitCheckList();
+                          /*  for (int i = 0; i < quesAnsList[0].questions.length; i++) {
+                            if (subQues.contains(3) &&
+                                quesAnsList[0].questions[i].mandatoryFlag == '1') {
+                              print("mandatoryFlag==1");
+                              setState(() {
+                                mandy = 1;
+                              });
+                            } else {
+                              print("mandatoryFlag==0");
+                              setState(() {
+                                mandy = 0;
+                              });
+                            }
+                          }
+                          print("mandatoryasdfeasfadsfFlag==$mandy");*/
+                          // print();
 
-                    if (optionMandatoryFlag == "1" ||
-                        optionMandatoryFlag == "0") {
-                      if (base64img_.isEmpty) {
-                        showSimpleDialog(title: "Alert!", msg: "Please take photo");
+                          // if (optionMandatoryFlag == "1" ||
+                          //     optionMandatoryFlag == "0") {
+                          //   if (base64img_.isEmpty) {
+                          //     showSimpleDialog(title: "Alert!", msg: "Please take photo");
+                          //
+                          //   } else if (sealnoCntrl.text.toString().isEmpty) {
+                          //     showSimpleDialog(title: "Alert!", msg: "Please enter comments");
+                          //   } else if (rating_ == 0.0) {
+                          //     showSimpleDialog(title: "Alert!", msg: "Please give Store rating");
+                          //
+                          //   } /*else if (rating2_ == 0.0) {
+                          //     showSimpleDialog(title: "Alert!", msg: "Please give Department rating");
+                          //
+                          //   }*/ else {
+                          //     print('$rating2_ ,$rating_');
+                          //     _showProceedAlert();
+                          //   }
+                          // } else {
+                          //   _showProceedAlert();
+                          // }
+                          // }
+                          // _showProceedAlert();
 
-                      } else if (sealnoCntrl.text.toString().isEmpty) {
-                        showSimpleDialog(title: "Alert!", msg: "Please enter comments");
-                      } else if (rating_ == 0.0) {
-                        showSimpleDialog(title: "Alert!", msg: "Please give Store rating");
 
-                      } /*else if (rating2_ == 0.0) {
-                        showSimpleDialog(title: "Alert!", msg: "Please give Department rating");
-
-                      }*/ else {
-                        print('$rating2_ ,$rating_');
-                        _showProceedAlert();
-                      }
-                    } else {
-                      _showProceedAlert();
-                    }
-                    // }
-                    // _showProceedAlert();
-                  },
-                  child: Container(
-                    height: 50,
-                    color: Colors.blue,
-                    child: const Center(
-                      child: Text(
-                        'SUBMIT',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                          // _showProceedAlert(0);
+                          goToPrevious();
+                        },
+                        child: Container(
+                          height: 50,
+                          color: Colors.blue,
+                          child: const Center(
+                            child: Text(
+                              'Previous',
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(
+                      width: 2,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          // if (widget.checkList.checklistEditStatus == 'E') {
+                          // submitCheckList();
+                          /*  for (int i = 0; i < quesAnsList[0].questions.length; i++) {
+                            if (subQues.contains(3) &&
+                                quesAnsList[0].questions[i].mandatoryFlag == '1') {
+                              print("mandatoryFlag==1");
+                              setState(() {
+                                mandy = 1;
+                              });
+                            } else {
+                              print("mandatoryFlag==0");
+                              setState(() {
+                                mandy = 0;
+                              });
+                            }
+                          }
+                          print("mandatoryasdfeasfadsfFlag==$mandy");*/
+                          // print();
+
+                          // if (optionMandatoryFlag == "1" ||
+                          //     optionMandatoryFlag == "0") {
+                          //   if (base64img_.isEmpty) {
+                          //     showSimpleDialog(title: "Alert!", msg: "Please take photo");
+                          //
+                          //   } else if (sealnoCntrl.text.toString().isEmpty) {
+                          //     showSimpleDialog(title: "Alert!", msg: "Please enter comments");
+                          //   } else if (rating_ == 0.0) {
+                          //     showSimpleDialog(title: "Alert!", msg: "Please give Store rating");
+                          //
+                          //   } /*else if (rating2_ == 0.0) {
+                          //     showSimpleDialog(title: "Alert!", msg: "Please give Department rating");
+                          //
+                          //   }*/ else {
+                          //     print('$rating2_ ,$rating_');
+                          //     _showProceedAlert();
+                          //   }
+                          // } else {
+                          //   _showProceedAlert();
+                          // }
+                          // }
+                          // _showProceedAlert();
+
+                          if(checkList_Answer_Option_Id_!=-1){
+                            _showProceedAlert(1);
+                          }else{
+                            Get.snackbar('Alert', "Please select an option",backgroundColor: Colors.red);
+                          }
+                        },
+                        child: Container(
+                          height: 50,
+                          color: Colors.blue,
+                          child: const Center(
+                            child: Text(
+                              'Next',
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Visibility(
@@ -632,7 +790,33 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           }),
     );
   }
+  void goToPrevious() {
+    if (currentPosition > 0) {
+      setState(() {
+        currentPosition--; // Move to previous position
+      });
+      getData(currentPosition); // Fetch previous data
+    }
+    else{
+      Get.snackbar("End", "You are at the first question!",snackPosition: SnackPosition.BOTTOM,backgroundColor: Colors.red);
 
+    }
+  }
+  void goToNext() {
+    if (currentPosition < widget.headerQuestion.length - 1) {
+      setState(() {
+        currentPosition++; // Move to next position
+      });
+      getData(currentPosition); // Fetch next data
+    }
+    else {
+
+      Navigator.pop(context);
+      // Get.snackbar("End", "You are at the last question!",snackPosition: SnackPosition.BOTTOM,backgroundColor: Colors.red);
+
+      // Get.snackbar("End", "You are at the last question!");
+    }
+  }
   CameraController? Camcontroller;
   String imagePath = "";
   bool camVisible = false;
@@ -688,7 +872,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
         compressFormat: ImageCompressFormat.jpg,
-        compressQuality : 40,//1280 x 720//1920 x 1080
+        compressQuality: 40,
+        //1280 x 720//1920 x 1080
         maxWidth: 1920,
         maxHeight: 1080,
         uiSettings: [
@@ -787,7 +972,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
   List<Answeroption> answerOptionsAttachProof_3 = [];
   List<Answeroption> answerOptionsComment_1 = [];
 
-  Future<void> getData() async {
+  Future<void> getData(int position) async {
     try {
       setState(() {
         loading = true;
@@ -797,11 +982,12 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
 
       //remove in prodcution
       String url =
-          "${Constants.apiHttpsUrl}/AreaManager/QuestionAnswers/${widget.checkList.am_checklist_assign_id}/${widget.checkList.checklisTItemMstId}/InProcess/$userId"; //
+          "${Constants.apiHttpsUrlTest}/AreaManager/QuestionAnswers/${widget.checkList.am_checklist_assign_id}/${widget.headerQuestion[position].checklisTItemMstId}/InProcess/$userId"; //
 
       print(url);
-      final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(milliseconds: 5000));
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(milliseconds: 5000));
       print(response.body);
 
       var responseData = json.decode(response.body);
@@ -844,7 +1030,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       options = [];
 
       checkList_Answer_Option_Id.clear();
-      checkList_Answer_Option_Id_ = "";
+      checkList_Answer_Option_Id_ = -1;
       for (var loop in questionslist) {
         var getCName = loop['answer_Type_Id'];
         print(getCName);
@@ -854,8 +1040,24 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           questionTitles.add(loop['question']);
         });
         // options.clear();
+        // List<Answeroption> parseAnswerOptions(List<dynamic> jsonList) {
+        //   return jsonList.map((json) => Answeroption.fromJson(json)).toList();
+        // }
+        //
+        // answerOptions.clear();
+        // answerOptions = parseAnswerOptions(loop['options']);
+        //
+        // for (var inLoop in loop['options']) {
+        //   // if (loop['answer_Type_Id'] == 4) {
+        //     options.add(inLoop['answer_Option']);
+        //   // }
+        //   // options.add(inLoop['answer_Option']);
+        //   nonCompFlag.add(inLoop['non_Compliance_Flag']);
+        //   checkList_Answer_Option_Id.add(inLoop['checkList_Answer_Option_Id']);
+        //   optionMandatoryFlags.add(inLoop['option_mandatory_Flag']);
+        // }
 
-        if (loop['answer_Type_Id'] == 4) {
+        if (loop['answer_Type_Id'] == 8) {
           List<Answeroption> parseAnswerOptions(List<dynamic> jsonList) {
             return jsonList.map((json) => Answeroption.fromJson(json)).toList();
           }
@@ -863,25 +1065,25 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           answerOptions.clear();
           answerOptions = parseAnswerOptions(loop['options']);
         }
-        if (loop['answer_Type_Id'] == 3) {
-          List<Answeroption> parseAnswerOptions(List<dynamic> jsonList) {
-            return jsonList.map((json) => Answeroption.fromJson(json)).toList();
-          }
-
-          answerOptionsAttachProof_3.clear();
-          answerOptionsAttachProof_3 = parseAnswerOptions(loop['options']);
-        }
-        if (loop['answer_Type_Id'] == 1) {
-          List<Answeroption> parseAnswerOptions(List<dynamic> jsonList) {
-            return jsonList.map((json) => Answeroption.fromJson(json)).toList();
-          }
-
-          answerOptionsComment_1.clear();
-          answerOptionsComment_1 = parseAnswerOptions(loop['options']);
-        }
-
+        // if (loop['answer_Type_Id'] == 3) {
+        //   List<Answeroption> parseAnswerOptions(List<dynamic> jsonList) {
+        //     return jsonList.map((json) => Answeroption.fromJson(json)).toList();
+        //   }
+        //
+        //   answerOptionsAttachProof_3.clear();
+        //   answerOptionsAttachProof_3 = parseAnswerOptions(loop['options']);
+        // }
+        // if (loop['answer_Type_Id'] == 1) {
+        //   List<Answeroption> parseAnswerOptions(List<dynamic> jsonList) {
+        //     return jsonList.map((json) => Answeroption.fromJson(json)).toList();
+        //   }
+        //
+        //   answerOptionsComment_1.clear();
+        //   answerOptionsComment_1 = parseAnswerOptions(loop['options']);
+        // }
+        //
         for (var inLoop in loop['options']) {
-          if (loop['answer_Type_Id'] == 4) {
+          if (loop['answer_Type_Id'] == 8) {
             options.add(inLoop['answer_Option']);
           }
           // options.add(inLoop['answer_Option']);
@@ -907,30 +1109,28 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
         loading = false;
       });
       _showAlert("Something went wrong\nPlease contact it support\n$e");
-     /* showConfirmDialog(onConfirmed: (){
-        Get.back();
-      }, title: 'Alert!', msg: 'Something went wrong\nPlease contact it support\n$e');*/
-    }
-    finally{
+
+    } finally {
       setState(() {
         loading = false;
       });
     }
   }
 
-  Future<void> _showRetryAlert__(int i) async {
+  Future<void> _showRetryAlert__(int i,String error) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-            content: const Text('Something went wrong'),
+          content:  Text('Something went wrong\n$error'),
 // Please retry?'),
           actions: <Widget>[
             Container(
-              decoration:
-              BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -938,12 +1138,10 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                     // submitCheckList();
                   },
                   child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16,vertical: 16),
-                    child: Text('Ok',
-                        style: TextStyle(color: Colors.white)),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: Text('Ok', style: TextStyle(color: Colors.white)),
                   )),
             ),
-
           ],
         );
       },
@@ -959,7 +1157,7 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     }
   }
 
-  Future<void> _showProceedAlert() async {
+  Future<void> _showProceedAlert(int history) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -989,7 +1187,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                 InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
-                    submitCheckList();
+
+                    submitCheckList(history);
                   },
                   child: Container(
                     padding: const EdgeInsets.only(
@@ -1064,8 +1263,6 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           title: const Text('Alert!'),
           content: Text(message),
           actions: <Widget>[
-
-
             ElevatedButton(
               onPressed: () {
                 // Close the dialog
@@ -1073,7 +1270,6 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                 Navigator.of(contextt).pop();
                 Navigator.of(context).pop();
                 // Execute the callback function
-
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -1083,18 +1279,14 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                   )),
               child: const Text(
                 'OK',
-                style: TextStyle(color: Colors.white,fontSize: 18),
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
             ),
-
           ],
         );
       },
     );
   }
-
-
-
 
 //QuestionCancel
 
@@ -1104,9 +1296,9 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       setState(() {
         loading = true;
       });
-       var url = Uri.https(
-      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWA_GROOMING_API/api/AreaManager/QuestionCancel',
+      var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/QuestionCancel',
       );
       var sendJson = {
         "checklist_assign_id": widget.checkList.am_checklist_assign_id,
@@ -1145,20 +1337,23 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
         });
 
         // _showMyDialog("Something went wrong\nPlease contact it support ");
-        showSimpleDialog(title: 'Alert!', msg: 'Something went wrong\nPlease contact it support');
-
+        showSimpleDialog(
+            title: 'Alert!',
+            msg: 'Something went wrong\nPlease contact it support');
       }
     } catch (w) {
       setState(() {
         loading = false;
         goBack = false;
       });
-      showSimpleDialog(title: 'Alert!', msg: 'Something went wrong\nPlease contact it support\n$w');
+      showSimpleDialog(
+          title: 'Alert!',
+          msg: 'Something went wrong\nPlease contact it support\n$w');
     }
     return goBack;
   }
 
-  submitCheckList() async {
+  submitCheckList(int history) async {
     try {
       setState(() {
         loading = true;
@@ -1170,9 +1365,9 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
 
       final prefs = await SharedPreferences.getInstance();
 
-       var url = Uri.https(
-      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWA_GROOMING_API/api/AreaManager/AddQuestionAnswer',
+      var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/AddQuestionAnswer',
       );
 
       var locationCode = prefs.getString('locationCode');
@@ -1193,17 +1388,19 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
         /* for(int j=0;j<quesAnsList[i].questions.length;j++){
 
       }*/
-        if (quesAnsList[0].questions[i].answerTypeId == 4) {
+        if (quesAnsList[0].questions[i].answerTypeId == 8) {
           sendJson.add({
-            "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,
-            "checklist_Id": widget.checkList.checklistId,
+            "checkList_Item_Mst_Id":
+                widget.headerQuestion[widget.position].checklisTItemMstId,
+            "checklist_Id": widget.headerQuestion[widget.position].checklistId,
             "item_name": quesAnsList[0].itemName,
             "checkList_Answer_Id":
                 quesAnsList[0].questions[i].checkListAnswerId,
             "question": questionTitles[i],
             "answer_Type_Id": subQues[0],
-            "mandatory_Flag": widget.checkList.mandatoryFlag,
-            "active_Flag": widget.checkList.activeFlag,
+            "mandatory_Flag":
+                widget.headerQuestion[widget.position].mandatoryFlag,
+            "active_Flag": widget.headerQuestion[widget.position].activeFlag,
             "checkList_Answer_Option_Id": checkList_Answer_Option_Id_,
             "answer_Option": dropdownText,
             "we_Care_Flag": widget.activeCheckList.weCareFlag,
@@ -1357,20 +1554,29 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
             }
           }
         } else {
-          _showSuccessAlert(respo['message'].toString());
+          setState(() {
+            dropdownText="";
+          });
+          if(history==0){
+            goToPrevious();
+          }else{
+            goToNext();
+          }
+          showSnackbar(respo['message']);
+          // _showSuccessAlert(respo['message'].toString());
         }
       } else {
         setState(() {
           loading = false;
         });
 
-        _showMyDialog("Something went wrong\nPlease contact it support ");
+        _showMyDialog("Something went wrong\nPlease contact it support\n${response.body}");
       }
     } catch (e) {
       setState(() {
-        loading = true;
+        loading = false;
       });
-      _showRetryAlert__(2);
+      _showRetryAlert__(2,"$e");
     }
   }
 
@@ -1436,7 +1642,6 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     }
   }
 
-
   Future<void> _showMyDialog(String msg) async {
     return showDialog<void>(
       context: context,
@@ -1463,5 +1668,13 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     );
   }
 
-
+  void showSnackbar(String respo) {
+    Get.snackbar(
+      "Success",
+      respo,
+      colorText: Colors.white,
+      backgroundColor: Colors.lightBlue,
+      icon: const Icon(Icons.add_alert),
+    );
+  }
 }

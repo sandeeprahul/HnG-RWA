@@ -565,9 +565,10 @@ class _WeCareScreenState extends State<WeCareScreen> {
         loading = true;
       });
       var url = Uri.https(
-        'hg.bpm360.net',
-        '/mycodes/get_departments_api.php',
+        'hgnew.bpm360.net',
+        'get_departments_api.php',
       );
+      //https://hgnew.bpm360.net/get_departments_api.php
       var response = await http
           .post(
             url,

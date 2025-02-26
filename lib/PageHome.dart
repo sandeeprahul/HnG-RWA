@@ -289,11 +289,15 @@ class _PageHomeState extends State<PageHome> {
       final imageUrl = await storageRef
           .child("Profile/$userCode/$profileImageUrl_")
           .getDownloadURL();
+      print("imageUrl");
+      print(imageUrl);
       setState(() {
         // attachProof = true;
         profile_image_url = imageUrl;
       });
     } catch (e) {
+      print("profile_image_urle");
+      print("$e");
       // Fluttertoast.showToast(msg: "");
     }
   }

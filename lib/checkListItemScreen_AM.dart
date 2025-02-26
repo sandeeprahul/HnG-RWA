@@ -238,8 +238,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                                       submitCheckListScreen_AM(
                                           checkList,
                                           widget.activeCheckList,
-
-                                          0,widget.mLpdChecklist)),
+                                          0,widget.mLpdChecklist,headerQuestion, position: pos,)),
                             ).then((value) {
                               getData();
                             });
@@ -484,7 +483,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
     try {
       final prefs = await SharedPreferences.getInstance();
       var userID = prefs.getString('userCode') ?? '105060';
-      String url = "${Constants.apiHttpsUrl}/AreaManager/HeaderQuestion/${widget.activeCheckList.amChecklistAssignId}/${widget.mLpdChecklist.sectionId}/$userID";
+      String url = "${Constants.apiHttpsUrlTest}/AreaManager/HeaderQuestion/${widget.activeCheckList.amChecklistAssignId}/${widget.mLpdChecklist.sectionId}/$userID";
 
       print(url);
       final response = await http.get(Uri.parse(url)).timeout(const Duration(milliseconds: 2500));
@@ -543,7 +542,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
 
       var url = Uri.https(
         'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWA_GROOMING_API/api/AreaManager/WorkFlowStatus',
+        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/WorkFlowStatus',
       );
 
       var response = await http.post(
