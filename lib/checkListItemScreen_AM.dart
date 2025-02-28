@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/data/ActiveCheckListStoreAudit.dart';
 import 'package:hng_flutter/data/HeaderQuesStoreAudit.dart';
@@ -20,6 +21,7 @@ import 'common/constants.dart';
 import 'data/ActiveCheckListAm.dart';
 import 'data/ActiveCheckListLpd.dart';
 import 'data/ActiveCheckListModel.dart';
+import 'data/AuditSummary.dart';
 import 'data/HeaderQuesLpd.dart';
 import 'data/HeaderQuesStoreAM.dart';
 import 'data/HeaderQuestion.dart';
@@ -257,7 +259,9 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                 onTap: () {
                   //popup
                   // submitAllDilo();
-                  openDialog();
+                  // openDialog();
+                  showAuditSummaryDialog(context);
+
                 },
                 child: Container(
                   width: double.infinity,
@@ -307,15 +311,16 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
     Get.dialog(
       AlertDialog(
         title: const Text('Alert!'),
-        content: const Text('Do you want to Close this Store Audit?'),
+        content: const Text('Do you want to Close this Section of Am Store Audit?'),
         actions: [
           TextButton(
             child: const Text("Yes",style: TextStyle(color: Colors.white),),//
             onPressed: () {
               Get.back();
               Navigator.pop(context);
+              showAuditSummaryDialog(context);
 
-              submitAllDilo();
+              // submitAllDilo();
             },
           ),
           TextButton(
@@ -530,7 +535,107 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
       ),
     );
   }
+  void showAuditSummaryDialog(BuildContext context) async {
+    AuditSummary? summary = await fetchAuditSummary();
 
+    if (summary != null) {
+      Get.defaultDialog(
+        title: "Audit Summary",
+        content: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Audit Start Time: ${summary.auditStartTime}"),
+              Text("Audit End Time: ${summary.auditEndTime}"),
+              const Divider(),
+              ...summary.sections.map((section) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "${section.sectionName}: ",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text("Score: ${section.yourRatingScore}"),
+
+                      ],
+                    ),
+                    // Text("Total Score: ${section.totalScore}"),
+                    const Divider(),
+                  ],
+                );
+              }).toList(),
+              // Text(
+              //   "Total Score: ${summary.totalScore}",
+              //   style: TextStyle(fontWeight: FontWeight.bold),
+              // ),
+              Text(
+                "Your Score: ${summary.yourRatingScore}",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text("Percentage: ${summary.percentage}%"),
+            ],
+          ),
+        ),
+        textConfirm: "Continue",
+        textCancel: "Cancel",
+        confirmTextColor: Colors.white,
+        cancelTextColor:Colors.white ,
+        confirm: InkWell(
+          onTap: (){
+            submitAllDilo();
+            Get.back(); // Close dialog
+
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 6),
+            decoration: BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(16)),
+            child: const Text('Continue',style: TextStyle(color: Colors.white),),
+          ),
+        ),
+        cancel: InkWell(
+          onTap: (){
+            Get.back(); // Close dialog
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 6),
+            decoration: BoxDecoration(color: Colors.grey,borderRadius: BorderRadius.circular(16)),
+            child: const Text('Cancel',style: TextStyle(color: Colors.white),),
+          ),
+        ),
+        onConfirm: () {
+          Get.back(); // Close dialog
+          // Add your 'Continue' action here
+        },
+        onCancel: () {
+          // Add your 'Cancel' action here if needed
+        },
+      );
+    } else {
+      // Handle the case when data is null
+      Get.snackbar(
+        "Error",
+        "Failed to load audit summary.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+  Future<AuditSummary?> fetchAuditSummary() async {
+    final response = await http.get(
+      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/AreaManager/GetAreamanagerSummary/${widget.activeCheckList.amChecklistAssignId}'),
+    );
+
+    if (response.statusCode == 200) {
+      return AuditSummary.fromJson(jsonDecode(response.body));
+    } else {
+      // Handle the error accordingly
+      print('Failed to load audit summary');
+      return null;
+    }
+  }
   Future<void> submitAllDilo() async {
     setState(() {
       loading = true;
@@ -565,17 +670,21 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
           });
 
           // if()
-          _showSuccessAlert('Checklist Successfully Submitted for Review');
-          // Navigator.pop(context);
+          // _showSuccessAlert('Checklist Successfully Submitted for Review');
+
+          Navigator.pop(context);
         }
         else {
+          Navigator.pop(context);
           /* setState(() {
           loading = false;
         });*/
-          _showAlert(respo['message']);
+          // _showAlert(respo['message']);
+          // Fluttertoast.showToast(msg: respo['message']);
         }      // Navigator.pop(context);
       } else {
         _showAlert('Something went wrong\nPlease contact IT support\nStatusCode:${response.statusCode}');
+        Fluttertoast.showToast(msg: respo['message']);
       }
     }catch(e){
       setState(() {

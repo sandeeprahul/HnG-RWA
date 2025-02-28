@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'AmAcceptSelectionScreen_AM.dart';
 import 'common/constants.dart';
 import 'data/ActiveCheckListAm.dart';
+import 'data/AuditSummary.dart';
 import 'data/LPDSection.dart';
 import 'OutletSelectScreen.dart';
 import 'checkListScreen_lpd.dart';
@@ -122,7 +123,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                       Padding(
                         padding: const EdgeInsets.only(left: 20),
                         child: Text(
-                          '${widget.mGetActvityTypes.auditName}',
+                          widget.mGetActvityTypes.auditName,
                           style: const TextStyle(color: Colors.black),
                         ),
                       ),
@@ -170,19 +171,20 @@ class _amCheckListScreenState extends State<amCheckListScreen>
             Align(
               alignment: Alignment.bottomCenter,
               child: Visibility(
-                visible: widget.activeCheckList.checklistEditStatus == "R"
-                    ? false
-                    : widget.activeCheckList.checklistEditStatus == "A"
-                    ? false
-                    : checklist_completed_status == "Completed"
-                    ? true
-                    : false,
+                // visible: widget.activeCheckList.checklistEditStatus == "R"
+                //     ? false
+                //     : widget.activeCheckList.checklistEditStatus == "A"
+                //     ? false
+                //     : checklist_completed_status == "Completed"
+                //     ? true
+                //     : false,
+                visible: true,
                 child: InkWell(
                   onTap: () {
                     //popup
                     // submitAllDilo();
                     openDialog();
-                  },
+                    },
                   child: Container(
                     width: double.infinity,
                     height: 50,
@@ -215,99 +217,104 @@ class _amCheckListScreenState extends State<amCheckListScreen>
             padding: EdgeInsets.all(10.0),
             child: Text('No records found'),
           )
-        : ListView.builder(
-            itemBuilder: (BuildContext context, int index) {
-              return InkWell(
-                onTap: (){
+        : Padding(
+          padding: const EdgeInsets.only(bottom: 60),
+          child: ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                return InkWell(
+                  onTap: (){
 
-                  if(widget.activeCheckList.checklistEditStatus=="R"){
-                    // Get.to(AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index]));
+                    if(widget.activeCheckList.checklistEditStatus=="R"){
+                      // Get.to(AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index]));
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value) => (){
-                      getActiveCheckListData();
-                    });
-                  }else if(widget.activeCheckList.checklistEditStatus=="A"){
-                    // Get.to(AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index]));
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value) => (){
-                      getActiveCheckListData();
-                    });
-                  }else{
-                    // Get.to(checkListItemScreen_AM(widget.activeCheckList,mLpdChecklist[index]));
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => checkListItemScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
-                    ).then((value){
-                      getActiveCheckListData();
-                    });
-                  }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
+                      ).then((value) => (){
+                        getActiveCheckListData();
+                      });
+                    }else if(widget.activeCheckList.checklistEditStatus=="A"){
+                      // Get.to(AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index]));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AmAcceptSelectionScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
+                      ).then((value) => (){
+                        getActiveCheckListData();
+                      });
+                    }else{
+                      // Get.to(checkListItemScreen_AM(widget.activeCheckList,mLpdChecklist[index]));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => checkListItemScreen_AM(widget.activeCheckList,mLpdChecklist[index])),
+                      ).then((value){
+                        getActiveCheckListData();
+                      });
+                    }
 
-                },
-                child: Container(
-                  // color: Colors.white,
-                  margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
-                  padding: const EdgeInsets.only(
-                      left: 10, top: 30, right: 20, bottom: 30),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(color: Color(0xFFBDBDBD), blurRadius: 2)
-                    ],
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  },
+                  child: Container(
+                    // color: Colors.white,
+                    margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
+                    padding: const EdgeInsets.only(
+                        left: 10, top: 30, right: 20, bottom: 30),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(color: Color(0xFFBDBDBD), blurRadius: 2)
+                      ],
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    // height: 85,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                mLpdChecklist[index].sectionName,
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                            ),
+                            // const Spacer(),
+                            Container(
+                              height: 35,
+                              margin: const EdgeInsets.only(right: 15),
+                              width: 1,
+                              color: Colors.grey[400],
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.grey[400],
+                            )
+                          ],
+                        ),
+                        Row(
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              mLpdChecklist[index].section_completion_status,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const Text(' - '),
+                            // Spacer(),
+                            Text(
+                              mLpdChecklist[index].percentage,
+                              style:  TextStyle(fontSize: 14,color: mLpdChecklist[index].section_completion_status=="Completed"?Colors.greenAccent:Colors.red),
+                            ),
+                          ],
+                        ),
+
+                      ],
+                    ),
                   ),
-                  // height: 85,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            mLpdChecklist[index].sectionName,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                          const Spacer(),
-                          Container(
-                            height: 35,
-                            margin: const EdgeInsets.only(right: 15),
-                            width: 1,
-                            color: Colors.grey[400],
-                          ),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.grey[400],
-                          )
-                        ],
-                      ),
-                      Row(
-                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            mLpdChecklist[index].section_completion_status,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          const Text(' - '),
-                          // Spacer(),
-                          Text(
-                            mLpdChecklist[index].percentage,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-
-                    ],
-                  ),
-                ),
-              );
-            },
-            itemCount: mLpdChecklist.length,
-          );
+                );
+              },
+              itemCount: mLpdChecklist.length,
+            ),
+        );
   }
 
   List<LPDSection> mLpdChecklist = [];
@@ -417,19 +424,21 @@ class _amCheckListScreenState extends State<amCheckListScreen>
 
   void openDialog() {
     Get.dialog(
+      barrierDismissible: false,
+
       AlertDialog(
-        title: const Text('Alert!'),
-        content: const Text('Do you want to close the audit?'),
+        title: const Text('Do you want to close the audit?'),
+        content:  Text(checklist_completed_status=="Completed"?'':'Many Sections were still pending!'),
         actions: [
           TextButton(
-            child: const Text("Yes"),
+            child: const Text("Yes",style: TextStyle(color: Colors.white),),
             onPressed: () {
               submitWorkFlow();
               Get.back();
             },
           ),
           TextButton(
-            child: const Text("No"),
+            child: const Text("No",style: TextStyle(color: Colors.white),),
             onPressed: () => Get.back(),
           ),
         ],
@@ -477,9 +486,9 @@ class _amCheckListScreenState extends State<amCheckListScreen>
 
         // if()
         // _showSuccessAlert('Checklist Successfully Submitted for Review');
-        Navigator.pop(context);
+        // Navigator.pop(context);
 
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => OutletSelectionScreen(
@@ -490,14 +499,21 @@ class _amCheckListScreenState extends State<amCheckListScreen>
         setState(() {
           loading = false;
         });
-        _showAlert(respo['message']);
+        // _showAlert(respo['message']);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => OutletSelectionScreen(
+                widget.mGetActvityTypes,
+              )),
+        ).then((value) => (){getActiveCheckListData();});
       } // Navigator.pop(context);
     } else {
       setState(() {
         loading = false;
       });
-      _showAlert('Something went wrong\nPlease contact IT suport');
-      // _showAlert('Something went wrong\nPlease contact IT suport');
+      _showAlert('Something went wrong\nPlease contact IT support');
+      // _showAlert('Something went wrong\nPlease contact IT support');
     }
   }
 
@@ -508,7 +524,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
       builder: (BuildContext contextt) {
         return AlertDialog(
           title: const Text('Info'),
-          content: Text('$msg'),
+          content: Text(msg),
           actions: <Widget>[
             InkWell(
               onTap: () {

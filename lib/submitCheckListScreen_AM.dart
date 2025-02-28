@@ -69,6 +69,8 @@ var options = [];
 var nonCompFlag = [];
 var checkList_Answer_Option_Id = [];
 int checkList_Answer_Option_Id_ = -1;
+String answer_Option_Id = "";
+String score = "";
 var non_Compliance_Flag;
 var checkList_Answer_Id;
 
@@ -139,8 +141,17 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: questionCancel,
+    return PopScope(
+      canPop: false, // Prevents popping the screen
+
+
+      onPopInvokedWithResult: (didPop, result){
+        if(!didPop){
+          Get.snackbar('Alert', 'Please answer all the questions',backgroundColor: Colors.red);
+        }
+        // return false;
+      },
+      // onWillPop: questionCancel,
       child: Scaffold(
         body: SafeArea(
           child: Stack(
@@ -170,7 +181,10 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                             padding: EdgeInsets.only(left: 20),
                             child: Text(
                               'Area Manager',
-                              style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18),
                             ),
                           ),
                         ],
@@ -221,73 +235,87 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                             ),
                           ),
                         )),
-        ListView.separated(
-          shrinkWrap: true,
-          itemCount: answerOptions.length,
-          itemBuilder: (context, pos) {
-            return RadioListTile<int>(
-              title: Text(
-                maxLines: 3,
-                answerOptions[pos].answerOption,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              value: answerOptions[pos].checkListAnswerOptionId,
-              groupValue: checkList_Answer_Option_Id_,
-              onChanged: (value) {
-                setState(() {
-                  checkList_Answer_Option_Id_ = value!;
-                  non_Compliance_Flag = answerOptions[pos].nonComplianceFlag;
-                  optionMandatoryFlag = answerOptions[pos].optionMandatoryFlag;
-                });
-              },
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const Divider();
-          },
-        ),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: answerOptions.length,
+                      itemBuilder: (context, pos) {
+                        bool isSelected = checkList_Answer_Option_Id_ == answerOptions[pos].checkListAnswerOptionId;
 
-                    Visibility(
-                      visible: false,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemCount:
-                        options.length, // subQues.contains(4) ? 4 :
-                        itemBuilder: (context, pos) {
-                          return InkWell(
-                            onTap: () {
-                              if (widget.checkList.checklistEditStatus ==
-                                  'E') {}
-                              setState(() {
-                                showpopup = false;
-                                dropdownText =
-                                    answerOptions[pos].answerOption;
-                                checkList_Answer_Option_Id_ =
-                                    answerOptions[pos]
-                                        .checkListAnswerOptionId;
-                                non_Compliance_Flag =
-                                    answerOptions[pos].nonComplianceFlag;
-                                optionMandatoryFlag = answerOptions[pos]
-                                    .optionMandatoryFlag;
-                              });
-                              print('000000non_Compliance_Flag');
-                              print(non_Compliance_Flag);
-                              print(checkList_Answer_Option_Id_);
-                            },
+                        return InkWell(
+                          onTap: () {
+                            if (widget.checkList.checklistEditStatus == 'E') {}
+
+                            setState(() {
+                              showpopup = false;
+                              dropdownText = answerOptions[pos].answerOption;
+                              checkList_Answer_Option_Id_ = answerOptions[pos].checkListAnswerOptionId;
+                              answer_Option_Id = answerOptions[pos].answerOptionID;
+                              score = answerOptions[pos].score;
+                              non_Compliance_Flag = answerOptions[pos].nonComplianceFlag;
+                              optionMandatoryFlag = answerOptions[pos].optionMandatoryFlag;
+                            });
+
+                            print('Selected Option ID: $checkList_Answer_Option_Id_');
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                            decoration: BoxDecoration(
+                              color: isSelected ? Colors.greenAccent : Colors.white, // Change color if selected
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             child: Text(
                               answerOptions[pos].answerOption,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16),
+                              style: TextStyle(
+                                // fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: isSelected ? Colors.white : Colors.black, // Change text color
+                              ),
                             ),
-                          );
-                        },
-                        separatorBuilder:
-                            (BuildContext context, int index) {
-                          return const Divider();
-                        },
-                      ),
-                    ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Divider();
+                      },
+                    )
+,
+                    //
+                    // Visibility(
+                    //   visible: false,
+                    //   child: ListView.separated(
+                    //     shrinkWrap: true,
+                    //     itemCount: options.length, // subQues.contains(4) ? 4 :
+                    //     itemBuilder: (context, pos) {
+                    //       return InkWell(
+                    //         onTap: () {
+                    //           if (widget.checkList.checklistEditStatus ==
+                    //               'E') {}
+                    //           setState(() {
+                    //             showpopup = false;
+                    //             dropdownText = answerOptions[pos].answerOption;
+                    //             checkList_Answer_Option_Id_ =
+                    //                 answerOptions[pos].checkListAnswerOptionId;
+                    //             non_Compliance_Flag =
+                    //                 answerOptions[pos].nonComplianceFlag;
+                    //             optionMandatoryFlag =
+                    //                 answerOptions[pos].optionMandatoryFlag;
+                    //           });
+                    //           print('000000non_Compliance_Flag');
+                    //           print(non_Compliance_Flag);
+                    //           print(checkList_Answer_Option_Id_);
+                    //         },
+                    //         child: Text(
+                    //           answerOptions[pos].answerOption,
+                    //           style: const TextStyle(
+                    //               fontWeight: FontWeight.bold, fontSize: 16),
+                    //         ),
+                    //       );
+                    //     },
+                    //     separatorBuilder: (BuildContext context, int index) {
+                    //       return const Divider();
+                    //     },
+                    //   ),
+                    // ),
                     //attach proof
                     Visibility(
                         visible: optionMandatoryFlag == "-1"
@@ -614,7 +642,6 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                           // }
                           // _showProceedAlert();
 
-
                           // _showProceedAlert(0);
                           goToPrevious();
                         },
@@ -679,10 +706,12 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
                           // }
                           // _showProceedAlert();
 
-                          if(checkList_Answer_Option_Id_!=-1){
-                            _showProceedAlert(1);
-                          }else{
-                            Get.snackbar('Alert', "Please select an option",backgroundColor: Colors.red);
+                          if (checkList_Answer_Option_Id_ != -1) {
+                            // _showProceedAlert(1);
+                            submitCheckList(1);
+                          } else {
+                            Get.snackbar('Alert', "Please select an option",
+                                backgroundColor: Colors.red);
                           }
                         },
                         child: Container(
@@ -790,33 +819,33 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           }),
     );
   }
+
   void goToPrevious() {
     if (currentPosition > 0) {
       setState(() {
         currentPosition--; // Move to previous position
       });
       getData(currentPosition); // Fetch previous data
-    }
-    else{
-      Get.snackbar("End", "You are at the first question!",snackPosition: SnackPosition.BOTTOM,backgroundColor: Colors.red);
-
+    } else {
+      Get.snackbar("End", "You are at the first question!",
+          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
     }
   }
+
   void goToNext() {
     if (currentPosition < widget.headerQuestion.length - 1) {
       setState(() {
         currentPosition++; // Move to next position
       });
       getData(currentPosition); // Fetch next data
-    }
-    else {
-
+    } else {
       Navigator.pop(context);
       // Get.snackbar("End", "You are at the last question!",snackPosition: SnackPosition.BOTTOM,backgroundColor: Colors.red);
 
       // Get.snackbar("End", "You are at the last question!");
     }
   }
+
   CameraController? Camcontroller;
   String imagePath = "";
   bool camVisible = false;
@@ -1109,7 +1138,6 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
         loading = false;
       });
       _showAlert("Something went wrong\nPlease contact it support\n$e");
-
     } finally {
       setState(() {
         loading = false;
@@ -1117,14 +1145,14 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
     }
   }
 
-  Future<void> _showRetryAlert__(int i,String error) async {
+  Future<void> _showRetryAlert__(int i, String error) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content:  Text('Something went wrong\n$error'),
+          content: Text('Something went wrong\n$error'),
 // Please retry?'),
           actions: <Widget>[
             Container(
@@ -1391,18 +1419,21 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
         if (quesAnsList[0].questions[i].answerTypeId == 8) {
           sendJson.add({
             "checkList_Item_Mst_Id":
-                widget.headerQuestion[widget.position].checklisTItemMstId,
-            "checklist_Id": widget.headerQuestion[widget.position].checklistId,
+                widget.headerQuestion[currentPosition].checklisTItemMstId,
+            "checklist_Id": widget.headerQuestion[currentPosition].checklistId,
             "item_name": quesAnsList[0].itemName,
             "checkList_Answer_Id":
                 quesAnsList[0].questions[i].checkListAnswerId,
             "question": questionTitles[i],
             "answer_Type_Id": subQues[0],
             "mandatory_Flag":
-                widget.headerQuestion[widget.position].mandatoryFlag,
-            "active_Flag": widget.headerQuestion[widget.position].activeFlag,
+                widget.headerQuestion[currentPosition].mandatoryFlag,
+            "active_Flag": widget.headerQuestion[currentPosition].activeFlag,
             "checkList_Answer_Option_Id": checkList_Answer_Option_Id_,
             "answer_Option": dropdownText,
+            "answer_Option_id": answer_Option_Id,
+            "score": score,
+            //checkList_Answer_Option_Id_
             "we_Care_Flag": widget.activeCheckList.weCareFlag,
             "non_Compliance_Flag": non_Compliance_Flag,
             "pos_bos_flag": widget.activeCheckList.posBosFlag,
@@ -1555,14 +1586,16 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           }
         } else {
           setState(() {
-            dropdownText="";
+            dropdownText = "";
           });
-          if(history==0){
+          if (history == 0) {
             goToPrevious();
-          }else{
+          } else {
             goToNext();
+            //  snackPosition: SnackPosition.BOTTOM, // Positions the snackbar at the bottom
           }
-          showSnackbar(respo['message']);
+
+          // showSnackbar(respo['message'],);   // Moves it up by 100 pixels);
           // _showSuccessAlert(respo['message'].toString());
         }
       } else {
@@ -1570,13 +1603,14 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
           loading = false;
         });
 
-        _showMyDialog("Something went wrong\nPlease contact it support\n${response.body}");
+        _showMyDialog(
+            "Something went wrong\nPlease contact it support\n${response.body}");
       }
     } catch (e) {
       setState(() {
         loading = false;
       });
-      _showRetryAlert__(2,"$e");
+      _showRetryAlert__(2, "$e");
     }
   }
 
@@ -1674,6 +1708,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
       respo,
       colorText: Colors.white,
       backgroundColor: Colors.lightBlue,
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.only(bottom: 100), // Moves it up by 100 pixels
       icon: const Icon(Icons.add_alert),
     );
   }
