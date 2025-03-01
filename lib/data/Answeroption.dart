@@ -18,13 +18,13 @@ class Answeroption {
     });
 
     factory Answeroption.fromJson(Map<String, dynamic> json) => Answeroption(
-        checkListAnswerOptionId: json["checkList_Answer_Option_Id"],
-        answerOptionID: json["answer_Option_id"],
-        answerOption: json["answer_Option"],
-        weCareFlag: json["we_Care_Flag"],
-        nonComplianceFlag: json["non_Compliance_Flag"],
-        optionMandatoryFlag: json["option_mandatory_Flag"],
-        score: json["score"],
+        checkListAnswerOptionId: json["checkList_Answer_Option_Id"]??-1,
+        answerOptionID: json["answer_Option_id"]??'',
+        answerOption: json["answer_Option"]??'',
+        weCareFlag: json["we_Care_Flag"]??'',
+        nonComplianceFlag: json["non_Compliance_Flag"]??'',
+        optionMandatoryFlag: json["option_mandatory_Flag"]??'',
+        score: json["score"]??'',
     );
 
     Map<String, dynamic> toJson() => {

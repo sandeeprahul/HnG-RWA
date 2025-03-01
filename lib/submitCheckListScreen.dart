@@ -663,6 +663,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
       String url =
           "${Constants.apiHttpsUrl}/CheckList/QuestionAnswers/${widget.checkList.checklistAssignId}/${widget.checkList.checklistItemMstId}/InProcess/$userId"; //
 
+      print(url);
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
@@ -772,7 +773,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
       setState(() {
         loading = false;
       });
-      _showRetryAlert__(0);
+      _showRetryAlert__(0,e.toString());
     }
   }
 
@@ -780,20 +781,20 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
   List<Answeroption> answerOptionsAttachProof_3 = [];
   List<Answeroption> answerOptionsComment_1 = [];
 
-  Future<void> _showRetryAlert__(int i) async {
+  Future<void> _showRetryAlert__(int i,String error) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content: const Text('Network issue\nPlease retry'),
+          content:  Text('Something went wrong\n$error'),
 // Please retry?'),
           actions: <Widget>[
             Container(
               padding: const EdgeInsets.all(10),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius:BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -805,7 +806,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius:BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -1051,7 +1052,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
         loading = false;
         goBack = false;
       });
-      _showRetryAlert__(1);
+      _showRetryAlert__(1,w.toString());
       // return false;
     }
     print('goBack');

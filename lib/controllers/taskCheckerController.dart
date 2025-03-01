@@ -32,7 +32,9 @@ class TaskCheckerController extends GetxController {
             confirm: ElevatedButton(
               onPressed: () {
                 // Navigate to the taskPage
-                Get.toNamed(taskPage);
+                Get.back();
+
+                // Get.toNamed(taskPage);
               },
               child: const Text("Continue",style: TextStyle(color: Colors.white),),
             ),

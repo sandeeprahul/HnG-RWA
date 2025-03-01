@@ -1259,7 +1259,7 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
-                    fontSize: 24),
+                    fontSize: 20),
               ),
             ),
           ],
