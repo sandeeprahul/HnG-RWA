@@ -555,11 +555,15 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
                   children: [
                     Row(
                       children: [
-                        Text(
-                          "${section.sectionName}: ",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Text(
+                            "${section.sectionName}: ",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
-                        Text("Score: ${section.yourRatingScore}"),
+                        Expanded(
+                          flex:2,
+                            child: Text("Score: ${section.yourRatingScore}")),
 
                       ],
                     ),

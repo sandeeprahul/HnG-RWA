@@ -238,7 +238,9 @@ class _WeCareScreenState extends State<WeCareScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 50,)
+                const SizedBox(
+                  height: 50,
+                )
               ],
             ),
           ),
@@ -384,20 +386,20 @@ class _WeCareScreenState extends State<WeCareScreen> {
                           : ListView.separated(
                               itemCount: wecareLocations.length,
                               itemBuilder: (context, pos) {
-                                if(wecareLocations[pos].weCareFlag!="1"){
-                                  return  ListTile(
+                                if (wecareLocations[pos].weCareFlag != "1") {
+                                  return ListTile(
                                       onTap: () {
                                         setState(() {
                                           weCareLocationPopup = false;
                                           selectedWeCareLocation =
-                                          wecareLocations[pos];
+                                              wecareLocations[pos];
                                           weCareLocation =
                                               wecareLocations[pos].locationName;
                                         });
                                       },
                                       title: Text(
                                           wecareLocations[pos].locationName));
-                                }else{
+                                } else {
                                   return const SizedBox.shrink();
                                 }
                               },
@@ -608,19 +610,18 @@ class _WeCareScreenState extends State<WeCareScreen> {
     }
   }
 
-
   Future<List<WeCareLocation>> fetchLocations() async {
     try {
       setState(() {
-        loading  =true;
+        loading = true;
       });
       final prefs = await SharedPreferences.getInstance();
       var userID = prefs.getString('userCode') ?? '';
       String url =
-          "${Constants.apiHttpsUrl}/Login/getlocationwecare/$userID";//
+          "${Constants.apiHttpsUrl}/Login/getlocationwecare/$userID"; //
       print("URL->$url");
       final response =
-      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         setState(() {
           loading = false;
@@ -643,8 +644,7 @@ class _WeCareScreenState extends State<WeCareScreen> {
         return locationList
             .map((location) => WeCareLocation.fromJson(location))
             .toList();
-      }
-      else {
+      } else {
         setState(() {
           loading = false;
         });
@@ -655,34 +655,54 @@ class _WeCareScreenState extends State<WeCareScreen> {
       setState(() {
         loading = false;
       });
-      _showAlert(Constants.networkIssue);
+      _showAlert(e.toString());
       throw Exception('Failed to fetch locations due to a network issue');
     }
   }
+
   bool loading = false;
 
   Future<void> sendData() async {
     setState(() {
       loading = true;
     });
-    SharedPreferences pref = await SharedPreferences.getInstance(); //userCode
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance(); //userCode
 
-    var locationCode = pref.getString('locationCode');
-    var user_name = pref.getString('user_name');
-    var wecare_userid = pref.getString('wecare_userid');
-    var wecare_location_code = pref.getString('wecare_location_code');
+      var locationCode = pref.getString('locationCode');
+      var user_name = pref.getString('user_name');
+      var wecare_userid = pref.getString('wecare_userid');
+      var wecare_location_code = pref.getString('wecare_location_code');
 
-    var url = Uri.https(
-      'hg.bpm360.net',
-      '/mycodes/create_ticket_api.php',
-    );
+      var url = Uri.https(
+        'hg.bpm360.net',
+        '/mycodes/create_ticket_api.php',
+      );
 
-    var response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
+      var response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          "BPM360": {
+            "api_key": "e6010eb878872c6b32a40d92518132ed",
+            "username": selectedWeCareLocation!.weCareUserId
+          },
+          "data": {
+            "subject": subjectCntrl.text.toString(),
+            "status": "Open",
+            "store_code": selectedWeCareLocation!.weCareLocationCode,
+            //"HG_$locationCode"
+            "department_name": issue,
+            "issue_name": issue_,
+            "priority": "P1",
+            "description": descitionCntrl.text.toString()
+          }
+        }),
+      );
+
+      var SendingJson = json.encode({
         "BPM360": {
           "api_key": "e6010eb878872c6b32a40d92518132ed",
           "username": selectedWeCareLocation!.weCareUserId
@@ -690,57 +710,46 @@ class _WeCareScreenState extends State<WeCareScreen> {
         "data": {
           "subject": subjectCntrl.text.toString(),
           "status": "Open",
-          "store_code": selectedWeCareLocation!.weCareLocationCode, //"HG_$locationCode"
+          "store_code": selectedWeCareLocation!.weCareLocationCode,
+          //"HG_$locationCode"
           "department_name": issue,
           "issue_name": issue_,
           "priority": "P1",
           "description": descitionCntrl.text.toString()
         }
-      }),
-    );
+      });
+      print(SendingJson);
 
-    var SendingJson = json.encode({
-      "BPM360": {
-        "api_key": "e6010eb878872c6b32a40d92518132ed",
-        "username": selectedWeCareLocation!.weCareUserId
-      },
-      "data": {
-        "subject": subjectCntrl.text.toString(),
-        "status": "Open",
-        "store_code": selectedWeCareLocation!.weCareLocationCode, //"HG_$locationCode"
-        "department_name": issue,
-        "issue_name": issue_,
-        "priority": "P1",
-        "description": descitionCntrl.text.toString()
+      if (response.statusCode == 200) {
+        setState(() {
+          loading = false;
+        });
+
+        TicketResponse temp;
+        Map<String, dynamic> map = json.decode(response.body);
+        var message = map['Message'];
+        Get.snackbar(
+          "Alert!",
+          "$message",
+          snackPosition: SnackPosition.TOP,
+        );
+        List<dynamic> data = map["Tickets"];
+        data.forEach((element) {
+          ticketRes.add(TicketResponse.fromJson(element));
+        });
+
+        _showSuccessAlert('$message: ${ticketRes[0].caseNumber}'); //Case_Number
+        /*{"Result":"Success","Message":"Existing [Ticket No: 172621] Open","Tickets":[{"Date_Entered":"2023-06-05 16:41:21","Subject":"Test","StoreName":"FW_952_Indira Nagar  100 Feet","Case_Number":"172621","Status":"Open","Department_Name":"Test Department","Issue":"","Description":"\n"}]}*/
+        // Navigator.pop(context);
+      } else {
+        setState(() {
+          loading = false;
+        });
+        // _showRetryAlert();
+        _showAlert(response.body);
       }
-    });
-
-    if (response.statusCode == 200) {
-      setState(() {
-        loading = false;
-      });
-
-      TicketResponse temp;
-      Map<String, dynamic> map = json.decode(response.body);
-      var message = map['Message'];
-      Get.snackbar(
-        "Alert!",
-        "$message",
-        snackPosition: SnackPosition.TOP,
-      );
-      List<dynamic> data = map["Tickets"];
-      data.forEach((element) {
-        ticketRes.add(TicketResponse.fromJson(element));
-      });
-
-      _showSuccessAlert('$message: ${ticketRes[0].caseNumber}'); //Case_Number
-      /*{"Result":"Success","Message":"Existing [Ticket No: 172621] Open","Tickets":[{"Date_Entered":"2023-06-05 16:41:21","Subject":"Test","StoreName":"FW_952_Indira Nagar  100 Feet","Case_Number":"172621","Status":"Open","Department_Name":"Test Department","Issue":"","Description":"\n"}]}*/
-      // Navigator.pop(context);
-    } else {
-      setState(() {
-        loading = false;
-      });
-      _showRetryAlert();
+    } catch (e) {
+      _showAlert(e.toString());
     }
   }
 
