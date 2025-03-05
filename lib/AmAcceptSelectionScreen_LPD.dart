@@ -872,7 +872,7 @@ class _AmAcceptSelectionScreen_LPDState
                                                 CrossAxisAlignment.start,
                                             children: [
                                               const Text(
-                                                'Please enter Seal Number',
+                                                'Enter your response here',
                                                 style: TextStyle(
                                                   fontSize: 16,
                                                 ),
@@ -1212,7 +1212,7 @@ class _AmAcceptSelectionScreen_LPDState
                                         if (checklist_Header_Status == "A") {
                                           sendData__();
                                         } else {
-                                          sendData();
+                                          sendData__();
                                         }
                                         setState(() {
                                           showPopUp = false;
@@ -1995,7 +1995,42 @@ class _AmAcceptSelectionScreen_LPDState
       // }
       //
 
-      if (selectAll) {
+    if(checklist_Header_Status=="R"){
+      for (int i = 0; i < mHeaderQuestionRM.length; i++) {
+        // print('mAmHeaderQuestion[i]');
+        // print(mAmHeaderQuestion[i]);
+        // int pos = mAmHeaderQuestion[i];
+        params.add({
+          "lpd_checklist_assign_id": mHeaderQuestionRM.isEmpty
+              ? 0
+              : mHeaderQuestionRM[i].lpdChecklistAssignId,
+          "checklist_id": widget.activeCheckList.checklisTId,
+          "checklist_item_mst_id": mHeaderQuestionRM.isEmpty
+              ? 0
+              : mHeaderQuestionRM[i].checklisTItemMstId,
+          "checklist_Answer_Id": /* mAmHeaderQuestion[i].checkListDetails.isEmpty
+                ? 0
+                : */
+          mHeaderQuestionRM[i].checkListDetails[0].checklisTAnswerId,
+          "checklist_answer_option_id":
+          mHeaderQuestionRM[i].checkListDetails.isEmpty
+              ? 0
+              : mHeaderQuestionRM[i]
+              .checkListDetails[0]
+              .checklisTAnswerOptionId,
+          "approved_by": 0,
+          "approved_by_datetime": "",
+          "reviewed_by": userId,
+          "reviewed_by_datetime": datetime_,
+          "approved_by_remarks": "",
+          "rejected_by": 0,
+          "rejected_by_remarks": "",
+          "rejected_by_datetime": "",
+          "reviewed_by_remarks": "Reviewed by $userId",
+        });
+      }
+
+    } else if (selectAll) {
         for (int i = 0; i < mHeaderQuestionRM.length; i++) {
           // print('mAmHeaderQuestion[i]');
           // print(mAmHeaderQuestion[i]);

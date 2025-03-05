@@ -225,7 +225,7 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
       body: WillPopScope(
         onWillPop: () {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please complete CheckIn process')));
+              const SnackBar(content: Text('Please complete process')));
           return Future.value(false);
         },
         child: SafeArea(

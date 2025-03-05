@@ -541,85 +541,117 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
     if (summary != null) {
       Get.defaultDialog(
         title: "Audit Summary",
-        content: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Audit Start Time: ${summary.auditStartTime}"),
-              Text("Audit End Time: ${summary.auditEndTime}"),
-              const Divider(),
-              ...summary.sections.map((section) {
-                return Column(
+        content: SizedBox(
+          height: MediaQuery.of(context).size.height /
+              1.7, // Set a fixed height to allow scrolling
+          width: double.maxFinite, // Make sure it takes full width
+          child: Scrollbar(
+            thumbVisibility: true, // Always show the scrollbar
+
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: Text(
-                            "${section.sectionName}: ",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          flex:2,
-                            child: Text("Score: ${section.yourRatingScore}")),
-
+                        Text("Start: ${summary.auditStartTime}"),
+                        Text("End: ${summary.auditEndTime}"),
                       ],
                     ),
-                    // Text("Total Score: ${section.totalScore}"),
                     const Divider(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      // Ensures ListView takes only necessary space
+                      physics: const NeverScrollableScrollPhysics(),
+                      // Prevents ListView from scrolling separately
+                      itemCount: summary.sections.length,
+                      itemBuilder: (context, index) {
+                        final section = summary.sections[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    "${section.sectionName} ",
+                                    style: const TextStyle(
+                                        // fontWeight: FontWeight.bold,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    " Score: ${section.yourRatingScore}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Divider(),
+                          ],
+                        );
+                      },
+                    ),
+                    Text(
+                      "Your Score: ${summary.yourRatingScore}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    Text(
+                      "Percentage: ${summary.percentage}%",
+                      style: const TextStyle(
+                          fontSize: 13),
+                    ),
                   ],
-                );
-              }).toList(),
-              // Text(
-              //   "Total Score: ${summary.totalScore}",
-              //   style: TextStyle(fontWeight: FontWeight.bold),
-              // ),
-              Text(
-                "Your Score: ${summary.yourRatingScore}",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              Text("Percentage: ${summary.percentage}%"),
-            ],
+            ),
           ),
         ),
         textConfirm: "Continue",
         textCancel: "Cancel",
         confirmTextColor: Colors.white,
-        cancelTextColor:Colors.white ,
+        cancelTextColor: Colors.white,
         confirm: InkWell(
-          onTap: (){
+          onTap: () {
             submitAllDilo();
             Get.back(); // Close dialog
-
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 6),
-            decoration: BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(16)),
-            child: const Text('Continue',style: TextStyle(color: Colors.white),),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+                color: Colors.green, borderRadius: BorderRadius.circular(16)),
+            child:
+            const Text('Continue', style: TextStyle(color: Colors.white)),
           ),
         ),
         cancel: InkWell(
-          onTap: (){
+          onTap: () {
             Get.back(); // Close dialog
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 6),
-            decoration: BoxDecoration(color: Colors.grey,borderRadius: BorderRadius.circular(16)),
-            child: const Text('Cancel',style: TextStyle(color: Colors.white),),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+                color: Colors.grey, borderRadius: BorderRadius.circular(16)),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
           ),
         ),
         onConfirm: () {
           Get.back(); // Close dialog
-          // Add your 'Continue' action here
         },
         onCancel: () {
-          // Add your 'Cancel' action here if needed
+          Get.back(); // Close dialog
+
         },
       );
     } else {
-      // Handle the case when data is null
       Get.snackbar(
         "Error",
         "Failed to load audit summary.",
@@ -627,6 +659,7 @@ class _checkListItemScreen_AMState extends State<checkListItemScreen_AM>
       );
     }
   }
+
   Future<AuditSummary?> fetchAuditSummary() async {
     final response = await http.get(
       Uri.parse('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/AreaManager/GetAreamanagerSummary/${widget.activeCheckList.amChecklistAssignId}'),

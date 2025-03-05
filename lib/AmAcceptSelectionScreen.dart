@@ -884,7 +884,7 @@ class _AmAcceptSelectionScreenState extends State<AmAcceptSelectionScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           const Text(
-                                            'Please enter Seal Number',
+                                            'Enter your response here',
                                             style: TextStyle(
                                               fontSize: 16,
                                             ),
@@ -1218,7 +1218,7 @@ class _AmAcceptSelectionScreenState extends State<AmAcceptSelectionScreen> {
                                         if (checklist_Header_Status == "A") {
                                           sendData__();
                                         } else {
-                                          sendData();
+                                          sendData__();
                                         }
                                         setState(() {
                                           showPopUp = false;
@@ -1584,7 +1584,41 @@ class _AmAcceptSelectionScreenState extends State<AmAcceptSelectionScreen> {
 
       var params = [];
 
-      if (headerQuestionSelected_.isNotEmpty ||
+    if(checklist_Header_Status == "R"){
+      for (int i = 0; i < mAmHeaderQuestion.length; i++) {
+        // print('mAmHeaderQuestion[i]');
+        // print(mAmHeaderQuestion[i]);
+        // int pos = mAmHeaderQuestion[i];
+        params.add({
+          "checklist_assign_id": mAmHeaderQuestion.isEmpty
+              ? 0
+              : mAmHeaderQuestion[i].checklistAssignId,
+          "checklist_id": widget.activeCheckList.checklisTId,
+          "checklist_item_mst_id": mAmHeaderQuestion.isEmpty
+              ? 0
+              : mAmHeaderQuestion[i].checklisTItemMstId,
+          "checklist_Answer_Id": mAmHeaderQuestion[i].checkListDetails.isEmpty
+              ? 0
+              : mAmHeaderQuestion[i].checkListDetails[0].checklisTAnswerId,
+          "checklist_answer_option_id":
+          mAmHeaderQuestion[i].checkListDetails.isEmpty
+              ? 0
+              : mAmHeaderQuestion[i]
+              .checkListDetails[0]
+              .checklisTAnswerOptionId,
+          "approved_by": 0,
+          "approved_by_datetime": "",
+          "reviewed_by": userId,
+          "reviewed_by_datetime": datetime_,
+          "approved_by_remarks": "",
+          "rejected_by": 0,
+          "rejected_by_remarks": "",
+          "rejected_by_datetime": "",
+          "reviewed_by_remarks": "Reviewed by $userId",
+        });
+      }
+
+    } else  if (headerQuestionSelected_.isNotEmpty ||
           mAmHeaderQuestion_notSelected.isNotEmpty) {
         for (int i = 0; i < headerQuestionSelected_.length; i++) {
           int pos = headerQuestionSelected_[i];

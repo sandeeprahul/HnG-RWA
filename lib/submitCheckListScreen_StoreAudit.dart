@@ -1464,7 +1464,7 @@ class _submitCheckListScreen_StoreAuditState
           loading = false;
         });
 
-        _showMyDialog("Something went wrong\nPlease contact it support ");
+        _showMyDialog("Something went wrong\nPlease contact it support\n${response.body}");
       }
     } catch (e) {
       setState(() {

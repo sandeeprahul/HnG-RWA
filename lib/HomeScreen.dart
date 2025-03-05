@@ -19,6 +19,7 @@ import 'PageProfile.dart';
 import 'PageRetail.dart';
 import 'common/constants.dart';
 import 'core/light_theme.dart';
+import 'data/AuditSummary.dart';
 import 'presentation/home/operations/operations_page.dart';
 
 void main() {
@@ -374,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     setState(() {
                                       comp = false;
                                     });
-
+                                    // showAuditSummaryDialog(context);
                                     Get.to(const WeCareScreen());
                                   },
                                 ),
@@ -498,43 +499,182 @@ class _HomeScreenState extends State<HomeScreen> {
       // _showRetryAlert(Constants.networkIssue);
     }
   }
+  void showAuditSummaryDialog(BuildContext context) async {
+    AuditSummary? summary = await fetchAuditSummary();
 
+    if (summary != null) {
+      Get.defaultDialog(
+        title: "Audit Summary",
+        content: SizedBox(
+          height: MediaQuery.of(context).size.height /
+              1.7, // Set a fixed height to allow scrolling
+          width: double.maxFinite, // Make sure it takes full width
+          child: Scrollbar(
+            thumbVisibility: true, // Always show the scrollbar
+
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Start: ${summary.auditStartTime}"),
+                        Text("End: ${summary.auditEndTime}"),
+                      ],
+                    ),
+                    const Divider(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      // Ensures ListView takes only necessary space
+                      physics: const NeverScrollableScrollPhysics(),
+                      // Prevents ListView from scrolling separately
+                      itemCount: summary.sections.length,
+                      itemBuilder: (context, index) {
+                        final section = summary.sections[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    "${section.sectionName} ",
+                                    style: const TextStyle(
+                                      // fontWeight: FontWeight.bold,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    " Score: ${section.yourRatingScore}",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Divider(),
+                          ],
+                        );
+                      },
+                    ),
+                    Text(
+                      "Your Score: ${summary.yourRatingScore}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    Text(
+                      "Percentage: ${summary.percentage}%",
+                      style: const TextStyle(
+                          fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        textConfirm: "Continue",
+        textCancel: "Cancel",
+        confirmTextColor: Colors.white,
+        cancelTextColor: Colors.white,
+        confirm: InkWell(
+          onTap: () {
+            // submitAllDilo();
+            Get.back(); // Close dialog
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+                color: Colors.green, borderRadius: BorderRadius.circular(16)),
+            child:
+            const Text('Continue', style: TextStyle(color: Colors.white)),
+          ),
+        ),
+        cancel: InkWell(
+          onTap: () {
+            Get.back(); // Close dialog
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+                color: Colors.grey, borderRadius: BorderRadius.circular(16)),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+          ),
+        ),
+        onConfirm: () {
+          Get.back(); // Close dialog
+        },
+        onCancel: () {
+          Get.back(); // Close dialog
+
+        },
+      );
+    } else {
+      Get.snackbar(
+        "Error",
+        "Failed to load audit summary.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<AuditSummary?> fetchAuditSummary() async {
+    final response = await http.get(
+      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/AreaManager/GetAreamanagerSummary/777052324900043'),
+    );
+
+    if (response.statusCode == 200) {
+      return AuditSummary.fromJson(jsonDecode(response.body));
+    } else {
+      // Handle the error accordingly
+      print('Failed to load audit summary');
+      return null;
+    }
+  }
   void _showImageAlert(BuildContext context, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content:  Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.network(
-                image,
-                loadingBuilder:(BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
-                  if (loadingProgress == null) {
-                    return child;
-                  } else {
-                    return  Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                        Text('Please wait while image loading',style: lightTheme.textTheme.labelSmall!.copyWith(fontSize: 12),)
-                      ],
-                    ); // Show loading indicator
-                  }
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.network(image, loadingBuilder: (BuildContext context,
+                  Widget child, ImageChunkEvent? loadingProgress) {
+                if (loadingProgress == null) {
+                  return child;
+                } else {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                      Text(
+                        'Please wait while image loading',
+                        style: lightTheme.textTheme.labelSmall!
+                            .copyWith(fontSize: 12),
+                      )
+                    ],
+                  ); // Show loading indicator
                 }
-            ),
-            const SizedBox(height: 16),
-            CustomElevatedButton(
-                text: 'Close',
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                }),
-          ],
-        ),
+              }),
+              const SizedBox(height: 16),
+              CustomElevatedButton(
+                  text: 'Close',
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  }),
+            ],
+          ),
         );
       },
     );
@@ -561,6 +701,8 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
+
 
   BottomNavigationBarItem buildBottomNavigationBarItem(
       IconData icon, String label) {
@@ -605,7 +747,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 text: 'Retry',
                 onPressed: () {
                   Navigator.of(context).pop();
-
                 }),
           ],
         );

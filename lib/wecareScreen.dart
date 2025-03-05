@@ -256,6 +256,9 @@ class _WeCareScreenState extends State<WeCareScreen> {
                   _showAlert('Please select department');
                 } else if (issue_ == 'Select issue') {
                   _showAlert('Please select issue');
+                }else if (selectedWeCareLocation==null){
+                  _showAlert('Please select location');
+
                 } else {
                   sendData();
                 }
@@ -633,14 +636,16 @@ class _WeCareScreenState extends State<WeCareScreen> {
           wecareLocations.add(WeCareLocation.fromJson(element));
         }
         print("wecareLocations--->${wecareLocations.length}");
-        for (int i = 0; i < wecareLocations.length; i++) {
+      /*  for (int i = 0; i < wecareLocations.length; i++) {
           if (wecareLocations[i].weCareFlag == "1") {
             setState(() {
               weCareLocation = wecareLocations[i].locationName;
+              selectedWeCareLocation =
+              wecareLocations[i];
             });
           }
           break;
-        }
+        }*/
         return locationList
             .map((location) => WeCareLocation.fromJson(location))
             .toList();
@@ -675,8 +680,8 @@ class _WeCareScreenState extends State<WeCareScreen> {
       var wecare_location_code = pref.getString('wecare_location_code');
 
       var url = Uri.https(
-        'hg.bpm360.net',
-        '/mycodes/create_ticket_api.php',
+        'hgnew.bpm360.net',
+        '/create_ticket_api.php',
       );
 
       var response = await http.post(
@@ -725,30 +730,48 @@ class _WeCareScreenState extends State<WeCareScreen> {
           loading = false;
         });
 
+
         TicketResponse temp;
         Map<String, dynamic> map = json.decode(response.body);
-        var message = map['Message'];
-        Get.snackbar(
-          "Alert!",
-          "$message",
-          snackPosition: SnackPosition.TOP,
-        );
-        List<dynamic> data = map["Tickets"];
-        data.forEach((element) {
-          ticketRes.add(TicketResponse.fromJson(element));
-        });
+        if(map['status']!="Failure"){
+          var message = map['Message'];
+          Get.snackbar(
+            "Alert!",
+            "$message",
+            snackPosition: SnackPosition.TOP,
+          );
+          List<dynamic> data = map["Tickets"];
+          data.forEach((element) {
+            ticketRes.add(TicketResponse.fromJson(element));
+          });
 
-        _showSuccessAlert('$message: ${ticketRes[0].caseNumber}'); //Case_Number
-        /*{"Result":"Success","Message":"Existing [Ticket No: 172621] Open","Tickets":[{"Date_Entered":"2023-06-05 16:41:21","Subject":"Test","StoreName":"FW_952_Indira Nagar  100 Feet","Case_Number":"172621","Status":"Open","Department_Name":"Test Department","Issue":"","Description":"\n"}]}*/
-        // Navigator.pop(context);
+          _showSuccessAlert('$message: ${ticketRes[0].caseNumber}'); //Case_Number
+          /*{"Result":"Success","Message":"Existing [Ticket No: 172621] Open","Tickets":[{"Date_Entered":"2023-06-05 16:41:21","Subject":"Test","StoreName":"FW_952_Indira Nagar  100 Feet","Case_Number":"172621","Status":"Open","Department_Name":"Test Department","Issue":"","Description":"\n"}]}*/
+          // Navigator.pop(context);
+        }else{
+          setState(() {
+            loading = false;
+          });
+          _showAlert("${map["message"]}\nStoreCode: ${map["provided_store_code"]}");
+
+        }
+
       } else {
         setState(() {
           loading = false;
         });
+        print(response.body);
+        print(response.statusCode);
+
         // _showRetryAlert();
         _showAlert(response.body);
       }
     } catch (e) {
+      print(e);
+
+      setState(() {
+        loading = false;
+      });
       _showAlert(e.toString());
     }
   }

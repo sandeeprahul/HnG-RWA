@@ -315,7 +315,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
                                           contentPadding: EdgeInsets.zero,
                                           border: InputBorder.none,
                                           hintText:
-                                              'Please enter the seal number',
+                                              'Enter your response here',
                                         ),
                                       ),
                                     ))

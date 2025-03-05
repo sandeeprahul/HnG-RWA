@@ -483,7 +483,7 @@ class _PageHomeState extends State<PageHome> {
 
             const ProductQuickEnquiryWidget(),
 
-            const ScanQrWidget(),
+            // const ScanQrWidget(),
             const Divider(),
 
             Align(

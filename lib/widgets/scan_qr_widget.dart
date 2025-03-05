@@ -12,10 +12,10 @@ class ScanQrWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const ScanQrPage()));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => const ScanQrPage()));
       },
       child: Container(
         margin: const EdgeInsets.only(
@@ -23,7 +23,7 @@ class ScanQrWidget extends StatelessWidget {
         padding: const EdgeInsets.only(
             left: 15, right: 15, top: 15, bottom: 10),
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.grey.shade100,
             borderRadius: const BorderRadius.all(Radius.circular(15)),
             boxShadow: [
               BoxShadow(

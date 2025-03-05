@@ -318,7 +318,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
                                           contentPadding: EdgeInsets.zero,
                                           border: InputBorder.none,
                                           hintText:
-                                              'Please enter the seal number',
+                                              'Enter your response here',
                                         ),
                                       ),
                                     ))

@@ -101,7 +101,6 @@ class _AmAcceptSelectionScreen_AMState
     mAmHeaderQuestion_notSelected.clear();
     mAmHeaderQuestion.clear();
     clearData();
-
   }
 
   clearData() {
@@ -116,8 +115,6 @@ class _AmAcceptSelectionScreen_AMState
     CompltedCount = 0;
     complanceFlgLength = 0;
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -144,8 +141,8 @@ class _AmAcceptSelectionScreen_AMState
     return Scaffold(
         backgroundColor: Colors.grey[50],
         body: WillPopScope(
-          onWillPop: (){
-            if(showCheckListDetails==true){
+          onWillPop: () {
+            if (showCheckListDetails == true) {
               setState(() {
                 showCheckListDetails = false;
               });
@@ -187,7 +184,8 @@ class _AmAcceptSelectionScreen_AMState
                           children: [
                             Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.only(left: 15, top: 10),
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
                                 child: Column(
                                   // mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
@@ -304,12 +302,12 @@ class _AmAcceptSelectionScreen_AMState
                                   : true,
                           child: InkWell(
                             onTap: () {
-                              if(showSelectAll ==false){
+                              if (showSelectAll == false) {
                                 setState(() {
                                   showSelectAll = true;
                                   // signleSelection = false;
                                 });
-                              }else{
+                              } else {
                                 setState(() {
                                   showSelectAll = false;
                                   // signleSelection = false;
@@ -420,8 +418,8 @@ class _AmAcceptSelectionScreen_AMState
                                 ),
                                 const Text(
                                   'Select all',
-                                  style:
-                                      TextStyle(fontSize: 12, color: Colors.grey),
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
                                 ),
                                 const Spacer(),
                                 const Text(
@@ -455,7 +453,8 @@ class _AmAcceptSelectionScreen_AMState
                             DateTime parseDate =
                                 new DateFormat("dd-MM-yyyy hh:mm:ss").parse(
                                     mAmHeaderQuestion[pos].updatedByDatetime);
-                            var inputDate = DateTime.parse(parseDate.toString());
+                            var inputDate =
+                                DateTime.parse(parseDate.toString());
                             var outputFormat = DateFormat('hh:mm a');
                             var time_ = outputFormat.format(inputDate);
 
@@ -560,7 +559,8 @@ class _AmAcceptSelectionScreen_AMState
                                                         fontSize: 13,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        color: Colors.grey[600]),
+                                                        color:
+                                                            Colors.grey[600]),
                                                   ),
                                                   const SizedBox(
                                                     height: 5,
@@ -577,7 +577,8 @@ class _AmAcceptSelectionScreen_AMState
                                                           '${mAmHeaderQuestion[pos].updatedBy} - ${mAmHeaderQuestion[pos].updated_By_Name}',
                                                           style: const TextStyle(
                                                               fontSize: 14,
-                                                              color: Colors.black,
+                                                              color:
+                                                                  Colors.black,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold)),
@@ -591,13 +592,16 @@ class _AmAcceptSelectionScreen_AMState
                                                       Text(
                                                           mAmHeaderQuestion[pos]
                                                               .checklistProgressStatus,
-                                                          style: const TextStyle(
-                                                              fontSize: 12,
-                                                              color:
-                                                                  Colors.green)),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .green)),
                                                       Text(' ' + time_,
-                                                          style: const TextStyle(
-                                                              fontSize: 12)),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      12)),
                                                     ],
                                                   ),
                                                 ],
@@ -618,9 +622,10 @@ class _AmAcceptSelectionScreen_AMState
                                   ),
                                   Visibility(
                                     visible: checklist_Header_Status == "E" ||
-                                                checklist_Header_Status == "R" || checklist_Header_Status == "A"
-                                            ? true
-                                            : false,
+                                            checklist_Header_Status == "R" ||
+                                            checklist_Header_Status == "A"
+                                        ? true
+                                        : false,
                                     child: Align(
                                       alignment: Alignment.topRight,
                                       child: Padding(
@@ -628,7 +633,8 @@ class _AmAcceptSelectionScreen_AMState
                                             right: 35, top: 10),
                                         child: CircleAvatar(
                                           radius: 4.5,
-                                          backgroundColor: mAmHeaderQuestion[pos]
+                                          backgroundColor: mAmHeaderQuestion[
+                                                          pos]
                                                       .non_compliance_flag ==
                                                   "1"
                                               ? Colors.red
@@ -649,7 +655,11 @@ class _AmAcceptSelectionScreen_AMState
                   ],
                 ),
                 Visibility(
-                  visible: checklist_Header_Status == "A"? showSelectAll==true?true:false:true,
+                  visible: checklist_Header_Status == "A"
+                      ? showSelectAll == true
+                          ? true
+                          : false
+                      : true,
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: InkWell(
@@ -725,7 +735,8 @@ class _AmAcceptSelectionScreen_AMState
                                   width: double.infinity,
                                   color: Colors.white,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         color: Colors.white,
@@ -787,7 +798,8 @@ class _AmAcceptSelectionScreen_AMState
                                                             fontSize: 14,
                                                             color: Colors.black,
                                                             fontWeight:
-                                                                FontWeight.bold)),
+                                                                FontWeight
+                                                                    .bold)),
                                                   ],
                                                 ),
                                                 const SizedBox(
@@ -803,7 +815,8 @@ class _AmAcceptSelectionScreen_AMState
                                                             : '',
                                                         style: const TextStyle(
                                                             fontSize: 12,
-                                                            color: Colors.green)),
+                                                            color:
+                                                                Colors.green)),
                                                     Text(
                                                         mAmHeaderQuestion
                                                                     .length !=
@@ -834,7 +847,8 @@ class _AmAcceptSelectionScreen_AMState
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 const Divider(),
-                                                Text(mAmHeaderQuestion.length != 0
+                                                Text(mAmHeaderQuestion.length !=
+                                                            0
                                                         ? checkListName
                                                         : ''
                                                     /*mAmHeaderQuestion.length != 0
@@ -849,7 +863,8 @@ class _AmAcceptSelectionScreen_AMState
                                                       ? chooseTheAns_answer
                                                       : '',
                                                   style: const TextStyle(
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       fontSize: 16),
                                                 ),
                                                 const Divider(),
@@ -884,7 +899,8 @@ class _AmAcceptSelectionScreen_AMState
                                                     height: 75,
                                                     width: 75,
                                                     child: Image.network(
-                                                        attachProofImg.isNotEmpty
+                                                        attachProofImg
+                                                                .isNotEmpty
                                                             ? attachProofImg
                                                             : ''),
                                                     /* CachedNetworkImage(
@@ -901,7 +917,8 @@ class _AmAcceptSelectionScreen_AMState
                                           )),
                                       const Divider(),
                                       Visibility(
-                                          visible: answer_TypeId, //answer_type_id
+                                          visible: answer_TypeId,
+                                          //answer_type_id
                                           child: Container(
                                             margin: const EdgeInsets.only(
                                                 top: 5, bottom: 5),
@@ -910,7 +927,7 @@ class _AmAcceptSelectionScreen_AMState
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 const Text(
-                                                  'Please enter Seal Number',
+                                                  'Enter your response here',
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                   ),
@@ -951,13 +968,15 @@ class _AmAcceptSelectionScreen_AMState
                                                 MaterialPageRoute(
                                                     builder: (context) =>
                                                         submitCheckListScreen_AM(
-                                                            headerQuestion[
-                                                                index_],
-                                                            widget
-                                                                .activeCheckList,
-                                                            1,
-                                                            widget
-                                                                .mLpdChecklist,headerQuestion, position: index_,)),
+                                                          headerQuestion[
+                                                              index_],
+                                                          widget
+                                                              .activeCheckList,
+                                                          1,
+                                                          widget.mLpdChecklist,
+                                                          headerQuestion,
+                                                          position: index_,
+                                                        )),
                                               ).then((value) {
                                                 getData();
                                                 getDataCheckList();
@@ -982,8 +1001,8 @@ class _AmAcceptSelectionScreen_AMState
                                                         color: Colors.white),
                                                   ),
                                                   Padding(
-                                                    padding:
-                                                        EdgeInsets.only(left: 3),
+                                                    padding: EdgeInsets.only(
+                                                        left: 3),
                                                     child: Icon(
                                                       Icons
                                                           .arrow_forward_ios_outlined,
@@ -1036,7 +1055,8 @@ class _AmAcceptSelectionScreen_AMState
                                 const Text(
                                   'Are you sure you want to approve this:',
                                   style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(
                                   height: 20,
@@ -1048,9 +1068,10 @@ class _AmAcceptSelectionScreen_AMState
                                     Row(
                                       children: [
                                         Container(
-                                            color: Colors.green.withOpacity(0.5),
-                                            margin:
-                                                const EdgeInsets.only(right: 10),
+                                            color:
+                                                Colors.green.withOpacity(0.5),
+                                            margin: const EdgeInsets.only(
+                                                right: 10),
                                             padding: const EdgeInsets.all(5),
                                             width: 45,
                                             child: Center(
@@ -1076,8 +1097,8 @@ class _AmAcceptSelectionScreen_AMState
                                       children: [
                                         Container(
                                             color: Colors.red.withOpacity(0.5),
-                                            margin:
-                                                const EdgeInsets.only(right: 10),
+                                            margin: const EdgeInsets.only(
+                                                right: 10),
                                             width: 45,
                                             padding: const EdgeInsets.all(5),
                                             child: Center(
@@ -1107,12 +1128,14 @@ class _AmAcceptSelectionScreen_AMState
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
                                           '${nonCompFlag_O.length}',
                                           style: const TextStyle(
-                                              fontSize: 20, color: Colors.green),
+                                              fontSize: 20,
+                                              color: Colors.green),
                                         ),
                                         const SizedBox(
                                           width: 5,
@@ -1124,7 +1147,8 @@ class _AmAcceptSelectionScreen_AMState
                                       ],
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
                                           '${nonCompFlag.length}',
@@ -1150,12 +1174,14 @@ class _AmAcceptSelectionScreen_AMState
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
                                           '$CompltedCount',
                                           style: const TextStyle(
-                                              fontSize: 20, color: Colors.green),
+                                              fontSize: 20,
+                                              color: Colors.green),
                                         ),
                                         const SizedBox(
                                           width: 5,
@@ -1167,7 +1193,8 @@ class _AmAcceptSelectionScreen_AMState
                                       ],
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
                                           '$pendingCount',
@@ -1223,7 +1250,7 @@ class _AmAcceptSelectionScreen_AMState
                                         if (checklist_Header_Status == "A") {
                                           sendData__();
                                         } else {
-                                          sendData();
+                                          sendData__();
                                         }
                                         setState(() {
                                           showPopUp = false;
@@ -1244,7 +1271,8 @@ class _AmAcceptSelectionScreen_AMState
                                         child: const Text(
                                           'Yes,approve',
                                           style: TextStyle(
-                                              color: Colors.white, fontSize: 14),
+                                              color: Colors.white,
+                                              fontSize: 14),
                                         ),
                                       ),
                                     ),
@@ -1350,7 +1378,6 @@ class _AmAcceptSelectionScreen_AMState
       overallScore = [];
       nonCompFlag = [];
       nonCompFlag_O = [];
-
 
       for (int i = 0; i < mAmHeaderQuestion.length; i++) {
         setState(() {
@@ -1579,9 +1606,9 @@ class _AmAcceptSelectionScreen_AMState
       var userId = prefs.getString('userCode');
       // String url = staticUrlString + "Login/validateLogin";
       //RWASTAFFMOVEMENT_TEST/api/
-       var url = Uri.https(
-      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWASTAFFMOVEMENT_TEST/api/AreaManager/QuestionUpdate',
+      var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/QuestionUpdate',
       );
 
       var params = [];
@@ -1729,7 +1756,41 @@ class _AmAcceptSelectionScreen_AMState
       //   }
       // }
 
-      if (selectedAll) {
+      if (checklist_Header_Status == "R") {
+        for (int i = 0; i < mAmHeaderQuestion.length; i++) {
+          // print('mAmHeaderQuestion[i]');
+          // print(mAmHeaderQuestion[i]);
+          // int pos = mAmHeaderQuestion[i];
+          params.add({
+            "lpd_checklist_assign_id": mAmHeaderQuestion.isEmpty
+                ? 0
+                : mAmHeaderQuestion[i].checklistAssignId,
+            "checklist_id": widget.activeCheckList.checklisTId,
+            "checklist_item_mst_id": mAmHeaderQuestion.isEmpty
+                ? 0
+                : mAmHeaderQuestion[i].checklisTItemMstId,
+            "checklist_Answer_Id": /* mAmHeaderQuestion[i].checkListDetails.isEmpty
+                ? 0
+                : */
+                mAmHeaderQuestion[i].checkListDetails[0].checklisTAnswerId,
+            "checklist_answer_option_id":
+                mAmHeaderQuestion[i].checkListDetails.isEmpty
+                    ? 0
+                    : mAmHeaderQuestion[i]
+                        .checkListDetails[0]
+                        .checklisTAnswerOptionId,
+            "approved_by": 0,
+            "approved_by_datetime": "",
+            "reviewed_by": userId,
+            "reviewed_by_datetime": datetime_,
+            "approved_by_remarks": "",
+            "rejected_by": 0,
+            "rejected_by_remarks": "",
+            "rejected_by_datetime": "",
+            "reviewed_by_remarks": "Reviewed by $userId",
+          });
+        }
+      } else if (selectedAll) {
         for (int i = 0; i < mAmHeaderQuestion.length; i++) {
           // print('mAmHeaderQuestion[i]');
           // print(mAmHeaderQuestion[i]);
@@ -1996,9 +2057,9 @@ class _AmAcceptSelectionScreen_AMState
     final payload =
         '{"checklist_assign_id":${widget.activeCheckList.amChecklistAssignId}}';
 
-     var url = Uri.https(
-        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWASTAFFMOVEMENT_TEST/api/AreaManager/WorkFlowStatus',
+    var url = Uri.https(
+      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+      '/RWASTAFFMOVEMENT_TEST/api/AreaManager/WorkFlowStatus',
     );
 
     var response = await http.post(

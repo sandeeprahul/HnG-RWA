@@ -1431,7 +1431,8 @@ class _AmAcceptSelectionScreen_EmployeeState
                                           //A
                                           sendData__();
                                         } else {
-                                          sendData();
+                                          sendData__();
+                                          // sendData();
                                         }
                                         setState(() {
                                           showPopUp = false;
@@ -1796,7 +1797,40 @@ class _AmAcceptSelectionScreen_EmployeeState
       print("mAmHeaderQuestion.length");
       print(mAmHeaderQuestion.length);
 
-      if (selectedAll) {
+      if( checklist_Header_Status == "R"){
+        for (int i = 0; i < mAmHeaderQuestion.length; i++) {
+          params.add({
+            "emp_checklist_assign_id": mAmHeaderQuestion.isEmpty
+                ? 0
+                : mAmHeaderQuestion[i].empChecklistAssignId,
+            "checklist_id": widget.activeCheckList.checklisTId,
+            "checklist_item_mst_id": mAmHeaderQuestion.isEmpty
+                ? 0
+                : mAmHeaderQuestion[i].checklisTItemMstId,
+            "checklist_Answer_Id":  mAmHeaderQuestion[i].checkListDetails.isEmpty
+                ? 0
+                :
+            mAmHeaderQuestion[i].checkListDetails[0].checklisTAnswerId,
+            "checklist_answer_option_id":
+            mAmHeaderQuestion[i].checkListDetails.isEmpty
+                ? 0
+                : mAmHeaderQuestion[i]
+                .checkListDetails[0]
+                .checklisTAnswerOptionId,
+            "approved_by": 0,
+            "approved_by_datetime": '',
+            "reviewed_by": userId,
+            "reviewed_by_datetime": datetime_,
+            "approved_by_remarks": "",
+            "rejected_by": 0,
+            "rejected_by_remarks": "",
+            "rejected_by_datetime": "",
+            "reviewed_by_remarks": "Reviewed by $userId",
+          });
+        }
+
+      }
+   else   if (selectedAll) {
         for (int i = 0; i < mAmHeaderQuestion.length; i++) {
           params.add({
             "emp_checklist_assign_id": mAmHeaderQuestion.isEmpty
@@ -1827,7 +1861,8 @@ class _AmAcceptSelectionScreen_EmployeeState
             "reviewed_by_remarks": "",
           });
         }
-      } else if (!selectedAll &&
+      }
+      else if (!selectedAll &&
           headerQuestionSelected_.isEmpty &&
           mAmHeaderQuestion_notSelected.isNotEmpty) {
         for (int i = 0; i < mAmHeaderQuestion.length; i++) {
@@ -1863,7 +1898,8 @@ class _AmAcceptSelectionScreen_EmployeeState
             "reviewed_by_remarks": "",
           });
         }
-      } else {
+      }
+      else {
         if (headerQuestionSelected_.isNotEmpty ||
             mAmHeaderQuestion_notSelected.isNotEmpty) {
           for (int i = 0; i < headerQuestionSelected_.length; i++) {
@@ -1978,7 +2014,7 @@ class _AmAcceptSelectionScreen_EmployeeState
         });
         sendData__();
       }*/
-      _showRetryAlert("Something went wrong\nPlease Contact IT support");
+      _showRetryAlert("Something went wrong\nPlease Contact IT support\n$e");
     }
   }
 
