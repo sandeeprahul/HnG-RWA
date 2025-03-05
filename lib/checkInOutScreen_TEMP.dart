@@ -74,6 +74,8 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
 
   bool showLocationList = false;
   UserLocations? selectedLocation;
+  TextEditingController searchController = TextEditingController();
+  List<UserLocations> filteredLocations = [];
 
   var imageEncoded;
   bool successPopUp = false;
@@ -231,389 +233,6 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
         child: SafeArea(
             child: Stack(
           children: [
-            // Column(
-            //   children: [
-            //     Padding(
-            //       padding: const EdgeInsets.only(bottom: 20, top: 15),
-            //       child: Stack(
-            //         // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //         children: [
-            //           Align(
-            //             alignment: Alignment.topLeft,
-            //             child: InkWell(
-            //               onTap: () {
-            //                 Navigator.pop(context);
-            //               },
-            //               child: const Padding(
-            //                 padding: EdgeInsets.only(left: 15),
-            //                 child: Icon(Icons.arrow_back),
-            //               ),
-            //             ),
-            //           ),
-            //           Align(
-            //             alignment: Alignment.center,
-            //             child: Padding(
-            //                 padding: const EdgeInsets.only(left: 20),
-            //                 child: RichText(
-            //                   text: TextSpan(children: <TextSpan>[
-            //                     TextSpan(
-            //                         text: widget.checkInoutType == 0
-            //                             ? 'Check In \n'
-            //                             : 'CheckOut\n',
-            //                         style: const TextStyle(
-            //                             fontSize: 18, color: Colors.black)),
-            //                     TextSpan(
-            //                         text: timeMin,
-            //                         style: const TextStyle(
-            //                             fontSize: 17, color: Colors.red))
-            //                   ]),
-            //                 )),
-            //           ),
-            //         ],
-            //       ),
-            //     ),
-            //
-            //     SizedBox(
-            //         height: 250,
-            //         child: Stack(
-            //           children: [
-            //             SizedBox(
-            //               height: 200,
-            //               child: Stack(
-            //                 children: [
-            //                   /*Image.asset(
-            //                       'assets/maps.jpeg',
-            //                       fit: BoxFit.cover,
-            //                       width: MediaQuery.of(context).size.width,
-            //                     ),*/
-            //                   Container(
-            //                     color: Colors.black26,
-            //                     child: GoogleMap(
-            //                       initialCameraPosition: CameraPosition(
-            //                         target: LatLng(lat_, lng_),
-            //                         zoom: 14.4746,
-            //                       ),
-            //                       onMapCreated:
-            //                           (GoogleMapController controller) {
-            //                         // _controller.complete(controller);
-            //                       },
-            //                       zoomControlsEnabled: false,
-            //                       myLocationEnabled: true,
-            //                       markers: <Marker>{
-            //                         Marker(
-            //                           markerId: const MarkerId('1'),
-            //                           position: LatLng(lat_, lng_),
-            //                         ),
-            //                       },
-            //                     ),
-            //                   ),
-            //                   Align(
-            //                     alignment: Alignment.bottomRight,
-            //                     child: InkWell(
-            //                       onTap: () {},
-            //                       child: Container(
-            //                         margin: const EdgeInsets.all(10),
-            //                         padding: const EdgeInsets.all(5),
-            //                         width: 80,
-            //                         decoration: const BoxDecoration(
-            //                           color: Colors.white,
-            //                           borderRadius:
-            //                               BorderRadius.all(Radius.circular(5)),
-            //                         ),
-            //                         child: const Row(
-            //                           mainAxisAlignment:
-            //                               MainAxisAlignment.center,
-            //                           children: [
-            //                             Icon(
-            //                               Icons.refresh,
-            //                               size: 20,
-            //                             ),
-            //                             Text(
-            //                               'Refresh',
-            //                               style: TextStyle(fontSize: 12),
-            //                             )
-            //                           ],
-            //                         ),
-            //                       ),
-            //                     ),
-            //                   )
-            //                 ],
-            //               ),
-            //             ),
-            //             Align(
-            //               alignment: Alignment.bottomCenter,
-            //               child: InkWell(
-            //                 onTap: () {
-            //                   // findUserGeoLoc();
-            //                   // getLocationStatus(1);
-            //                   // getlocation(1);
-            //                   setState(() {
-            //                     showLocationList = true;
-            //                   });
-            //                   // findUserGeoLoc(1);
-            //
-            //                   getTime();
-            //                 },
-            //                 child: SizedBox(
-            //                   height: 110,
-            //                   width: 120,
-            //                   child: Stack(
-            //                     children: [
-            //                       Container(
-            //                         color: Colors.white,
-            //                         child: _body(),
-            //                       ),
-            //                       const Align(
-            //                         alignment: Alignment.topRight,
-            //                         child: Padding(
-            //                           padding: EdgeInsets.all(5.0),
-            //                           child: Icon(
-            //                             Icons.camera_alt,
-            //                             color: Colors.white,
-            //                           ),
-            //                         ),
-            //                       ),
-            //                     ],
-            //                   ),
-            //                 ),
-            //               ),
-            //             ),
-            //           ],
-            //         )),
-            //     Center(
-            //       child: Padding(
-            //         padding:
-            //             const EdgeInsets.only(top: 10, left: 15, right: 10),
-            //         child: Column(
-            //           children: [
-            //             const Visibility(
-            //               visible: false,
-            //               child: Padding(
-            //                 padding: EdgeInsets.only(top: 5, bottom: 5),
-            //                 child: Text(
-            //                   'User - Profile Matched',
-            //                   style: TextStyle(
-            //                       fontWeight: FontWeight.bold,
-            //                       fontSize: 16,
-            //                       color: Colors.green),
-            //                 ),
-            //               ),
-            //             ),
-            //             /* Text(
-            //                     timeMin,
-            //                     style: TextStyle(
-            //                         fontWeight: FontWeight.bold,
-            //                         color: Colors.green,
-            //                         fontSize: 16),
-            //                   ),*/
-            //             const SizedBox(
-            //               height: 10,
-            //             ),
-            //             const Row(
-            //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //               children: [
-            //                 Column(
-            //                   children: [
-            //                     Text(
-            //                       'Shift',
-            //                       style: TextStyle(
-            //                           fontSize: 16, color: Color(0xFF757575)),
-            //                     ),
-            //                     SizedBox(
-            //                       height: 5,
-            //                     ),
-            //                     Text('General Shift',
-            //                         style: TextStyle(
-            //                           fontSize: 16,
-            //                           color: Colors.black,
-            //                         ))
-            //                   ],
-            //                 ),
-            //                 Column(
-            //                   children: [
-            //                     Text('Time',
-            //                         style: TextStyle(
-            //                             fontSize: 16,
-            //                             color: Color(0xFF757575))),
-            //                     SizedBox(
-            //                       height: 5,
-            //                     ),
-            //                     Text('09:30AM To 07:00PM',
-            //                         style: TextStyle(
-            //                           fontSize: 16,
-            //                           color: Colors.black,
-            //                         ))
-            //                   ],
-            //                 ),
-            //               ],
-            //             ),
-            //             const SizedBox(
-            //               height: 7,
-            //             ),
-            //             const Divider(),
-            //             const SizedBox(
-            //               height: 7,
-            //             ),
-            //             Column(
-            //               // mainAxisAlignment: MainAxisAlignment.start,
-            //               children: [
-            //                 const Align(
-            //                   alignment: Alignment.topLeft,
-            //                   child: Text(
-            //                     'Attendance Type',
-            //                     style: TextStyle(
-            //                         fontSize: 16,
-            //                         color: Colors.black,
-            //                         fontWeight: FontWeight.bold),
-            //                   ),
-            //                 ),
-            //                 const SizedBox(
-            //                   height: 7,
-            //                 ),
-            //                 Container(
-            //                   margin: const EdgeInsets.only(bottom: 15, top: 7),
-            //                   padding: const EdgeInsets.all(5),
-            //                   decoration: BoxDecoration(
-            //                       borderRadius: const BorderRadius.all(
-            //                           Radius.circular(5)),
-            //                       border: Border.all(color: Colors.grey)),
-            //                   child: InkWell(
-            //                     onTap: () {
-            //                       // popupAttendence();
-            //                       setState(() {
-            //                         // showpopup = true;
-            //                         showAtdncTypePopup = true;
-            //                       });
-            //                     },
-            //                     child: Row(
-            //                       children: [
-            //                         Expanded(
-            //                             child: Padding(
-            //                           padding: const EdgeInsets.only(left: 5),
-            //                           child: Text(dropdownText),
-            //                         )),
-            //                         const Icon(Icons.keyboard_arrow_down),
-            //                       ],
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ],
-            //             ),
-            //           ],
-            //         ),
-            //       ),
-            //     ),
-            //
-            //     // _body(),
-            //   ],
-            // ),
-            // Visibility(
-            //   visible: showAtdncTypePopup,
-            //   child: Container(
-            //     color: const Color(0x80000000),
-            //     child: Column(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       children: [
-            //         Container(
-            //           margin: const EdgeInsets.all(10),
-            //           padding: const EdgeInsets.only(
-            //               left: 15, top: 10, bottom: 15, right: 15),
-            //           color: Colors.white,
-            //           child: Column(
-            //             crossAxisAlignment: CrossAxisAlignment.start,
-            //             children: [
-            //               const Align(
-            //                   alignment: Alignment.center,
-            //                   child: Padding(
-            //                     padding: EdgeInsets.all(5),
-            //                     child: Text(
-            //                       'Select Attendance Type',
-            //                       style: TextStyle(
-            //                           fontSize: 18, color: Colors.black),
-            //                     ),
-            //                   )),
-            //               const Divider(),
-            //               ListView.separated(
-            //                 shrinkWrap: true,
-            //                 itemCount: typeAttencenceList.length,
-            //                 itemBuilder: (context, pos) {
-            //                   return Padding(
-            //                     padding: const EdgeInsets.only(
-            //                         top: 7, bottom: 7, left: 10),
-            //                     child: InkWell(
-            //                       onTap: () {
-            //                         setState(() {
-            //                           dropdownText = typeAttencenceList[pos];
-            //                           showAtdncTypePopup = false;
-            //                         });
-            //                         print(typeAttencenceList[pos]);
-            //                       },
-            //                       child: Text(typeAttencenceList[pos],
-            //                           style: const TextStyle(
-            //                             fontSize: 18,
-            //                             color: Colors.black87,
-            //                           )),
-            //                     ),
-            //                   );
-            //                 },
-            //                 separatorBuilder:
-            //                     (BuildContext context, int index) {
-            //                   return const Divider();
-            //                 },
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            // Visibility(visible: successPopUp, child: loginSuccess()),
-
-            // Visibility(
-            //     visible: showProgress,
-            //     child: Container(
-            //       color: const Color(0x80000000),
-            //       child: Center(
-            //           child: Container(
-            //               decoration: BoxDecoration(
-            //                   color: Colors.white,
-            //                   borderRadius: BorderRadius.circular(5)),
-            //               padding: const EdgeInsets.all(20),
-            //               height: 115,
-            //               width: 150,
-            //               child: const Column(
-            //                 children: [
-            //                   CircularProgressIndicator(),
-            //                   Padding(
-            //                     padding: EdgeInsets.all(8.0),
-            //                     child: Text('Please wait..'),
-            //                   )
-            //                 ],
-            //               ))),
-            //     )),
-            // Visibility(
-            //     visible: loading,
-            //     child: Container(
-            //       color: const Color(0x80000000),
-            //       child: Center(
-            //           child: Container(
-            //               decoration: BoxDecoration(
-            //                   color: Colors.white,
-            //                   borderRadius: BorderRadius.circular(5)),
-            //               padding: const EdgeInsets.all(20),
-            //               height: 115,
-            //               width: 200,
-            //               child: const Column(
-            //                 children: [
-            //                   CircularProgressIndicator(),
-            //                   Padding(
-            //                     padding: EdgeInsets.all(8.0),
-            //                     child: Text('Getting location..'),
-            //                   )
-            //                 ],
-            //               ))),
-            //     )),
             Container(
               color: Colors.white,
               height: MediaQuery.of(context).size.height,
@@ -705,7 +324,7 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
                           borderRadius: BorderRadius.circular(10)),
 
                       // width: MediaQuery.of(context).size.width / 2,
-                      height: userLocations.length > 4
+                      height: filteredLocations.length > 4
                           ? MediaQuery.of(context).size.height
                           : MediaQuery.of(context).size.height / 2,
                       child: Column(
@@ -720,12 +339,22 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
                           const Divider(
                             color: Colors.black,
                           ),
+                          TextField(
+                            controller: searchController,
+                            decoration: const InputDecoration(
+                              hintText: "Search",
+                              hintStyle: TextStyle(fontSize: 15),
+                              suffixIcon: Icon(Icons.search),
+                            ),
+                            onChanged: filterSearch,
+                          ),
+                          const SizedBox(height: 10,),
                           Expanded(
                             child: ListView.separated(
-                              itemCount: userLocations.length,
+                              itemCount: filteredLocations.length,
                               // itemCount: 2,
                               itemBuilder: (context, index) {
-                                final location = userLocations[index];
+                                final location = filteredLocations[index];
                                 return InkWell(
                                   onTap: () async {
                                     // controller.showLocationList(!controller.showLocationList.value);
@@ -1520,6 +1149,7 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
           final List<dynamic> jsonList = responses['locations'];
 
           userLocations.clear();
+          filteredLocations.clear;
           final List<UserLocations> locations =
               jsonList.map((json) => UserLocations.fromJson(json)).toList();
 /*
@@ -1527,8 +1157,8 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
 */
 
           userLocations = locations;
-
-          if (userLocations.length == 1 || userLocations.isNotEmpty) {
+          filteredLocations = userLocations;
+          if (filteredLocations.length == 1 || filteredLocations.isNotEmpty) {
             setState(() {
               showLocationList = true;
               loading = false;
@@ -1576,4 +1206,19 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
     }
     return null;
   }
+
+  void filterSearch(String query) {
+    setState(() {
+      filteredLocations = userLocations
+          .where((location) =>
+      location.locationName
+          .toLowerCase()
+          .contains(query.toLowerCase()) ||
+          location.locationCode
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
 }

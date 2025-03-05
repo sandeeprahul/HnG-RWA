@@ -44,7 +44,8 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
 
   Geolocator geolocator = Geolocator();
 
-
+  TextEditingController searchController = TextEditingController();
+  List<UserLocations> filteredLocations = [];
 
   Timer? timer;
   var status_;
@@ -95,6 +96,19 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
     imageEncoded = "";
 
     super.dispose();
+  }
+  void filterSearch(String query) {
+    setState(() {
+      filteredLocations = userLocations
+          .where((location) =>
+      location.locationName
+          .toLowerCase()
+          .contains(query.toLowerCase()) ||
+          location.locationCode
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   Future<void> getlocation() async {
@@ -614,12 +628,23 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                           const Divider(
                             color: Colors.black,
                           ),
+                          TextField(
+                            controller: searchController,
+                            decoration: const InputDecoration(
+                              hintText: "Search",
+                              hintStyle: TextStyle(fontSize: 15),
+                              suffixIcon: Icon(Icons.search),
+                            ),
+                            onChanged: filterSearch,
+                          ),
+                          const SizedBox(height: 10,),
+
                           Expanded(
                             child: ListView.separated(
-                              itemCount: userLocations.length,
+                              itemCount: filteredLocations.length,
                               // itemCount: 2,
                               itemBuilder: (context, index) {
-                                final location = userLocations[index];
+                                final location = filteredLocations[index];
                                 return InkWell(
                                   onTap: () async {
                                     // controller.showLocationList(!controller.showLocationList.value);
@@ -1331,6 +1356,8 @@ compressQuality : 40,//1280 x 720//1920 x 1080
           final List<dynamic> jsonList = responses['locations'];
 
           userLocations.clear();
+          filteredLocations.clear;
+
           final List<UserLocations> locations =
               jsonList.map((json) => UserLocations.fromJson(json)).toList();
 /*
@@ -1338,8 +1365,9 @@ compressQuality : 40,//1280 x 720//1920 x 1080
 */
 
           userLocations = locations;
+          filteredLocations = userLocations;
 
-          if (userLocations.length == 1 || userLocations.isNotEmpty) {
+          if (filteredLocations.length == 1 || filteredLocations.isNotEmpty) {
             setState(() {
               showLocationList = true;
               loading = false;
