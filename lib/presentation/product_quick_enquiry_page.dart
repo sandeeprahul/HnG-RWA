@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../common/zoomable_image.dart';
+import '../widgets/location_search_dialog.dart';
 
 class ProductQuickEnquiryPage extends StatefulWidget {
   const ProductQuickEnquiryPage({super.key});
@@ -30,8 +31,8 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
   Map<String, dynamic>? productData;
 
   Future<void> fetchProductDetails(String code) async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    var locationCode = pref.getString('locationCode');
+    // SharedPreferences pref = await SharedPreferences.getInstance();
+    // var locationCode = pref.getString('locationCode');
     // var locationCode = "106";
     final url = Uri.parse(
         "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Coupon/productenquiry/$code/$locationCode");
@@ -282,18 +283,40 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
   }
 
   String locationCode = '';
+  String userId = '';
   String locationName = '';
   @override
   void initState() {
     super.initState();
     loadLocationCode();
+
   }
   Future<void> loadLocationCode() async {
+
     final prefs = await SharedPreferences.getInstance();
+
     setState(() {
       locationCode = prefs.getString('locationCode') ?? 'No Code Found';
+      userId = prefs.getString('userCode') ?? 'No User Found';
       locationName = prefs.getString('location_name') ?? 'No Name Found';
     });
+
+    showLocationDialog(context, userId);
+  }
+
+  void showLocationDialog(BuildContext context, String userId) async {
+    final selectedLocation = await showDialog(
+      context: context,
+      builder: (context) => LocationSearchDialog(userId: userId),
+    );
+
+    if (selectedLocation != null) {
+      print("Selected Location: ${selectedLocation['locationName']}");
+      setState(() {
+        locationCode =selectedLocation['locationCode'] ?? 'No Code Found';
+        locationName =selectedLocation['locationName'] ?? 'No Name Found';
+      });
+    }
   }
 
   @override
@@ -303,9 +326,10 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
       appBar: AppBar(
         backgroundColor: Colors.deepOrangeAccent,
         elevation: 2,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Product Quick Enquiry",
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
         ),
       ),
       /* appBar: AppBar(
@@ -338,9 +362,11 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                         print("onSubmitted:$d");
                       }
                     },
+
                     decoration: InputDecoration(
                       hintText: 'Enter Code or Scan Product',
                       border: const OutlineInputBorder(),
+
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.qr_code_scanner),
                         onPressed: _scanProduct,
@@ -354,9 +380,14 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
             ),
             const SizedBox(height: 8,),
 
-            LocationDisplay(
-              locationCode: locationCode,
-              locationName: locationName,
+            InkWell(
+              onTap: (){
+                showLocationDialog(context,"70002");
+              },
+              child: LocationDisplay(
+                locationCode: locationCode,
+                locationName: locationName,
+              ),
             ),
 
 
