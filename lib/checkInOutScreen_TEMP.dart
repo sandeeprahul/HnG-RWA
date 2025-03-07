@@ -336,17 +336,20 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ),
-                          const Divider(
-                            color: Colors.black,
-                          ),
-                          TextField(
-                            controller: searchController,
-                            decoration: const InputDecoration(
-                              hintText: "Search",
-                              hintStyle: TextStyle(fontSize: 15),
-                              suffixIcon: Icon(Icons.search),
+                          // const Divider(
+                          //   color: Colors.black,
+                          // ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: TextField(
+                              controller: searchController,
+                              decoration: const InputDecoration(
+                                hintText: "Search",
+                                hintStyle: TextStyle(fontSize: 15),
+                                suffixIcon: Icon(Icons.search),
+                              ),
+                              onChanged: filterSearch,
                             ),
-                            onChanged: filterSearch,
                           ),
                           const SizedBox(height: 10,),
                           Expanded(
