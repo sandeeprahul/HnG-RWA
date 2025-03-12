@@ -730,32 +730,40 @@ class _WeCareScreenState extends State<WeCareScreen> {
           loading = false;
         });
 
-
-        TicketResponse temp;
         Map<String, dynamic> map = json.decode(response.body);
-        if(map['status']!="Failure"){
-          var message = map['Message'];
+        if (map['status'] == "Success") {
+          var message = map['message'];
+          var ticketId = map['ticket_id'];
+          var ticketNumber = map['ticket_number'];
+
           Get.snackbar(
-            "Alert!",
-            "$message",
+            "Success!",
+            "$message (Ticket No: $ticketNumber)",
             snackPosition: SnackPosition.TOP,
           );
-          List<dynamic> data = map["Tickets"];
-          data.forEach((element) {
-            ticketRes.add(TicketResponse.fromJson(element));
-          });
 
-          _showSuccessAlert('$message: ${ticketRes[0].caseNumber}'); //Case_Number
-          /*{"Result":"Success","Message":"Existing [Ticket No: 172621] Open","Tickets":[{"Date_Entered":"2023-06-05 16:41:21","Subject":"Test","StoreName":"FW_952_Indira Nagar  100 Feet","Case_Number":"172621","Status":"Open","Department_Name":"Test Department","Issue":"","Description":"\n"}]}*/
-          // Navigator.pop(context);
-        }else{
+          // Extracting mapped IDs
+          var mappedIds = map['mapped_ids'];
+          String statusId = mappedIds['status_id'];
+          String departmentId = mappedIds['department_id'];
+          String issueId = mappedIds['issue_id'];
+          String priorityId = mappedIds['priority_id'];
+          String storeUserId = mappedIds['store_user_id'];
+
+          debugPrint("Ticket ID: $ticketId");
+          debugPrint("Status ID: $statusId");
+          debugPrint("Department ID: $departmentId");
+          debugPrint("Issue ID: $issueId");
+          debugPrint("Priority ID: $priorityId");
+          debugPrint("Store User ID: $storeUserId");
+
+          _showSuccessAlert('$message (Ticket No: $ticketNumber)');
+        } else {
           setState(() {
             loading = false;
           });
           _showAlert("${map["message"]}\nStoreCode: ${map["provided_store_code"]}");
-
         }
-
       } else {
         setState(() {
           loading = false;
@@ -763,7 +771,6 @@ class _WeCareScreenState extends State<WeCareScreen> {
         print(response.body);
         print(response.statusCode);
 
-        // _showRetryAlert();
         _showAlert(response.body);
       }
     } catch (e) {
