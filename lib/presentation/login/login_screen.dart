@@ -730,7 +730,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           'deviceid': deviceId,
           'osVersion': '$release',
           'osType': Platform.isAndroid ? 'Android' : 'Ios',
-          "appVersion": Constants.appVersionString, //(1.0.61)
+          "appVersion": Constants.appVersionString, //(1.0.62)
           // "appVersion": "$number",
           "fcmToken": "$tokenFCM"
           // 'deviceid': '123',

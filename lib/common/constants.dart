@@ -7,9 +7,9 @@ class Constants {
    static const String apiHttpsUrl = 'https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api';
    static const String apiHttpsUrlTest = 'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api';
 
-  static const String appVersion = '61(1.0.61)';
-  static const String appVersionCode = '61';
-  static const String appVersionString = '(1.0.61)';
+  static const String appVersion = '62(1.0.62)';
+  static const String appVersionCode = '62';
+  static const String appVersionString = '(1.0.62)';
   static const String networkIssue =
       'Network issue occurred!\nPlease check your internet connection.';
   static const String slowNetworkIssue = 'Slow network!';
