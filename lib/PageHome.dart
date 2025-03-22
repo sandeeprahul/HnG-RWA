@@ -1098,6 +1098,7 @@ class _PageHomeState extends State<PageHome> {
     try {
       final prefs = await SharedPreferences.getInstance();
       var userID = prefs.getString('userCode') ?? '';
+      // String url = "${Constants.apiHttpsUrl}/Login/checkinstatus/70002";
       String url = "${Constants.apiHttpsUrl}/Login/checkinstatus/$userID";
 
       print(url);

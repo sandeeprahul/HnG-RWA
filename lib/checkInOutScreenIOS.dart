@@ -170,7 +170,7 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 20, top: 15),
+                  padding: const EdgeInsets.only(bottom: 15, top: 15),
                   child: Stack(
                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -188,21 +188,33 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                       ),
                       Align(
                         alignment: Alignment.center,
+
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Check In Time '),
+                            Text(timeMin, style: const TextStyle(
+                                fontSize: 17, color: Colors.green)),
+                          ],
+                        ),
+                      ),
+                   /*   Align(
+                        alignment: Alignment.center,
                         child: Padding(
                             padding: const EdgeInsets.only(left: 20),
                             child: RichText(
                               text: TextSpan(children: <TextSpan>[
                                 const TextSpan(
-                                    text: 'Check In Time \n   ',
+                                    text: 'Check In Time ',
                                     style: TextStyle(
                                         fontSize: 18, color: Colors.black)),
                                 TextSpan(
                                     text: timeMin,
                                     style: const TextStyle(
-                                        fontSize: 17, color: Colors.red))
+                                        fontSize: 17, color: Colors.green))
                               ]),
                             )),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -392,7 +404,7 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                                   // popupAttendence();
                                   setState(() {
                                     // showpopup = true;
-                                    showAtdncTypePopup = true;
+                                    // showAtdncTypePopup = true;
                                   });
                                 },
                                 child: Row(
@@ -708,7 +720,7 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Text(
-                                        'Location Code: ${location.locationCode} : ${location.latitude}-${location.longitude}',
+                                        'Location Code: ${location.locationCode} ${location.latitude}-${location.longitude}',
                                         style: const TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.bold)),
