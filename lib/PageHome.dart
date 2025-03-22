@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hng_flutter/presentation/order_list_screen.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:hng_flutter/widgets/product_quick_enquiry_widget.dart';
 import 'package:hng_flutter/widgets/scan_qr_widget.dart';
@@ -130,25 +131,26 @@ class _PageHomeState extends State<PageHome> {
                 ],
               ),
               actions: [
-                CustomElevatedButton(text: 'Settings', onPressed: (){
-                  openAppSettings();
-                }),
-                CustomElevatedButton(text: 'Proceed', onPressed: () async {
-                  gotoCheckInOutScreen(checkInOutType);
-                  Navigator.pop(context);
-                  if (locationPermission.isPermanentlyDenied ||
-                      locationPermission.isDenied ||
-                      locationPermission.isRestricted||cameraPermission.isPermanentlyDenied ||
-                      cameraPermission.isDenied ||
-                      cameraPermission.isRestricted
-                  ) {
-                    await Permission.camera.request();
-                    await Permission.location.request();
-
-                  }
-                }),
-
-
+                CustomElevatedButton(
+                    text: 'Settings',
+                    onPressed: () {
+                      openAppSettings();
+                    }),
+                CustomElevatedButton(
+                    text: 'Proceed',
+                    onPressed: () async {
+                      gotoCheckInOutScreen(checkInOutType);
+                      Navigator.pop(context);
+                      if (locationPermission.isPermanentlyDenied ||
+                          locationPermission.isDenied ||
+                          locationPermission.isRestricted ||
+                          cameraPermission.isPermanentlyDenied ||
+                          cameraPermission.isDenied ||
+                          cameraPermission.isRestricted) {
+                        await Permission.camera.request();
+                        await Permission.location.request();
+                      }
+                    }),
               ],
             );
           });
@@ -308,7 +310,8 @@ class _PageHomeState extends State<PageHome> {
   }
 
   bool showImage = false;
-  final TaskCheckerController taskCheckController = Get.put(TaskCheckerController());
+  final TaskCheckerController taskCheckController =
+      Get.put(TaskCheckerController());
 
   @override
   Widget build(BuildContext context) {
@@ -485,12 +488,66 @@ class _PageHomeState extends State<PageHome> {
 
             // const ScanQrWidget(),
             const Divider(),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const OrderListScreen()));
+              },
+              child: Container(
+                margin: const EdgeInsets.only(left: 15, right: 15, bottom: 5),
+                padding: const EdgeInsets.only(
+                    left: 15, right: 15, top: 15, bottom: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.all(Radius.circular(15)),
+                    boxShadow: [
+                      BoxShadow(
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          color: (Colors.grey[200]!))
+                    ]),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const CircleAvatar(
+                      radius: 15,
+                      backgroundColor: Color(0xFFE0E0E0),
+                      child: Icon(
+                        Icons.help_outline,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'HyperLocal ',
+                        style: lightTheme.textTheme.labelSmall!.copyWith(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+
+                        /* style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),*/
+                      ),
+                    ),
+                    const Spacer(),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(),
 
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding:
-                    const EdgeInsets.only(left: 15, top: 10, right: 10, bottom: 15),
+                padding: const EdgeInsets.only(
+                    left: 15, top: 10, right: 10, bottom: 15),
                 child: Text(
                   'Explore Company',
                   // style: TextStyle(fontSize: 15),
@@ -678,44 +735,48 @@ class _PageHomeState extends State<PageHome> {
 
   Widget checkInBtn() {
     return InkWell(
-      onTap: () {
-        checkPermissions(0);
-
-        /*  if(Platform.isAndroid){
+        onTap: () {
+          if (Platform.isIOS) {
+            gotoCheckInOutScreen(0);
+          } else {
+            checkPermissions(0);
+          }
+          /* Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => checkInOutScreenIOS(0),
+            ));*/
+          /*  if(Platform.isAndroid){
           requestLocationPermission(0);
         }else{
           gotoCheckInOutScreen(0);
         }*/
-      },
-      child:Container(
-        margin: const EdgeInsets.only(top: 7),
-        padding:
-        const EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10),
-        decoration: BoxDecoration(
-            color: Colors.green,
-            borderRadius: const BorderRadius.all(Radius.circular(5)),
-            border: Border.all(
+        },
+        child: Container(
+          margin: const EdgeInsets.only(top: 7),
+          padding:
+              const EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10),
+          decoration: BoxDecoration(
               color: Colors.green,
-            )),
-        child: Obx((){
-          if (taskCheckController.isLoading.value) {
-            return const SizedBox(
-              width: 20,height: 20,
-              child: CircularProgressIndicator(),
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              border: Border.all(
+                color: Colors.green,
+              )),
+          child: Obx(() {
+            if (taskCheckController.isLoading.value) {
+              return const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Text(
+              'Check In',
+              style: lightTheme.textTheme.labelSmall!
+                  .copyWith(fontSize: 13, color: Colors.white),
             );
-          }
-          return Text(
-            'Check In',
-            style: lightTheme.textTheme.labelSmall!
-                .copyWith(fontSize: 13, color: Colors.white),
-
-          );
-        }),
-
-
-      )
-    );
-
+          }),
+        ));
   }
 
   // var lat, lng;
@@ -966,6 +1027,7 @@ class _PageHomeState extends State<PageHome> {
   Future<void> gotoCheckInOutScreen(int checkInOutType) async {
     final prefs = await SharedPreferences.getInstance();
     var result;
+
     if (Platform.isAndroid) {
       await Navigator.push(
           context,
@@ -1095,7 +1157,6 @@ class _PageHomeState extends State<PageHome> {
               startendTimeText = "Your Shift time start at ";
             });
             taskCheckController.checkTaskStatus();
-
           } else if (responseData['checkin_flag'] == "N" &&
               responseData['checkiout_flag'] == "N") {
             String date = responseData['chekout_time'];
@@ -1112,7 +1173,6 @@ class _PageHomeState extends State<PageHome> {
               });
             }
             taskCheckController.checkTaskStatus();
-
           }
         }
       } else {
@@ -1136,6 +1196,4 @@ class _PageHomeState extends State<PageHome> {
   }
 
   bool noInterNet = true;
-
-
 }

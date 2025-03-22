@@ -17,6 +17,7 @@ import 'package:hng_flutter/PageRetail.dart';
 import 'package:hng_flutter/ThemeData_.dart';
 import 'package:hng_flutter/core/light_theme.dart';
 import 'package:hng_flutter/loginBinding.dart';
+import 'package:hng_flutter/presentation/order_list_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -46,8 +47,8 @@ Future<void> main() async {
           getPages: AppPages.pages,
           // initialBinding: loginBinding(),
           debugShowCheckedModeBanner: false,
+          // home: const OrderListScreen())
           home: const GifScreen())
-      // home:  SplashScreen())
       );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -80,7 +81,6 @@ class _GifScreenState extends State<GifScreen> {
   getDeviceId() async {
     String id = await getOrGenerateDeviceId();
     print("Generated Device ID: $id");
-
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -115,8 +115,7 @@ class _GifScreenState extends State<GifScreen> {
     if (deviceId == null) {
       deviceId = await dbHelper.getDeviceId();
 
-      if(deviceId == null){
-
+      if (deviceId == null) {
         // Generate a new Device ID
         DateTime now = DateTime.now();
 
@@ -135,9 +134,7 @@ class _GifScreenState extends State<GifScreen> {
         // Save it in SharedPreferences
         await prefs.setString(deviceIdKey, deviceId);
         await dbHelper.insertDeviceId(deviceId);
-
       }
-
     }
 
     return deviceId;

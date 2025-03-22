@@ -949,10 +949,11 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                         ),
                       ),
                       ElevatedButton(
+
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(22))
-                              // backgroundColor: Colors.b,
                               ),
                           onPressed: () {
                             if (usernameController.text.toString().isEmpty) {

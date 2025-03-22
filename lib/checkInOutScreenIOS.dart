@@ -52,15 +52,16 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
   var imageEncoded;
   bool successPopUp = false;
   bool loading = false;
-  var typeAttencenceList = ['Present', 'CheckOut'];
+  var typeAttendanceList = ['Present', 'CheckOut'];
   String dropdownText = "Present";
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getlocation();
     fetchLocations(0);
+
+    getLocation();
     getTime();
 
     /*Timer timer =
@@ -70,10 +71,32 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
 
   getPhoto(int firstTime) async {
     final ImagePicker picker = ImagePicker();
+    // Request camera permission
+    var status = await Permission.camera.status;
+    if (!status.isGranted) {
+      status = await Permission.camera.request();
+      if (!status.isGranted) {
+        Get.defaultDialog(
+          middleText: 'Please grant camera permission for CheckIn/CheckOut',
+        );
+        print('Camera permission denied');
+        return;
+      }
+    }
 
-    photo = await picker.pickImage(
-        source: ImageSource.camera, preferredCameraDevice: CameraDevice.front);
-    _cropImage(photo, firstTime);
+    try {
+      photo = await picker.pickImage(
+        source: ImageSource.camera,
+        preferredCameraDevice: CameraDevice.front,
+      );
+      if (photo != null) {
+        _cropImage(photo, firstTime);
+      } else {
+        print('No photo selected');
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
   }
 
   var timeMin = "";
@@ -97,35 +120,44 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
 
     super.dispose();
   }
+
   void filterSearch(String query) {
     setState(() {
       filteredLocations = userLocations
           .where((location) =>
-      location.locationName
-          .toLowerCase()
-          .contains(query.toLowerCase()) ||
-          location.locationCode
-              .toLowerCase()
-              .contains(query.toLowerCase()))
+              location.locationName
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              location.locationCode.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
 
-  Future<void> getlocation() async {
+  Future<void> getLocation() async {
     // try{}
 
-    await Permission.location.request();
-    await Permission.camera.request();
+   var status =  await Permission.location.request();
 
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    print(position.latitude);
-    print(position.longitude);
+   if(status.isGranted){
+     Position position = await Geolocator.getCurrentPosition(
+         desiredAccuracy: LocationAccuracy.high);
+     print(position.latitude);
+     print(position.longitude);
 
-    setState(() {
-      lat = position.latitude;
-      lng = position.longitude;
-    });
+     setState(() {
+       lat = position.latitude;
+       lng = position.longitude;
+     });
+   }
+   else if (status.isDenied) {
+     print("Location permission denied.");
+     Get.defaultDialog(middleText: "Location permission denied.");
+   } else if (status.isPermanentlyDenied) {
+     print("Location permission permanently denied. Open settings to enable.");
+     // await openAppSettings();
+     Get.defaultDialog(middleText: "Location permission permanently denied. Open settings to enable.");
+
+   }
 
   }
 
@@ -198,6 +230,11 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                                     margin: const EdgeInsets.all(10),
                                     padding: const EdgeInsets.all(5),
                                     width: 80,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5)),
+                                    ),
                                     child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -211,11 +248,6 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                                           style: TextStyle(fontSize: 12),
                                         )
                                       ],
-                                    ),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5)),
                                     ),
                                   ),
                                 ),
@@ -338,7 +370,7 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                             const Align(
                               alignment: Alignment.topLeft,
                               child: Text(
-                                'Attendence Type',
+                                'Attendance Type',
                                 style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.black,
@@ -352,8 +384,8 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                               margin: const EdgeInsets.only(bottom: 15, top: 7),
                               padding: const EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                  borderRadius:
-                                      const BorderRadius.all(Radius.circular(5)),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(5)),
                                   border: Border.all(color: Colors.grey)),
                               child: InkWell(
                                 onTap: () {
@@ -488,7 +520,7 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
               alignment: Alignment.bottomCenter,
               child: InkWell(
                 onTap: () {
-                  if (imageEncoded.toString().length != 0 ||
+                  if (imageEncoded.toString().isNotEmpty ||
                       imageEncoded != null) {
                     checkInUser(imageEncoded);
                   } else {
@@ -500,9 +532,9 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                 child: Container(
                   height: 50,
                   color: Colors.blue,
-                  child:  Center(
+                  child: Center(
                     child: Text(
-                      widget.checkInOutType==0?'Check In':'ChechOut',
+                      widget.checkInOutType == 0 ? 'Check In' : 'CheckOut',
                       style: const TextStyle(
                           fontSize: 18,
                           color: Colors.white,
@@ -532,7 +564,7 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                               child: Padding(
                                 padding: EdgeInsets.all(5),
                                 child: Text(
-                                  'Select Attendence Type',
+                                  'Select Attendance Type',
                                   style: TextStyle(
                                       fontSize: 18, color: Colors.black),
                                 ),
@@ -540,7 +572,7 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                           const Divider(),
                           ListView.separated(
                             shrinkWrap: true,
-                            itemCount: typeAttencenceList.length,
+                            itemCount: typeAttendanceList.length,
                             itemBuilder: (context, pos) {
                               return Padding(
                                 padding: const EdgeInsets.only(
@@ -548,12 +580,12 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                                 child: InkWell(
                                   onTap: () {
                                     setState(() {
-                                      dropdownText = typeAttencenceList[pos];
+                                      dropdownText = typeAttendanceList[pos];
                                       showAtdncTypePopup = false;
                                     });
-                                    print(typeAttencenceList[pos]);
+                                    print(typeAttendanceList[pos]);
                                   },
-                                  child: Text(typeAttencenceList[pos],
+                                  child: Text(typeAttendanceList[pos],
                                       style: const TextStyle(
                                         fontSize: 18,
                                         color: Colors.black87,
@@ -640,7 +672,9 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
                               onChanged: filterSearch,
                             ),
                           ),
-                          const SizedBox(height: 10,),
+                          const SizedBox(
+                            height: 10,
+                          ),
 
                           Expanded(
                             child: ListView.separated(
@@ -750,7 +784,8 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: photo!.path,
         compressFormat: ImageCompressFormat.jpg,
-compressQuality : 40,//1280 x 720//1920 x 1080
+        compressQuality: 40,
+        //1280 x 720//1920 x 1080
         maxWidth: 1920,
         maxHeight: 1080,
         uiSettings: [
@@ -843,9 +878,9 @@ compressQuality : 40,//1280 x 720//1920 x 1080
 
       // cloudstorageRef(imageEncoded, empCode);
 
-       var url = Uri.https(
-      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWA_GROOMING_API/api/Attendance/AttendanceAdd',
+      var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWA_GROOMING_API/api/Attendance/AttendanceAdd',
       );
 
       var params;
@@ -1175,7 +1210,8 @@ compressQuality : 40,//1280 x 720//1920 x 1080
       width: double.infinity,
       color: const Color(0x80000000),
       child: Container(
-        margin: const EdgeInsets.only(left: 30, right: 30, top: 100, bottom: 100),
+        margin:
+            const EdgeInsets.only(left: 30, right: 30, top: 100, bottom: 100),
         color: Colors.white,
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1192,7 +1228,7 @@ compressQuality : 40,//1280 x 720//1920 x 1080
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
-                    fontSize: 24),
+                    fontSize: 20),
               ),
             ),
           ],
@@ -1358,32 +1394,45 @@ compressQuality : 40,//1280 x 720//1920 x 1080
             responses['status'] == "success") {
           final List<dynamic> jsonList = responses['locations'];
 
-          userLocations.clear();
-          filteredLocations.clear;
+          if (jsonList.isNotEmpty) {
+            userLocations.clear();
+            filteredLocations.clear;
 
-          final List<UserLocations> locations =
-              jsonList.map((json) => UserLocations.fromJson(json)).toList();
+            final List<UserLocations> locations =
+                jsonList.map((json) => UserLocations.fromJson(json)).toList();
 /*
         print("locations.length" + locations.length.toString());
 */
 
-          userLocations = locations;
-          filteredLocations = userLocations;
+            userLocations = locations;
+            filteredLocations = userLocations;
 
-          if (filteredLocations.length == 1 || filteredLocations.isNotEmpty) {
+            if (filteredLocations.length == 1 || filteredLocations.isNotEmpty) {
+              setState(() {
+                showLocationList = true;
+                loading = false;
+              });
+              // print("$userLocations[0].latitude");
+            }
+
             setState(() {
-              showLocationList = true;
+              loading = false;
+              // selectedLocation = userLocations[0];
+            });
+
+            return locations;
+          } else {
+            setState(() {
               loading = false;
             });
-            // print("$userLocations[0].latitude");
+            Get.defaultDialog(
+              title: "Alert!",
+              content: const Text('Locations list is empty'),
+            );
+            Future.delayed(const Duration(seconds: 3), () {
+              Navigator.pop(context);
+            });
           }
-
-          setState(() {
-            loading = false;
-            // selectedLocation = userLocations[0];
-          });
-
-          return locations;
         } else {
           setState(() {
             loading = false;
