@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hng_flutter/widgets/order_list_widget.dart';
 
 import 'order_details_screen.dart';
 
@@ -89,17 +90,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Text('Orders'),
-
-            // Spacer(),
-            // Icon(Icons.document_scanner_outlined),
-
-          ],
+        title: const Text(
+          'All Orders',
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.orange,
-
       ),
       body: Column(
         children: [
@@ -109,106 +104,39 @@ class _OrderListScreenState extends State<OrderListScreen> {
               decoration: InputDecoration(
                   hintText: 'Search',
                   suffixIcon: Icon(Icons.document_scanner_outlined),
-
-                  border: UnderlineInputBorder(
-
-                  )
-              ),
+                  border: UnderlineInputBorder()),
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: orders.length,
-              itemBuilder: (context, index) {
-                final order = orders[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    title: Row(
-                      // mainAxisAlignmentlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Order ID: ${order['orderId']}',
-                          style: const TextStyle(color: Colors.blue, fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Order Status: ',
-                                style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                              ),
-                              Text(
-                                order['status'],
-                                style: TextStyle(
-                                  color: order['status'] == 'ORDER_APPROVED' ? Colors.green : Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Payment Method: ',
-                                style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                              ),
-                              Text(
-                                order['paymentMethod'] ?? 'null',
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Payment Status: ',
-                                style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                              ),
-                              Text(
-                                order['paymentStatus'] ?? 'null',
-                                style: TextStyle(
-                                  color: order['paymentStatus'] == 'SUCCESS' ? Colors.green : Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),const Spacer(),
-                              Text(
-                                order['date'],
-                                style: const TextStyle(color: Colors.black54, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    // trailing: Text(
-                    //   order['date'],
-                    //   style: const TextStyle(color: Colors.black54, fontSize: 12),
-                    // ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailsScreen(order: order),
-                        ),
-                      );
-                    },
-                  )
-                  ,
-                );
-              },
+            child:OrderListWidget(orders: orders, onOrderTap: (order){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      OrderDetailsScreen(order: order),
+                ),
+              );
+            }),
+          ),
+          Container(
+            decoration: BoxDecoration(border: Border.all(color: Colors.orange)),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Center(child: Text('ClearAll')),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    color: Colors.orange,
+                    child: const Center(
+                        child: Text(
+                      'Filter',
+                      style: TextStyle(color: Colors.white),
+                    )),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

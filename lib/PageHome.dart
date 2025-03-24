@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/presentation/order_list_screen.dart';
+import 'package:hng_flutter/presentation/order_management_screen.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:hng_flutter/widgets/product_quick_enquiry_widget.dart';
 import 'package:hng_flutter/widgets/scan_qr_widget.dart';
@@ -493,7 +494,7 @@ class _PageHomeState extends State<PageHome> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const OrderListScreen()));
+                        builder: (context) =>  OrderManagementScreen()));///OrderListScreen
               },
               child: Container(
                 margin: const EdgeInsets.only(left: 15, right: 15, bottom: 5),
