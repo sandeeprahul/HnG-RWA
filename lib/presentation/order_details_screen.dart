@@ -74,18 +74,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           Expanded(
                               // flex: 2,
                               child: ListView.builder(
-                                  // itemCount: 2,
                                   itemCount: orderDetails!.items.length,
                                   itemBuilder: (context, index) {
                                     final item = orderDetails!.items[index];
-                                    // final borderColor = orderController
-                                    //         .borderColors[item.skuCode] ??
-                                    //     Colors.red;
 
                                     return Obx(() {
-                                      final borderColor = orderController
-                                              .borderColors[item.skuCode] ??
-                                          Colors.red;
+                                      // final borderColor = orderController
+                                      //         .borderColors[item.skuCode] ??
+                                      //     Colors.red;
+                                      final selectedData = orderController
+                                          .selectedProductData[item.skuCode];
 
                                       return Stack(
                                         children: [
@@ -94,7 +92,13 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                               decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   border: Border.all(
-                                                      color: borderColor),
+                                                      width: 2,
+                                                      color: orderController
+                                                                  .borderColors[
+                                                              item.skuCode] ??
+                                                          Colors.transparent),
+                                                  // Use dynamic color
+
                                                   borderRadius:
                                                       BorderRadius.circular(16),
                                                   boxShadow: [
@@ -161,7 +165,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                           Row(
                                                             children: [
                                                               Text(
-                                                                  '₹${item.listPrice}',
+                                                                  selectedData !=
+                                                                          null
+                                                                      ? '₹${selectedData["mrp"]}'
+                                                                      : '₹${item.listPrice}',
                                                                   style: const TextStyle(
                                                                       color: Colors
                                                                           .red,
@@ -187,7 +194,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                                         color: Colors
                                                                             .grey)),
                                                                 child: Text(
-                                                                    '${item.listPrice}',
+                                                                    selectedData !=
+                                                                            null
+                                                                        ? '₹${selectedData["mrp"]}'
+                                                                        : '₹${item.listPrice}',
                                                                     style: const TextStyle(
                                                                         color: Colors
                                                                             .black,
@@ -217,7 +227,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                                         color: Colors
                                                                             .grey)),
                                                                 child: Text(
-                                                                    '${item.quantity}',
+                                                                    selectedData !=
+                                                                            null
+                                                                        ? '${selectedData["quantity"]}'
+                                                                        : 'N/A',
                                                                     style: const TextStyle(
                                                                         color: Colors
                                                                             .black,
@@ -267,20 +280,61 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           ),
                           SizedBox(
                             width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                            height:successOrderIdFlag? 75:45,
+
+                            child: Stack(
+                              children: [
+                                Visibility(
+                                  visible:successOrderIdFlag,
+                                  child: Positioned(
+                                    left: 0,right: 0,
+                                    bottom: 0,
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: () {},
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 8),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'READY TO SHIP',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                'READY TO SHIP',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                                Positioned(
+
+                                  left: 0,right: 0,
+                                  top: 0,
+
+                                  child: SizedBox(
+                                    child: CircleAvatar(
+
+                                      // onPressed: (){},
+                                      // color: Colors.orange,
+
+                                        backgroundColor:Colors.orange,
+                                        radius: 22,
+                                        child: IconButton(
+                                          onPressed:(){
+                                            _scanOrderId(orderDetails!.orderId);
+                                          },
+                                          icon: const Icon(
+                                            Icons.document_scanner_outlined,
+                                            color: Colors.white,
+                                          ),
+                                        )),
+                                  ),
+                                ),
+
+                              ],
                             ),
                           ),
                         ],
@@ -288,6 +342,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     ],
                   ),
                 ),
+
+      /*  bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(), // Optional for better design
+        child: SizedBox(height: 60), // Adjust height for spacing
+      ),*/
     );
   }
 
@@ -316,7 +375,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     }
   }
 
-  bool successBarcodeFlag = false;
+  bool successOrderIdFlag = false;
 
   Future<void> _scanProduct(String skuCode) async {
     // Replace this with your QR scanning function.
@@ -340,6 +399,22 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           // Smooth animation
           overlayBlur: 2, // No background blur
         );
+        orderController.borderColors[skuCode] = Colors.red;
+      }
+      // _codeController.text = scannedCode;
+
+      // fetchProductDetails(scannedCode);
+    }
+  }
+  Future<void> _scanOrderId(String orderId) async {
+    // Replace this with your QR scanning function.
+    String? scannedCode = await goToQrPage("your-phone-number");
+    if (scannedCode != null) {
+
+      if(scannedCode==orderId){
+        setState(() {
+          successOrderIdFlag = true;
+        });
       }
       // _codeController.text = scannedCode;
 
