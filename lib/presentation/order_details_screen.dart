@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
+import 'package:http/http.dart' as http;
 
+import '../data/order_model.dart';
 import '../widgets/payment_card_widget.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
@@ -14,121 +18,273 @@ class OrderDetailsScreen extends StatefulWidget {
 }
 
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
+  Order? orderDetails;
+  bool isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchOrderDetails();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order Details'),
+        title: Text(
+          'Order ID: ${widget.order['orderId']}',
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.orange,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Order ID: ${widget.order['orderId']}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Order Status: ${widget.order['status']}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: SizedBox(
-                          height: 50,
-                          width: 50,
-                          child: SvgPicture.network(
-                              'https://ik.imagekit.io/hng/desktop-assets/svgs/logo.svg')),
-                      title: const Text('Bella Cotton Paper Sticks Foil A160' ,style: TextStyle(fontSize: 15)),
-                      subtitle: const Column(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage != null
+              ? Center(child: Text("Error: $errorMessage"))
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Stack(
+                    children: [
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 6,),
-                          Text('Product# 567411',style: TextStyle(fontWeight: FontWeight.bold),),
-                          SizedBox(height: 6,),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8, right: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Order Status: ${widget.order['status']}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  '${widget.order['date']}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                              // flex: 2,
+                              child: ListView.builder(
+                                  // itemCount: 2,
+                                  itemCount: orderDetails!.items.length,
+                                  itemBuilder: (context, index) {
+                                    final item = orderDetails!.items[index];
 
+                                    return SizedBox(
+                                      child: Card(
+                                        color: Colors.white,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              height: 150,width: 4,
+                                              color: Colors.red,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(
+                                                      8.0),
+                                              child: SizedBox(
+                                                height: 75,
+                                                width: 75,
+                                                child: Image.network(
+                                                  item.imageUrl,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(top: 12,bottom: 12),
+                                                child: Column(
+                                                  // mainAxisAlignment: MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .start,
 
+                                                  children: [
+                                                    Text(item.skuName,
+                                                        // maxLines: 4,
+                                                        // softWrap: true, // Enables word wrapping
+                                                        // overflow: TextOverflow.visible, // Ensures text doesn't get truncated
+
+                                                        style:
+                                                            const TextStyle(
+                                                                fontSize:
+                                                                    15)),
+                                                    const SizedBox(
+                                                      height: 14,
+                                                    ),
+                                                    Text(
+                                                        'Code: ${item.skuCode}',
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                    const SizedBox(
+                                                      height: 14,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                            '₹${item.listPrice}',
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .red,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                        const SizedBox(
+                                                          width: 14,
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical:
+                                                                      2,
+                                                                  horizontal:
+                                                                      6),
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          6),
+                                                              color: Colors
+                                                                  .white,
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .grey)),
+                                                          child: Text(
+                                                              '${item.listPrice}',
+                                                              style:
+                                                                  const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                      fontSize: 12
+
+                                                                  )),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        const Text('X'),
+                                                        const SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical:
+                                                                      2,
+                                                                  horizontal:
+                                                                      6),
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          6),
+                                                              color: Colors
+                                                                  .white,
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .grey)),
+                                                          child: Text(
+                                                              '${item.quantity}',
+                                                              style:
+                                                                  const TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                    fontSize: 12
+                                                              )),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  })),
+                          SizedBox(
+                              height: MediaQuery.of(context).size.height / 2.5),
                         ],
                       ),
-
-                      trailing: const Column(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text('₹79.0', style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold)),
-                          Text('x 1'),
+                          PaymentSummary(
+                            order: orderDetails!,
+                          ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _scanProduct,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              child: const Text('SCAN'),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Spacer(),
-                        Text('Coupon: null ',style: TextStyle(color: Colors.grey,fontSize: 12)),
-                        Spacer(),
-                        Text('Campaign: 0.0',style: TextStyle(color: Colors.grey,fontSize: 12)),
-                      ],
-                    ),
-
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            const Expanded(
-              child:PaymentSummary(),
-            ),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: _scanProduct,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Text('SCAN'),
-                    ),
-                    const SizedBox(height: 4,),ElevatedButton(
-                      onPressed: () {
-
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Text('ENTER BARCODE'),
-                    ),
-                  ],
-                ),
-          ],
-        ),
-      ),
     );
   }
+
+  Future<void> fetchOrderDetails() async {
+    final String apiUrl =
+        "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/StoreOrderDetailslist/${widget.order['orderId']}";
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          orderDetails = Order.fromJson(data['data']);
+          isLoading = false;
+        });
+      } else {
+        throw Exception(
+            'Failed to load order details\nStatusCode:${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = e.toString();
+      });
+    }
+  }
+
+  bool successBarcodeFlag = false;
 
   Future<void> _scanProduct() async {
     // Replace this with your QR scanning function.
     String? scannedCode = await goToQrPage("your-phone-number");
     if (scannedCode != null) {
-      /* setState(() {
-
-      });*/
+      setState(() {
+        successBarcodeFlag = true;
+      });
       // _codeController.text = scannedCode;
 
       // fetchProductDetails(scannedCode);
     }
   }
-
-
 
   Future<String?> goToQrPage(String phone) async {
     // Replace with your QR scanning logic

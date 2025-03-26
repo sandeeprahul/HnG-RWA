@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hng_flutter/widgets/order_list_widget.dart';
 
+import '../controllers/order_controller.dart';
 import 'order_details_screen.dart';
 
 class OrderListScreen extends StatefulWidget {
@@ -11,80 +13,7 @@ class OrderListScreen extends StatefulWidget {
 }
 
 class _OrderListScreenState extends State<OrderListScreen> {
-  final List<Map<String, dynamic>> orders = [
-    {
-      'orderId': '3003-106-1788734',
-      'status': 'ORDER_APPROVED',
-      'paymentMethod': 'upi',
-      'paymentStatus': 'SUCCESS',
-      'date': 'November 28',
-      'icon': Icons.check_circle,
-      'iconColor': Colors.green,
-    },
-    {
-      'orderId': '1001-106-1783039',
-      'status': 'ORDER_PAYMENT_DETAILS',
-      'paymentMethod': 'ONLINE',
-      'paymentStatus': "APPROVED",
-      'date': 'November 13',
-      'icon': Icons.local_shipping,
-      'iconColor': Colors.grey,
-    },
-    {
-      'orderId': '1001-106-1747771',
-      'status': 'ORDER_PAYMENT_FAILED',
-      'paymentMethod': 'PAYTM',
-      'paymentStatus': 'FAILED',
-      'date': 'August 22',
-      'icon': Icons.error,
-      'iconColor': Colors.red,
-    },
-    {
-      'orderId': '3003-106-1788734',
-      'status': 'ORDER_APPROVED',
-      'paymentMethod': 'upi',
-      'paymentStatus': 'SUCCESS',
-      'date': 'November 28',
-      'icon': Icons.check_circle,
-      'iconColor': Colors.green,
-    },
-    {
-      'orderId': '1001-106-1747771',
-      'status': 'ORDER_PAYMENT_FAILED',
-      'paymentMethod': 'PAYTM',
-      'paymentStatus': 'FAILED',
-      'date': 'August 22',
-      'icon': Icons.error,
-      'iconColor': Colors.red,
-    },
-    {
-      'orderId': '3003-106-1788734',
-      'status': 'ORDER_APPROVED',
-      'paymentMethod': 'upi',
-      'paymentStatus': 'SUCCESS',
-      'date': 'November 28',
-      'icon': Icons.check_circle,
-      'iconColor': Colors.green,
-    },
-    {
-      'orderId': '1001-106-1747771',
-      'status': 'ORDER_PAYMENT_FAILED',
-      'paymentMethod': 'PAYTM',
-      'paymentStatus': 'FAILED',
-      'date': 'August 22',
-      'icon': Icons.error,
-      'iconColor': Colors.red,
-    },
-    {
-      'orderId': '3003-106-1788734',
-      'status': 'ORDER_APPROVED',
-      'paymentMethod': 'upi',
-      'paymentStatus': 'SUCCESS',
-      'date': 'November 28',
-      'icon': Icons.check_circle,
-      'iconColor': Colors.green,
-    },
-  ];
+  final OrderController orderController = Get.put(OrderController());
 
   @override
   Widget build(BuildContext context) {
@@ -108,14 +37,36 @@ class _OrderListScreenState extends State<OrderListScreen> {
             ),
           ),
           Expanded(
-            child:OrderListWidget(orders: orders, onOrderTap: (order){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      OrderDetailsScreen(order: order),
-                ),
-              );
+            child: Obx(() {
+              if (orderController.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (orderController.isError.value) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text("Failed to load orders"),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () => orderController.fetchOrders(),
+                        child: const Text("Retry"),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return OrderListWidget(
+                    orders: orderController.orders,
+                    onOrderTap: (order) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              OrderDetailsScreen(order: order),
+                        ),
+                      );
+                    });
+              }
             }),
           ),
           Container(

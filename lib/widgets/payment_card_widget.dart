@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hng_flutter/data/order_model.dart';
 
 class PaymentSummary extends StatelessWidget {
-  const PaymentSummary({super.key});
+  final Order order;
+  const PaymentSummary({super.key, required this.order,});
 
   @override
   Widget build(BuildContext context) {
@@ -20,23 +22,23 @@ class PaymentSummary extends StatelessWidget {
               'Payment Summary',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 18,
+                fontSize: 16,
                 color: Colors.blue,
               ),
             ),
             const SizedBox(height: 8),
             const Divider(thickness: 1.5, color: Colors.grey),
             const SizedBox(height: 8),
-            _buildSummaryRow('No of Items:', '1'),
-            _buildSummaryRow('Total Order Value:', '₹79'),
-            _buildSummaryRow('Discount:', '₹0'),
-            _buildSummaryRow('Total Invoice Value:', '₹79'),
-            _buildSummaryRow('Paid With Glow Points:', '₹0'),
-            _buildSummaryRow('Paid With Coupon:', '₹0'),
-            _buildSummaryRow('Delivery Charges:', '₹0'),
+            _buildSummaryRow('No of Items:', "${order.itemCount}"),
+            _buildSummaryRow('Total Order Value:', "${order.subTotal}"),
+            _buildSummaryRow('Discount:',  "${order.discountTotal}"),
+            _buildSummaryRow('Total Invoice Value:', "${order.total}"),
+            // _buildSummaryRow('Paid With Glow Points:', '₹0'),
+            // _buildSummaryRow('Paid With Coupon:', '₹0'),
+            _buildSummaryRow('Delivery Charges:',  "${order.shippingPrice}"),
             const SizedBox(height: 8),
-            const Divider(thickness: 1.5, color: Colors.grey),
-            const SizedBox(height: 8),
+            // const Divider(thickness: 1.5, color: Colors.grey),
+            // const SizedBox(height: 8),
 
           ],
         ),
@@ -53,14 +55,14 @@ class PaymentSummary extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.black87,
             ),
           ),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
