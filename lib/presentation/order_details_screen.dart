@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:hng_flutter/controllers/order_details_controller.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,6 +23,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   Order? orderDetails;
   bool isLoading = true;
   String? errorMessage;
+  final OrderDetailsController orderController =
+      Get.put(OrderDetailsController());
 
   @override
   void initState() {
@@ -74,174 +78,182 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   itemCount: orderDetails!.items.length,
                                   itemBuilder: (context, index) {
                                     final item = orderDetails!.items[index];
+                                    // final borderColor = orderController
+                                    //         .borderColors[item.skuCode] ??
+                                    //     Colors.red;
 
-                                    return Stack(
-                                      children: [
-                                        SizedBox(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                border: Border.all(
-                                                    color: Colors.red),
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                      color:
-                                                          Colors.grey.shade100,
-                                                      spreadRadius: 2,
-                                                      blurRadius: 2)
-                                                ]),
-                                            margin: const EdgeInsets.only(
-                                                bottom: 6),
-                                            child: Row(
-                                              children: [
-                                                /*     Container(
-                                                  height: 150,width: 4,
-                                                  // color: Colors.red,
-                                                ),*/
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: SizedBox(
-                                                    height: 75,
-                                                    width: 75,
-                                                    child: Image.network(
-                                                      item.imageUrl,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Padding(
+                                    return Obx(() {
+                                      final borderColor = orderController
+                                              .borderColors[item.skuCode] ??
+                                          Colors.red;
+
+                                      return Stack(
+                                        children: [
+                                          SizedBox(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                      color: borderColor),
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: Colors
+                                                            .grey.shade100,
+                                                        spreadRadius: 2,
+                                                        blurRadius: 2)
+                                                  ]),
+                                              margin: const EdgeInsets.only(
+                                                  bottom: 6),
+                                              child: Row(
+                                                children: [
+                                                  /*     Container(
+                                                      height: 150,width: 4,
+                                                      // color: Colors.red,
+                                                    ),*/
+                                                  Padding(
                                                     padding:
-                                                        const EdgeInsets.only(
-                                                            top: 12,
-                                                            bottom: 12),
-                                                    child: Column(
-                                                      // mainAxisAlignment: MainAxisAlignment.start,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-
-                                                      children: [
-                                                        Text(item.skuName,
-                                                            // maxLines: 4,
-                                                            // softWrap: true, // Enables word wrapping
-                                                            // overflow: TextOverflow.visible, // Ensures text doesn't get truncated
-
-                                                            style:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        15)),
-                                                        const SizedBox(
-                                                          height: 14,
-                                                        ),
-                                                        Text(
-                                                            'Code: ${item.skuCode}',
-                                                            style: const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold)),
-                                                        const SizedBox(
-                                                          height: 14,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                                '₹${item.listPrice}',
-                                                                style: const TextStyle(
-                                                                    color: Colors
-                                                                        .red,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold)),
-                                                            const SizedBox(
-                                                              width: 14,
-                                                            ),
-                                                            Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          2,
-                                                                      horizontal:
-                                                                          6),
-                                                              decoration: BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              6),
-                                                                  color: Colors
-                                                                      .white,
-                                                                  border: Border.all(
-                                                                      color: Colors
-                                                                          .grey)),
-                                                              child: Text(
-                                                                  '${item.listPrice}',
-                                                                  style: const TextStyle(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      fontSize:
-                                                                          12)),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 8,
-                                                            ),
-                                                            const Text('X'),
-                                                            const SizedBox(
-                                                              width: 8,
-                                                            ),
-                                                            Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          2,
-                                                                      horizontal:
-                                                                          6),
-                                                              decoration: BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              6),
-                                                                  color: Colors
-                                                                      .white,
-                                                                  border: Border.all(
-                                                                      color: Colors
-                                                                          .grey)),
-                                                              child: Text(
-                                                                  '${item.quantity}',
-                                                                  style: const TextStyle(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      fontSize:
-                                                                          12)),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: SizedBox(
+                                                      height: 75,
+                                                      width: 75,
+                                                      child: Image.network(
+                                                        item.imageUrl,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                  Expanded(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 12,
+                                                              bottom: 12),
+                                                      child: Column(
+                                                        // mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+
+                                                        children: [
+                                                          Text(item.skuName,
+                                                              // maxLines: 4,
+                                                              // softWrap: true, // Enables word wrapping
+                                                              // overflow: TextOverflow.visible, // Ensures text doesn't get truncated
+
+                                                              style:
+                                                                  const TextStyle(
+                                                                      fontSize:
+                                                                          15)),
+                                                          const SizedBox(
+                                                            height: 14,
+                                                          ),
+                                                          Text(
+                                                              'Code: ${item.skuCode}',
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                          const SizedBox(
+                                                            height: 14,
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                  '₹${item.listPrice}',
+                                                                  style: const TextStyle(
+                                                                      color: Colors
+                                                                          .red,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold)),
+                                                              const SizedBox(
+                                                                width: 14,
+                                                              ),
+                                                              Container(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical: 2,
+                                                                    horizontal:
+                                                                        6),
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            6),
+                                                                    color: Colors
+                                                                        .white,
+                                                                    border: Border.all(
+                                                                        color: Colors
+                                                                            .grey)),
+                                                                child: Text(
+                                                                    '${item.listPrice}',
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            12)),
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 8,
+                                                              ),
+                                                              const Text('X'),
+                                                              const SizedBox(
+                                                                width: 8,
+                                                              ),
+                                                              Container(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical: 2,
+                                                                    horizontal:
+                                                                        6),
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            6),
+                                                                    color: Colors
+                                                                        .white,
+                                                                    border: Border.all(
+                                                                        color: Colors
+                                                                            .grey)),
+                                                                child: Text(
+                                                                    '${item.quantity}',
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            12)),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Positioned(
-                                          right: 0,
-                                          bottom: 0,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: IconButton(
-                                                onPressed: _scanProduct,
-                                                icon: const Icon(
-                                                  Icons.document_scanner_outlined,
-                                                  color: Colors.orange,
-                                                )),
-                                          ),
-                                        )
-                                      ],
-                                    );
+                                          Positioned(
+                                            right: 0,
+                                            bottom: 0,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: IconButton(
+                                                  onPressed: () {
+                                                    _scanProduct(item.skuCode);
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons
+                                                        .document_scanner_outlined,
+                                                    color: Colors.orange,
+                                                  )),
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    });
                                   })),
                           SizedBox(
                               height: MediaQuery.of(context).size.height / 2.5),
@@ -306,13 +318,29 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   bool successBarcodeFlag = false;
 
-  Future<void> _scanProduct() async {
+  Future<void> _scanProduct(String skuCode) async {
     // Replace this with your QR scanning function.
     String? scannedCode = await goToQrPage("your-phone-number");
     if (scannedCode != null) {
-      setState(() {
-        successBarcodeFlag = true;
-      });
+      if (skuCode == scannedCode) {
+        orderController.scanProduct(scannedCode);
+      } else {
+        Get.snackbar(
+          "Error",
+          "SKUCODE not matching",
+          snackPosition: SnackPosition.TOP,
+          // Position at the top
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+          margin: const EdgeInsets.only(top: 200, left: 20, right: 20),
+          // Center-like effect
+          animationDuration: const Duration(milliseconds: 500),
+          forwardAnimationCurve: Curves.easeInOut,
+          // Smooth animation
+          overlayBlur: 2, // No background blur
+        );
+      }
       // _codeController.text = scannedCode;
 
       // fetchProductDetails(scannedCode);

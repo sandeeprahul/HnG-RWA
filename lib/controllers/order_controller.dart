@@ -49,6 +49,8 @@ class OrderController extends GetxController {
     }
   }
 
+
+
   IconData _getOrderIcon(String status) {
     switch (status) {
       case 'open':
