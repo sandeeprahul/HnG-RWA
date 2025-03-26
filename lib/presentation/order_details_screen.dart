@@ -75,142 +75,172 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   itemBuilder: (context, index) {
                                     final item = orderDetails!.items[index];
 
-                                    return SizedBox(
-                                      child: Card(
-                                        color: Colors.white,
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              height: 150,width: 4,
-                                              color: Colors.red,
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(
-                                                      8.0),
-                                              child: SizedBox(
-                                                height: 75,
-                                                width: 75,
-                                                child: Image.network(
-                                                  item.imageUrl,
+                                    return Stack(
+                                      children: [
+                                        SizedBox(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                border: Border.all(
+                                                    color: Colors.red),
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                      color:
+                                                          Colors.grey.shade100,
+                                                      spreadRadius: 2,
+                                                      blurRadius: 2)
+                                                ]),
+                                            margin: const EdgeInsets.only(
+                                                bottom: 6),
+                                            child: Row(
+                                              children: [
+                                                /*     Container(
+                                                  height: 150,width: 4,
+                                                  // color: Colors.red,
+                                                ),*/
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: SizedBox(
+                                                    height: 75,
+                                                    width: 75,
+                                                    child: Image.network(
+                                                      item.imageUrl,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(top: 12,bottom: 12),
-                                                child: Column(
-                                                  // mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 12,
+                                                            bottom: 12),
+                                                    child: Column(
+                                                      // mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
 
-                                                  children: [
-                                                    Text(item.skuName,
-                                                        // maxLines: 4,
-                                                        // softWrap: true, // Enables word wrapping
-                                                        // overflow: TextOverflow.visible, // Ensures text doesn't get truncated
-
-                                                        style:
-                                                            const TextStyle(
-                                                                fontSize:
-                                                                    15)),
-                                                    const SizedBox(
-                                                      height: 14,
-                                                    ),
-                                                    Text(
-                                                        'Code: ${item.skuCode}',
-                                                        style: const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
-                                                    const SizedBox(
-                                                      height: 14,
-                                                    ),
-                                                    Row(
                                                       children: [
+                                                        Text(item.skuName,
+                                                            // maxLines: 4,
+                                                            // softWrap: true, // Enables word wrapping
+                                                            // overflow: TextOverflow.visible, // Ensures text doesn't get truncated
+
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        15)),
+                                                        const SizedBox(
+                                                          height: 14,
+                                                        ),
                                                         Text(
-                                                            '₹${item.listPrice}',
+                                                            'Code: ${item.skuCode}',
                                                             style: const TextStyle(
-                                                                color: Colors
-                                                                    .red,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold)),
                                                         const SizedBox(
-                                                          width: 14,
+                                                          height: 14,
                                                         ),
-                                                        Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical:
-                                                                      2,
-                                                                  horizontal:
-                                                                      6),
-                                                          decoration: BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                                '₹${item.listPrice}',
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold)),
+                                                            const SizedBox(
+                                                              width: 14,
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          2,
+                                                                      horizontal:
                                                                           6),
-                                                              color: Colors
-                                                                  .white,
-                                                              border: Border.all(
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              6),
                                                                   color: Colors
-                                                                      .grey)),
-                                                          child: Text(
-                                                              '${item.listPrice}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: Colors
-                                                                    .black,
-                                                                      fontSize: 12
-
-                                                                  )),
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 8,
-                                                        ),
-                                                        const Text('X'),
-                                                        const SizedBox(
-                                                          width: 8,
-                                                        ),
-                                                        Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical:
-                                                                      2,
-                                                                  horizontal:
-                                                                      6),
-                                                          decoration: BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
+                                                                      .white,
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .grey)),
+                                                              child: Text(
+                                                                  '${item.listPrice}',
+                                                                  style: const TextStyle(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          12)),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 8,
+                                                            ),
+                                                            const Text('X'),
+                                                            const SizedBox(
+                                                              width: 8,
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          2,
+                                                                      horizontal:
                                                                           6),
-                                                              color: Colors
-                                                                  .white,
-                                                              border: Border.all(
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              6),
                                                                   color: Colors
-                                                                      .grey)),
-                                                          child: Text(
-                                                              '${item.quantity}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: Colors
-                                                                    .black,
-                                                                    fontSize: 12
-                                                              )),
+                                                                      .white,
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .grey)),
+                                                              child: Text(
+                                                                  '${item.quantity}',
+                                                                  style: const TextStyle(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          12)),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
+                                              ],
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
+                                        Positioned(
+                                          right: 0,
+                                          bottom: 0,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: IconButton(
+                                                onPressed: _scanProduct,
+                                                icon: const Icon(
+                                                  Icons.document_scanner_outlined,
+                                                  color: Colors.orange,
+                                                )),
+                                          ),
+                                        )
+                                      ],
                                     );
                                   })),
                           SizedBox(
@@ -226,7 +256,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: _scanProduct,
+                              onPressed: () {},
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange,
                                 padding: const EdgeInsets.symmetric(
@@ -235,7 +265,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
-                              child: const Text('SCAN'),
+                              child: const Text(
+                                'READY TO SHIP',
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
                         ],

@@ -100,8 +100,8 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Text(
-          widget.type == 0? 'Update Out For Delivery':"Delivery Update",
+        title: Text(
+          widget.type == 0 ? 'Update Out For Delivery' : "Delivery Update",
           style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.orange,
@@ -140,7 +140,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                     orders: orderController.orders,
                     onOrderTap: (order) {
                       if (widget.type == 0) {
-                        showDeliveryPopup( order);
+                        showDeliveryPopup(order);
                       } else {
                         showOutForDeliveryPopup(order);
                       }
@@ -148,8 +148,6 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
               }
             }),
           ),
-
-
           Container(
             decoration: BoxDecoration(border: Border.all(color: Colors.orange)),
             child: Row(
@@ -207,29 +205,29 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
 
             // Using Obx to observe loading state
             Obx(() => ElevatedButton(
-              onPressed: controller.isLoading.value
-                  ? null
-                  : () {
-                controller.submitDeliveryDetails(
-                  name: nameController.text,
-                  mobile: mobileController.text,
-                  minutes: int.tryParse(minutesController.text) ?? 0,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                // minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: controller.isLoading.value
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
-                'Out For Delivery',
-                style: TextStyle(color: Colors.white),
-              ),
-            )),
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : () {
+                          controller.submitDeliveryDetails(
+                            name: nameController.text,
+                            mobile: mobileController.text,
+                            minutes: int.tryParse(minutesController.text) ?? 0,
+                          );
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    // minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: controller.isLoading.value
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'Out For Delivery',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                )),
           ],
         ),
       ),
@@ -268,7 +266,8 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
 
             // Send OTP Button
             ElevatedButton(
-              onPressed:() => controller.sendOtp(mobileController.text,nameController.text,order['orderId']),
+              onPressed: () => controller.sendOtp(
+                  mobileController.text, nameController.text, order['orderId']),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 minimumSize: const Size(double.infinity, 45),
@@ -279,9 +278,9 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
               child: controller.isLoading.value
                   ? const CircularProgressIndicator(color: Colors.white)
                   : const Text(
-                'Send OTP',
-                style: TextStyle(color: Colors.white),
-              ),
+                      'Send OTP',
+                      style: TextStyle(color: Colors.white),
+                    ),
             ),
             const SizedBox(height: 16),
 
@@ -303,14 +302,15 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
               ),
             ),
 
-
             const SizedBox(height: 20),
 
             // Final Out For Delivery Button (Only visible if OTP is verified)
             ElevatedButton(
-              onPressed:  () {
+              onPressed: () {
                 controller.submitDelivered(
-                    orderId:  order['orderId']
+                  orderId: order['orderId'],
+                  mobile: mobileController.text,
+                  name: nameController.text,
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -323,9 +323,9 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
               child: controller.isLoading.value
                   ? const CircularProgressIndicator(color: Colors.white)
                   : const Text(
-                'Delivered',
-                style: TextStyle(color: Colors.white),
-              ),
+                      'Delivered',
+                      style: TextStyle(color: Colors.white),
+                    ),
             ),
           ],
         ),
@@ -334,7 +334,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
     );
   }
 
-  Widget buildTextField(String label,TextEditingController controller) {
+  Widget buildTextField(String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
