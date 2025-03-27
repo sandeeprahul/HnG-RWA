@@ -18,6 +18,7 @@ import '../../../provider/week_off_provider.dart';
 import 'package:http/http.dart' as http;
 
 import '../../dashboard_page.dart';
+import '../../order_management_screen.dart';
 import '../../week_off_employee_list_page.dart';
 import 'employees_leave_apply_page.dart';
 
@@ -97,6 +98,11 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                               // fullscreenDialog: true,
                               builder: (context) => const WebViewExample()),
                         );
+                      } else if (audit.auditId == 108) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => OrderManagementScreen()));
                       }
                     },
                     child: Column(

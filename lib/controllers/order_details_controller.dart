@@ -18,13 +18,14 @@ class OrderDetailsController extends GetxController {
     super.onInit();
   }
 
-  Future<void> scanProduct(String skuCode) async {
+  Future<void> scanProduct(String skuCode, int originalQuantity) async {
     // borderColors[skuCode] = Colors.red; // Error case, keep red
     // borderColors.refresh();
+    //https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=106&ean_code=502309
     try {
       final response = await http.get(
         Uri.parse(
-            "http://36.255.252.199/selfcheck_uat/api/checkout/geteandetail?location=106&ean_code=$skuCode"),
+            "https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=106&ean_code=$skuCode"),
         // Replace with actual API URL
         headers: {"Content-Type": "application/json"},
         // body: jsonEncode({"sku_code": skuCode}),
@@ -56,12 +57,13 @@ class OrderDetailsController extends GetxController {
         } else {
           bool isProductFound = responseData["product"]
               .any((product) => product["SKU_CODE"] == skuCode);
-          borderColors[skuCode] =
-              isProductFound ? Colors.green : Colors.transparent;
+          /* borderColors[skuCode] =
+              isProductFound ? Colors.green : Colors.transparent;*/
           if (isProductFound) {
             List batchList = responseData["batch"];
             if (batchList.isNotEmpty) {
-              showMRPSelectionDialog(batchList, skuCode); // Show MRP popup
+              showMRPSelectionDialog(
+                  batchList, skuCode, originalQuantity); // Show MRP popup
             }
           }
 
@@ -77,7 +79,7 @@ class OrderDetailsController extends GetxController {
           // }
         }
 
-        borderColors.assignAll({...borderColors}); // ✅ Forces UI update
+        // borderColors.assignAll({...borderColors}); // ✅ Forces UI update
         // update();
       } else {
         borderColors[skuCode] = Colors.red; // Error case, keep red
@@ -91,49 +93,55 @@ class OrderDetailsController extends GetxController {
     }
   }
 
-  void showMRPSelectionDialog(List batchList, String skuCode) {
+  void showMRPSelectionDialog(
+      List batchList, String skuCode, int originalQuantity) {
     selectedMRP.value = "";
     selectedStockNo.value = "";
     quantityController.clear();
     Get.dialog(
+      barrierDismissible: false,
       AlertDialog(
         title: const Text("Select MRP & Quantity"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Obx(() => DropdownButton<String>(
-              hint: const Text("Select MRP"),
-              value: selectedMRP.value.isEmpty ? null : selectedMRP.value,
-              isExpanded: true,
-              items: batchList.map<DropdownMenuItem<String>>((batch) {
-                return DropdownMenuItem<String>(
-                  value: batch["MRP"],
-                  child: Text(
-                      "₹${batch["MRP"]} (Stock No: ${batch["STORE_SKU_LOC_STOCK_NO"]})"),
-                );
-              }).toList(),
-              onChanged: (value) {
-                selectedMRP.value = value!;
-                selectedStockNo.value = batchList
-                    .firstWhere((batch) => batch["MRP"] == value)["STORE_SKU_LOC_STOCK_NO"];
-              },
-            )),
+                  hint: const Text("Select MRP"),
+                  value: selectedMRP.value.isEmpty ? null : selectedMRP.value,
+                  isExpanded: true,
+                  items: batchList.map<DropdownMenuItem<String>>((batch) {
+                    return DropdownMenuItem<String>(
+                      value: batch["MRP"],
+                      child: Text(
+                          "₹${batch["MRP"]} (Stock No: ${batch["STORE_SKU_LOC_STOCK_NO"]})"),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    selectedMRP.value = value!;
+                    selectedStockNo.value = batchList.firstWhere((batch) =>
+                        batch["MRP"] == value)["STORE_SKU_LOC_STOCK_NO"];
+                  },
+                )),
             const SizedBox(height: 10),
             TextField(
               controller: quantityController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Enter Quantity",
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: "Enter Quantity not more than $originalQuantity",
+                labelStyle: const TextStyle(fontSize: 12),
+                border: const OutlineInputBorder(),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(
+          /*TextButton(
             onPressed: () => Get.back(),
-            child: const Text("Cancel"),
-          ),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),*/
           TextButton(
             onPressed: () {
               if (selectedMRP.value.isEmpty) {
@@ -141,9 +149,19 @@ class OrderDetailsController extends GetxController {
                 return;
               }
 
+              /// can be zero and not more than give quantity
               int? quantity = int.tryParse(quantityController.text);
-              if (quantity == null || quantity <= 0) {
+              if (quantity == null) {
+                showErrorSnackbar("Error", "Please enter a valid quantity");
+                return;
+              }
+              /*if (quantity <= 0) {
                 showErrorSnackbar("Error", "Quantity must be greater than zero");
+                return;
+              }*/
+              if (quantity > originalQuantity) {
+                showErrorSnackbar("Error",
+                    "Quantity cannot exceed available stock ($originalQuantity)");
                 return;
               }
 
@@ -152,6 +170,8 @@ class OrderDetailsController extends GetxController {
                 "stockNo": selectedStockNo.value,
                 "quantity": quantity,
               };
+              selectedProductData.refresh();  // Force UI to update
+              updateProductQuantity(skuCode, quantity);
 
               // Find and update the item in the order
               // OrderItem? item = order.items.firstWhereOrNull((item) => item.skuCode == skuCode);
@@ -159,16 +179,26 @@ class OrderDetailsController extends GetxController {
               //   item.updateItem(double.parse(selectedMRP.value), quantity);
               //   order.updateOrderSummary(); // Update totals
               // }
+              borderColors[skuCode] = Colors.green;
+              borderColors.assignAll({...borderColors}); // ✅ Forces UI update
 
               Get.back();
             },
-            child: const Text("Confirm"),
+            child: const Text(
+              "Confirm",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
     );
   }
-
+  void updateProductQuantity(String skuCode, int newQuantity) {
+    if (selectedProductData.containsKey(skuCode)) {
+      selectedProductData[skuCode]?["quantity"] = newQuantity;
+      selectedProductData.refresh();  // Force UI to update
+    }
+  }
   void showErrorSnackbar(String title, String message) {
     Get.snackbar(
       title,

@@ -72,20 +72,29 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           ),
                           const SizedBox(height: 16),
                           Expanded(
-                              // flex: 2,
-                              child: ListView.builder(
-                                  itemCount: orderDetails!.items.length,
-                                  itemBuilder: (context, index) {
-                                    final item = orderDetails!.items[index];
+                            child: ListView.builder(
+                              // shrinkWrap: true,
+                                itemCount: orderDetails!.items.length+1,
+                                itemBuilder: (context, index) {
+                                  if (index == orderDetails!.items.length) {
+                                    // Last item -> Show PaymentSummary
+                                    return PaymentSummary(order: orderDetails!, orderController: orderController,);
+                                  }
 
-                                    return Obx(() {
-                                      // final borderColor = orderController
-                                      //         .borderColors[item.skuCode] ??
-                                      //     Colors.red;
-                                      final selectedData = orderController
-                                          .selectedProductData[item.skuCode];
+                                  final item = orderDetails!.items[index];
 
-                                      return Stack(
+                                  return Obx(() {
+                                    // final borderColor = orderController
+                                    //         .borderColors[item.skuCode] ??
+                                    //     Colors.red;
+                                    final selectedData = orderController
+                                        .selectedProductData[item.skuCode];
+
+                                    return InkWell(
+                                      onTap: (){
+                                        _scanProduct(item.skuCode,item.quantity);
+                                      },
+                                      child: Stack(
                                         children: [
                                           SizedBox(
                                             child: Container(
@@ -230,7 +239,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                                     selectedData !=
                                                                             null
                                                                         ? '${selectedData["quantity"]}'
-                                                                        : 'N/A',
+                                                                        : '${item.quantity}',
                                                                     style: const TextStyle(
                                                                         color: Colors
                                                                             .black,
@@ -255,7 +264,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                   const EdgeInsets.all(8.0),
                                               child: IconButton(
                                                   onPressed: () {
-                                                    _scanProduct(item.skuCode);
+                                                    _scanProduct(item.skuCode,item.quantity);
                                                   },
                                                   icon: const Icon(
                                                     Icons
@@ -265,19 +274,20 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                             ),
                                           )
                                         ],
-                                      );
-                                    });
-                                  })),
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height / 2.5),
+                                      ),
+                                    );
+                                  });
+                                }),
+                          ),
+                       /*   PaymentSummary(
+                            order: orderDetails!,
+                          ),*/
                         ],
                       ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          PaymentSummary(
-                            order: orderDetails!,
-                          ),
+
                           SizedBox(
                             width: double.infinity,
                             height:successOrderIdFlag? 75:45,
@@ -377,12 +387,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   bool successOrderIdFlag = false;
 
-  Future<void> _scanProduct(String skuCode) async {
+  Future<void> _scanProduct(String skuCode, int quantity) async {
     // Replace this with your QR scanning function.
     String? scannedCode = await goToQrPage("your-phone-number");
     if (scannedCode != null) {
       if (skuCode == scannedCode) {
-        orderController.scanProduct(scannedCode);
+        orderController.scanProduct(scannedCode,quantity);
       } else {
         Get.snackbar(
           "Error",

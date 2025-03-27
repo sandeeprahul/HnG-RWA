@@ -5,25 +5,30 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 
+import '../data/UserLocations.dart';
+import 'location_controller.dart';
+
 class OrderController extends GetxController {
   var isLoading = true.obs;
   var isError = false.obs;
   var orders = <Map<String, dynamic>>[].obs;
+  final LocationController locationController = Get.put(LocationController());
 
   @override
   void onInit() {
-    fetchOrders();
+    // fetchOrders();
     super.onInit();
   }
 
-  Future<void> fetchOrders() async {
+  Future<void> fetchOrders(String locationCode) async {
     try {
       isLoading(true);
       isError(false);
 
       final response = await http.get(Uri.parse(
-          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/StoreOrderlist/106'));
+          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/StoreOrderlist/$locationCode'));
 
+      print(response.body);
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['status'] == 'ok') {
@@ -48,8 +53,6 @@ class OrderController extends GetxController {
       isLoading(false);
     }
   }
-
-
 
   IconData _getOrderIcon(String status) {
     switch (status) {

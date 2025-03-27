@@ -7,6 +7,7 @@ class DeliveryController extends GetxController {
   var isLoading = false.obs; // Observable loading state
   var isOtpSent = false.obs; // Tracks if OTP is sent
   var otpFromServer = ''.obs; // Stores OTP received from API
+  var otpVerified = false.obs;
 
   Future<void> sendOtp(String mobile, String name, String orderId) async {
     const String otpApiUrl =
@@ -51,12 +52,15 @@ class DeliveryController extends GetxController {
   }
 
   Future<void> verifyOtp(String enteredOtp) async {
-    if (enteredOtp == otpFromServer.value) {
+    if (enteredOtp == otpFromServer.value.toString()) {
       // Get.back(); // Close popup after success
+      otpVerified.value=true;
       Get.snackbar("Success", "OTP verified successfully!",
           backgroundColor: Colors.green, colorText: Colors.white);
       // await Future.delayed(const Duration(milliseconds: 500));
     } else {
+      otpVerified.value=false;
+
       Get.snackbar("Error", "Invalid OTP. Try again!",
           backgroundColor: Colors.red, colorText: Colors.white);
     }
