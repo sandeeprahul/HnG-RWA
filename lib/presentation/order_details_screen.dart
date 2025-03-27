@@ -13,8 +13,9 @@ import '../widgets/payment_card_widget.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> order;
+  final String selectedLocationCode;
 
-  const OrderDetailsScreen({super.key, required this.order});
+  const OrderDetailsScreen({super.key, required this.order,required this.selectedLocationCode});
 
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -31,6 +32,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   void initState() {
     super.initState();
     fetchOrderDetails();
+    orderController.selectedProductData.clear();
   }
 
   @override
@@ -97,7 +99,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                     return InkWell(
                                       onTap: () {
                                         _scanProduct(
-                                            item.skuCode, item.quantity);
+                                            item.skuCode, item.quantity,widget.selectedLocationCode);
                                       },
                                       child: Stack(
                                         children: [
@@ -270,7 +272,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                               child: IconButton(
                                                   onPressed: () {
                                                     _scanProduct(item.skuCode,
-                                                        item.quantity);
+                                                        item.quantity,widget.selectedLocationCode);
                                                   },
                                                   icon: const Icon(
                                                     Icons
@@ -285,38 +287,27 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   });
                                 }),
                           ),
-                          /*   PaymentSummary(
-                            order: orderDetails!,
-                          ),*/
                         ],
                       ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           SizedBox(
-                            width: double.infinity,
                             height: 45,
-                            child: Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed:_submitReadyToShip,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orange,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 8),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'READY TO SHIP',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _submitReadyToShip,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
+                              ),
+                              child: const Text(
+                                'READY TO SHIP',
+                                style: TextStyle(color: Colors.white),
                               ),
                             ),
                           ),
@@ -360,12 +351,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   bool successOrderIdFlag = false;
 
-  Future<void> _scanProduct(String skuCode, int quantity) async {
+  Future<void> _scanProduct(String skuCode, int quantity, String selectedLocationCode) async {
     // Replace this with your QR scanning function.
     String? scannedCode = await goToQrPage("your-phone-number");
     if (scannedCode != null) {
       if (skuCode == scannedCode) {
-        orderController.scanProduct(scannedCode, quantity);
+        orderController.scanProduct(scannedCode, quantity,selectedLocationCode);
       } else {
         Get.snackbar(
           "Error",
@@ -407,23 +398,26 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           "Sku_code": skuCode,
           "Order_id": orderDetails?.orderId ?? "",
           // Ensure order ID is present
-          "sku_batch_no": data["batch_no"] ?? "UNKNOWN",
+          "sku_batch_no": data["stockNo"] ?? "",
           // Fallback batch number
         });
       });
 
       // Ensure there is data to send
       if (pickedItems.isEmpty) {
-
         debugPrint("No items picked for shipping.");
-        Get.snackbar("Failure", "Failed to get location",overlayBlur: 2 );
+        Get.snackbar("Failure", "No items picked for shipping.",
+            overlayBlur: 2,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
 
         return;
       }
 
+
       // Define API endpoint
       const url =
-          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/order/readyToShip';
+          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/UpdateRTS';
 
       // Make API request
       final response = await http.post(
@@ -432,6 +426,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         body: jsonEncode(pickedItems),
       );
       print("_submitReadyToShip");
+      print(url);
+      print(jsonEncode(pickedItems));
       print(response.body);
 
       setState(() {
@@ -440,6 +436,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
         if (responseBody['status'] == "ok") {
+          Navigator.pop(context);
           Get.snackbar('Success', responseBody['message'],
               overlayBlur: 2,
               backgroundColor: Colors.green,
@@ -460,9 +457,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
       }
     } catch (e) {
       Get.snackbar('Error', "Error submitting Ready to Ship data: $e",
-          overlayBlur: 2,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
+          overlayBlur: 2, backgroundColor: Colors.red, colorText: Colors.white);
 
       debugPrint("Error submitting Ready to Ship data: $e");
     } finally {

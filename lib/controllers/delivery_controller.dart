@@ -68,6 +68,8 @@ class DeliveryController extends GetxController {
       Get.snackbar("Success", "OTP verified successfully!",
           backgroundColor: Colors.green, colorText: Colors.white);
       // await Future.delayed(const Duration(milliseconds: 500));
+      print(enteredOtp);
+      print(otpFromServer.value.toString());
     } else {
       otpVerified.value = false;
 

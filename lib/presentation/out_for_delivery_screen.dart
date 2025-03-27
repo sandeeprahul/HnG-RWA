@@ -510,9 +510,16 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
 
             ElevatedButton(
               onPressed: () {
-                mobileController.clear();
-                nameController.clear();
-                controller.verifyOtp(otpController.text);
+                if (otpController.text.isNotEmpty) {
+                  controller.verifyOtp(otpController.text);
+                  mobileController.clear();
+                  nameController.clear();
+                } else {
+                  Get.snackbar("Alert!", "Please enter otp",
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      overlayBlur: 2);
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
@@ -559,7 +566,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
           ],
         ),
       ),
-      barrierDismissible: true,
+      barrierDismissible: false,
     );
   }
 

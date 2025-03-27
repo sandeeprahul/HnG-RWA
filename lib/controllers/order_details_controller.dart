@@ -18,14 +18,14 @@ class OrderDetailsController extends GetxController {
     super.onInit();
   }
 
-  Future<void> scanProduct(String skuCode, int originalQuantity) async {
+  Future<void> scanProduct(String skuCode, int originalQuantity, String selectedLocationCode) async {
     // borderColors[skuCode] = Colors.red; // Error case, keep red
     // borderColors.refresh();
     //https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=106&ean_code=502309
     try {
       final response = await http.get(
         Uri.parse(
-            "https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=106&ean_code=$skuCode"),
+            "https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=$selectedLocationCode&ean_code=$skuCode"),
         // Replace with actual API URL
         headers: {"Content-Type": "application/json"},
         // body: jsonEncode({"sku_code": skuCode}),
@@ -54,7 +54,20 @@ class OrderDetailsController extends GetxController {
             overlayBlur: 2, // No background blur
           );
           borderColors.assignAll({...borderColors}); // ✅ Forces UI update
-        } else {
+        } else if(responseData["statusCode"] == "401"){
+          Get.snackbar(
+            "${responseData["Status"]}",
+            "${responseData["Message"]}",
+            snackPosition: SnackPosition.TOP,
+            // Position at the top
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
+            duration: const Duration(seconds: 3),
+            overlayBlur: 2, // No background blur
+          );
+
+        }else {
           bool isProductFound = responseData["product"]
               .any((product) => product["SKU_CODE"] == skuCode);
           /* borderColors[skuCode] =

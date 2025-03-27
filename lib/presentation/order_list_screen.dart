@@ -136,22 +136,24 @@ class _OrderListScreenState extends State<OrderListScreen> {
             child: locations.isEmpty
                 ? const Center(child: Text("No locations available"))
                 : Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: TextField(
-                        controller: searchController,
-                        decoration: const InputDecoration(
-                          hintText: "Search",
-                          hintStyle: TextStyle(fontSize: 15),
-                          suffixIcon: Icon(Icons.search),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: TextField(
+                          controller: searchController,
+                          decoration: const InputDecoration(
+                            hintText: "Search",
+                            hintStyle: TextStyle(fontSize: 15),
+                            suffixIcon: Icon(Icons.search),
+                          ),
+                          onChanged: filterSearch,
                         ),
-                        onChanged: filterSearch,
                       ),
-                    ),
-                    const SizedBox(height: 10,),
-                    Expanded(
-                      child: ListView.builder(
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Expanded(
+                        child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: filteredLocations.length,
                           itemBuilder: (context, index) {
@@ -159,19 +161,21 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             return Card(
                               child: ListTile(
                                 title: Text(location.locationName),
-                                subtitle: Text("Code: ${location.locationCode}"),
+                                subtitle:
+                                    Text("Code: ${location.locationCode}"),
                                 onTap: () async {
                                   print("Code: ${location.locationCode}");
                                   Navigator.pop(context); // Close popup
-                                  await checkDistanceAndProceed(context, location);
+                                  await checkDistanceAndProceed(
+                                      context, location);
                                 },
                               ),
                             );
                           },
                         ),
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
           ),
           actions: [
             TextButton(
@@ -186,8 +190,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
   /// **Check distance & perform next action**
   Future<void> checkDistanceAndProceed(
-      BuildContext context, UserLocations location) async
-  {
+      BuildContext context, UserLocations location) async {
     double userLat, userLng;
 
     // Get user location
@@ -234,24 +237,31 @@ class _OrderListScreenState extends State<OrderListScreen> {
       orderController.isError.value = true;
       orderController.isLoading.value = false;
       Get.snackbar(
-          "Alert!", "You are too far (${distance.toStringAsFixed(2)} meters)",
-          backgroundColor: Colors.red,colorText: Colors.white,);
+        "Alert!",
+        "You are too far (${distance.toStringAsFixed(2)} meters)",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       // Navigator.of(context).pop();
     }
   }
 
   /// **Example method called after successful selection**
-  void onLocationSelected(UserLocations selectedLocation) {
-    print("Proceed with location: ${selectedLocation.locationCode}");
+  void onLocationSelected(UserLocations selectedLocationn) {
+    print("Proceed with location: ${selectedLocationn.locationCode}");
+    setState(() {
+      selectedLocation = selectedLocationn;
+    });
     // Perform next actions like fetching orders, etc.
-    orderController.fetchOrders(selectedLocation.locationCode);
+    orderController.fetchOrders(selectedLocationn.locationCode);
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    orderController.orders.clear();  // Removes all elements but keeps the observable list
+    orderController.orders
+        .clear(); // Removes all elements but keeps the observable list
     fetchLocations();
   }
 
@@ -299,9 +309,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     } else if (orderController.isLoading.value) {
                       return const Center(child: CircularProgressIndicator());
                     } else {
-                      if(
-                      orderController.orders.isEmpty
-                      ){
+                      if (orderController.orders.isEmpty) {
                         return const Center(child: Text('No data'));
                       }
                       return OrderListWidget(
@@ -310,8 +318,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    OrderDetailsScreen(order: order),
+                                builder: (context) => OrderDetailsScreen(
+                                  order: order,
+                                  selectedLocationCode:
+                                      selectedLocation!.locationCode,
+                                ),
                               ),
                             );
                           });
