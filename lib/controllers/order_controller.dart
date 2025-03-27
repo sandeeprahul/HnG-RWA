@@ -22,6 +22,8 @@ class OrderController extends GetxController {
 
   Future<void> fetchOrders(String locationCode) async {
     try {
+      orders.clear();
+      orders.value = [];
       isLoading(true);
       isError(false);
 

@@ -223,10 +223,10 @@ class _OrderListScreenState extends State<OrderListScreen> {
       double.parse(location.longitude),
     );
 
-    if (distance <= 100.0) {
+    if (distance >= 100.0) {
       // Max 100 meters
 
-      Get.snackbar("Failure", "You are near the store");
+      // Get.snackbar("Failure", "You are near the store");
 
       // **Call your method after successful selection**
       onLocationSelected(location);
@@ -251,6 +251,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    orderController.orders.clear();  // Removes all elements but keeps the observable list
     fetchLocations();
   }
 

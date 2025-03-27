@@ -9,6 +9,9 @@ class DeliveryController extends GetxController {
   var otpFromServer = ''.obs; // Stores OTP received from API
   var otpVerified = false.obs;
 
+
+
+
   Future<void> sendOtp(String mobile, String name, String orderId) async {
     const String otpApiUrl =
         "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/DeliveryConfSendOTP"; // Replace with actual API
@@ -33,12 +36,19 @@ class DeliveryController extends GetxController {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         print("sendOtp Response: $responseData");
+        if (responseData["status"] == "ok" ||
+            responseData["message"] == "OTP sent successfully.") {
+          otpFromServer.value =
+              responseData["otp"].toString(); // Store OTP from API
+          isOtpSent.value = true; // Enable OTP verification
+          Get.snackbar("Success", "OTP sent successfully!",
+              backgroundColor: Colors.green, colorText: Colors.white);
+        }else{
+          Get.snackbar("Success", responseData["message"] ,
+              backgroundColor: Colors.green, colorText: Colors.white);
+        }
 
-        otpFromServer.value =
-            responseData["otp"].toString(); // Store OTP from API
-        isOtpSent.value = true; // Enable OTP verification
-        Get.snackbar("Success", "OTP sent successfully!",
-            backgroundColor: Colors.green, colorText: Colors.white);
+
       } else {
         Get.snackbar("Error", "Failed to send OTP.",
             backgroundColor: Colors.red, colorText: Colors.white);
@@ -54,12 +64,12 @@ class DeliveryController extends GetxController {
   Future<void> verifyOtp(String enteredOtp) async {
     if (enteredOtp == otpFromServer.value.toString()) {
       // Get.back(); // Close popup after success
-      otpVerified.value=true;
+      otpVerified.value = true;
       Get.snackbar("Success", "OTP verified successfully!",
           backgroundColor: Colors.green, colorText: Colors.white);
       // await Future.delayed(const Duration(milliseconds: 500));
     } else {
-      otpVerified.value=false;
+      otpVerified.value = false;
 
       Get.snackbar("Error", "Invalid OTP. Try again!",
           backgroundColor: Colors.red, colorText: Colors.white);
@@ -127,9 +137,9 @@ class DeliveryController extends GetxController {
     print("submitDelivered: $apiUrl");
 
     Map<String, dynamic> requestBody = {
-      "order_id": "OID101",
-      // "order_id": orderId,
-      "Delivered_To_Person_Name":name,
+      // "order_id": "OID101",
+      "order_id": orderId,
+      "Delivered_To_Person_Name": name,
       "Delivered_To_Mobile_No": mobile
     };
     print("submitDelivered: $requestBody");
@@ -161,7 +171,9 @@ class DeliveryController extends GetxController {
               backgroundColor: Colors.red, colorText: Colors.white);
         }
       } else {
-        Get.snackbar("Failed", "Failed to submit. Please try again.",
+        final responseData = jsonDecode(response.body);
+
+        Get.snackbar("Failed", "${responseData['message']}",
             backgroundColor: Colors.red, colorText: Colors.white);
       }
     } catch (e) {

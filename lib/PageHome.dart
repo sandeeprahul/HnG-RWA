@@ -489,12 +489,12 @@ class _PageHomeState extends State<PageHome> {
 
             // const ScanQrWidget(),
             const Divider(),
-           /* GestureDetector(
+            GestureDetector(
               onTap: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>  OrderManagementScreen()));
+                        builder: (context) => OrderManagementScreen()));
               },
               child: Container(
                 margin: const EdgeInsets.only(left: 15, right: 15, bottom: 5),
@@ -527,8 +527,6 @@ class _PageHomeState extends State<PageHome> {
                         'HyperLocal ',
                         style: lightTheme.textTheme.labelSmall!.copyWith(
                             fontSize: 14, fontWeight: FontWeight.bold),
-
-
                       ),
                     ),
                     const Spacer(),
@@ -541,7 +539,7 @@ class _PageHomeState extends State<PageHome> {
                 ),
               ),
             ),
-            const Divider(),*/
+            const Divider(),
 
             Align(
               alignment: Alignment.topLeft,

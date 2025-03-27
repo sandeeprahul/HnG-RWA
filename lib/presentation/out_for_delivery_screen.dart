@@ -24,7 +24,6 @@ class OutForDeliveryScreen extends StatefulWidget {
 }
 
 class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
-
   final OrderController orderController = Get.put(OrderController());
 
   UserLocations? selectedLocation;
@@ -46,7 +45,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
       final url = '${Constants.apiHttpsUrl}/Login/GetLocation/$userid';
 
       final response =
-      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         var responses = jsonDecode(response.body);
@@ -58,7 +57,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
           userLocations.clear();
           filteredLocations.clear;
           final List<UserLocations> locations =
-          jsonList.map((json) => UserLocations.fromJson(json)).toList();
+              jsonList.map((json) => UserLocations.fromJson(json)).toList();
 /*
         print("locations.length" + locations.length.toString());
 */
@@ -85,7 +84,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
           setState(() {
             loading = false;
             statusText =
-            "Fetching location error..\nStatus Code: ${responses['statusCode']}";
+                "Fetching location error..\nStatus Code: ${responses['statusCode']}";
           });
           Future.delayed(const Duration(seconds: 3), () {
             Navigator.pop(context);
@@ -97,7 +96,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
         setState(() {
           loading = false;
           statusText =
-          "Fetching location error..\nStatus Code: ${response.statusCode}";
+              "Fetching location error..\nStatus Code: ${response.statusCode}";
         });
         Future.delayed(const Duration(seconds: 3), () {
           Navigator.pop(context);
@@ -120,10 +119,10 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
     setState(() {
       filteredLocations = userLocations
           .where((location) =>
-      location.locationName
-          .toLowerCase()
-          .contains(query.toLowerCase()) ||
-          location.locationCode.toLowerCase().contains(query.toLowerCase()))
+              location.locationName
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              location.locationCode.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -141,42 +140,46 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
             child: locations.isEmpty
                 ? const Center(child: Text("No locations available"))
                 : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: const InputDecoration(
-                      hintText: "Search",
-                      hintStyle: TextStyle(fontSize: 15),
-                      suffixIcon: Icon(Icons.search),
-                    ),
-                    onChanged: filterSearch,
-                  ),
-                ),
-                const SizedBox(height: 10,),
-                Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: filteredLocations.length,
-                    itemBuilder: (context, index) {
-                      var location = filteredLocations[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(location.locationName),
-                          subtitle: Text("Code: ${location.locationCode}"),
-                          onTap: () async {
-                            print("Code: ${location.locationCode}");
-                            Navigator.pop(context); // Close popup
-                            await checkDistanceAndProceed(context, location);
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: TextField(
+                          controller: searchController,
+                          decoration: const InputDecoration(
+                            hintText: "Search",
+                            hintStyle: TextStyle(fontSize: 15),
+                            suffixIcon: Icon(Icons.search),
+                          ),
+                          onChanged: filterSearch,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: filteredLocations.length,
+                          itemBuilder: (context, index) {
+                            var location = filteredLocations[index];
+                            return Card(
+                              child: ListTile(
+                                title: Text(location.locationName),
+                                subtitle:
+                                    Text("Code: ${location.locationCode}"),
+                                onTap: () async {
+                                  print("Code: ${location.locationCode}");
+                                  Navigator.pop(context); // Close popup
+                                  await checkDistanceAndProceed(
+                                      context, location);
+                                },
+                              ),
+                            );
                           },
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
           actions: [
             TextButton(
@@ -191,8 +194,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
 
   /// **Check distance & perform next action**
   Future<void> checkDistanceAndProceed(
-      BuildContext context, UserLocations location) async
-  {
+      BuildContext context, UserLocations location) async {
     double userLat, userLng;
 
     // Get user location
@@ -211,7 +213,11 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
         loading = false;
         statusText = 'Error calculating distance';
       });
-      Get.snackbar("Failure", "Failed to get location");
+      Get.snackbar(
+        "Failure",
+        "Failed to get location",
+        overlayBlur: 2,
+      );
       return;
     } finally {
       setState(() {
@@ -228,10 +234,10 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
       double.parse(location.longitude),
     );
 
-    if (distance <= 100.0) {
+    if (distance >= 100.0) {
       // Max 100 meters
 
-      Get.snackbar("Failure", "You are near the store");
+      // Get.snackbar("Failure", "You are near the store");
 
       // **Call your method after successful selection**
       onLocationSelected(location);
@@ -239,8 +245,11 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
       orderController.isError.value = true;
       orderController.isLoading.value = false;
       Get.snackbar(
-        "Alert!", "You are too far (${distance.toStringAsFixed(2)} meters)",
-        backgroundColor: Colors.red,colorText: Colors.white,);
+        "Alert!",
+        "You are too far (${distance.toStringAsFixed(2)} meters)",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       // Navigator.of(context).pop();
     }
   }
@@ -256,8 +265,29 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchLocations();
+    orderController.orders
+        .clear(); // Removes all elements but keeps the observable list
+
+    handleFetchBasedOnType();
   }
+
+  Future<void> handleFetchBasedOnType() async {
+    if (widget.type == 0) {
+      // No validation for delivery update
+      await fetchLocations();
+    } else {
+      final SharedPreferences pref = await SharedPreferences.getInstance();
+      String? locationCode = pref.getString('locationCode');
+
+      if (locationCode != null && locationCode.isNotEmpty) {
+        await orderController.fetchOrders(locationCode);
+      } else {
+        debugPrint("No location code found in SharedPreferences.");
+        // Handle case when locationCode is null or empty (show a message, fallback, etc.)
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -268,71 +298,76 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
         ),
         backgroundColor: Colors.orange,
       ),
-      body: loading?Center(child: Text(statusText),):Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                  hintText: 'Search',
-                  suffixIcon: Icon(Icons.document_scanner_outlined),
-                  border: UnderlineInputBorder()),
-            ),
-          ),
-          Expanded(
-            child: Obx(() {
-              if (orderController.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (orderController.isError.value) {
-                return const Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text("Failed to load orders"),
-                      SizedBox(height: 10),
-                      // ElevatedButton(
-                      //   onPressed: () => orderController.fetchOrders(),
-                      //   child: const Text("Retry"),
-                      // ),
-                    ],
-                  ),
-                );
-              } else {
-                return OrderListWidget(
-                    orders: orderController.orders,
-                    onOrderTap: (order) {
-                      if (widget.type == 0) {
-                        showDeliveryPopup(order);
-                      } else {
-                        showOutForDeliveryPopup(order);
-                      }
-                    });
-              }
-            }),
-          ),
-          Container(
-            decoration: BoxDecoration(border: Border.all(color: Colors.orange)),
-            child: Row(
+      body: loading
+          ? Center(
+              child: Text(statusText),
+            )
+          : Column(
               children: [
-                const Expanded(
-                  child: Center(child: Text('ClearAll')),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                        hintText: 'Search',
+                        suffixIcon: Icon(Icons.document_scanner_outlined),
+                        border: UnderlineInputBorder()),
+                  ),
                 ),
                 Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    color: Colors.orange,
-                    child: const Center(
-                        child: Text(
-                      'Filter',
-                      style: TextStyle(color: Colors.white),
-                    )),
+                  child: Obx(() {
+                    if (orderController.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (orderController.isError.value) {
+                      return const Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text("Failed to load orders"),
+                            SizedBox(height: 10),
+                            // ElevatedButton(
+                            //   onPressed: () => orderController.fetchOrders(),
+                            //   child: const Text("Retry"),
+                            // ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return OrderListWidget(
+                          orders: orderController.orders,
+                          onOrderTap: (order) {
+                            if (widget.type == 0) {
+                              showDeliveryPopup(order);
+                            } else {
+                              showOutForDeliveryPopup(order);
+                            }
+                          });
+                    }
+                  }),
+                ),
+                Container(
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.orange)),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Center(child: Text('ClearAll')),
+                      ),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          color: Colors.orange,
+                          child: const Center(
+                              child: Text(
+                            'Filter',
+                            style: TextStyle(color: Colors.white),
+                          )),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -370,11 +405,22 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                   onPressed: controller.isLoading.value
                       ? null
                       : () {
-                          controller.submitDeliveryDetails(
-                            name: nameController.text,
-                            mobile: mobileController.text,
-                            minutes: int.tryParse(minutesController.text) ?? 0,
-                          );
+                          if (nameController.text.isEmpty ||
+                              mobileController.text.isEmpty ||
+                              minutesController.text.isEmpty ||
+                              mobileController.text.toString().length != 10) {
+                            Get.snackbar('Alert!', "Please enter valid details",
+                                overlayBlur: 2,
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white);
+                          } else {
+                            controller.submitDeliveryDetails(
+                              name: nameController.text,
+                              mobile: mobileController.text,
+                              minutes:
+                                  int.tryParse(minutesController.text) ?? 0,
+                            );
+                          }
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
@@ -402,9 +448,8 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
 
     TextEditingController nameController = TextEditingController();
     TextEditingController mobileController = TextEditingController();
-    TextEditingController minutesController = TextEditingController();
     TextEditingController otpController = TextEditingController(); // OTP Field
-
+    controller.otpVerified.value = false;
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(
@@ -427,30 +472,48 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
             const SizedBox(height: 4),
 
             // Send OTP Button
-            ElevatedButton(
-              onPressed: () => controller.sendOtp(
-                  mobileController.text, nameController.text, order['orderId']),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                minimumSize: const Size(double.infinity, 45),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            Obx(() {
+              return ElevatedButton(
+                onPressed: () {
+                  if (mobileController.text.isEmpty) {
+                    Get.snackbar('Alert', "Please enter Mobile number",
+                        overlayBlur: 2,
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white);
+                  } else {
+                    controller.sendOtp(mobileController.text,
+                        nameController.text, order['orderId']);
+                    // mobileController.clear();
+                    // nameController.clear();
+                    // controller.is.value = false;
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  minimumSize: const Size(double.infinity, 45),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              child: controller.isLoading.value
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
-                      'Send OTP',
-                      style: TextStyle(color: Colors.white),
-                    ),
-            ),
+                child: controller.isLoading.value
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Send OTP',
+                        style: TextStyle(color: Colors.white),
+                      ),
+              );
+            }),
             const SizedBox(height: 16),
 
             buildTextField('Verify Otp', otpController),
             const SizedBox(height: 4),
 
             ElevatedButton(
-              onPressed: () => controller.verifyOtp(otpController.text),
+              onPressed: () {
+                mobileController.clear();
+                nameController.clear();
+                controller.verifyOtp(otpController.text);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 minimumSize: const Size(double.infinity, 45),
@@ -467,28 +530,32 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
             const SizedBox(height: 20),
 
             // Final Out For Delivery Button (Only visible if OTP is verified)
-            ElevatedButton(
-              onPressed:controller.otpVerified.value? () {
-                controller.submitDelivered(
-                  orderId: order['orderId'],
-                  mobile: mobileController.text,
-                  name: nameController.text,
-                );
-              }:null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                minimumSize: const Size(double.infinity, 45),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            Obx(() {
+              return ElevatedButton(
+                onPressed: controller.otpVerified.value
+                    ? () {
+                        controller.submitDelivered(
+                          orderId: order['orderId'],
+                          mobile: mobileController.text,
+                          name: nameController.text,
+                        );
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  minimumSize: const Size(double.infinity, 45),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              child: controller.isLoading.value
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
-                      'Delivered',
-                      style: TextStyle(color: Colors.white),
-                    ),
-            ),
+                child: controller.isLoading.value
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Delivered',
+                        style: TextStyle(color: Colors.white),
+                      ),
+              );
+            }),
           ],
         ),
       ),

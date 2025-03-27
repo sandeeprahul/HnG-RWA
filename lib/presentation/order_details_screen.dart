@@ -7,6 +7,7 @@ import 'package:hng_flutter/controllers/order_details_controller.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
 
+import '../common/constants.dart';
 import '../data/order_model.dart';
 import '../widgets/payment_card_widget.dart';
 
@@ -73,12 +74,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           const SizedBox(height: 16),
                           Expanded(
                             child: ListView.builder(
-                              // shrinkWrap: true,
-                                itemCount: orderDetails!.items.length+1,
+                                // shrinkWrap: true,
+                                itemCount: orderDetails!.items.length + 1,
                                 itemBuilder: (context, index) {
                                   if (index == orderDetails!.items.length) {
                                     // Last item -> Show PaymentSummary
-                                    return PaymentSummary(order: orderDetails!, orderController: orderController,);
+                                    return PaymentSummary(
+                                      order: orderDetails!,
+                                      orderController: orderController,
+                                    );
                                   }
 
                                   final item = orderDetails!.items[index];
@@ -91,8 +95,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         .selectedProductData[item.skuCode];
 
                                     return InkWell(
-                                      onTap: (){
-                                        _scanProduct(item.skuCode,item.quantity);
+                                      onTap: () {
+                                        _scanProduct(
+                                            item.skuCode, item.quantity);
                                       },
                                       child: Stack(
                                         children: [
@@ -264,7 +269,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                   const EdgeInsets.all(8.0),
                                               child: IconButton(
                                                   onPressed: () {
-                                                    _scanProduct(item.skuCode,item.quantity);
+                                                    _scanProduct(item.skuCode,
+                                                        item.quantity);
                                                   },
                                                   icon: const Icon(
                                                     Icons
@@ -279,7 +285,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   });
                                 }),
                           ),
-                       /*   PaymentSummary(
+                          /*   PaymentSummary(
                             order: orderDetails!,
                           ),*/
                         ],
@@ -287,64 +293,31 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-
                           SizedBox(
                             width: double.infinity,
-                            height:successOrderIdFlag? 75:45,
-
-                            child: Stack(
-                              children: [
-                                Visibility(
-                                  visible:successOrderIdFlag,
-                                  child: Positioned(
-                                    left: 0,right: 0,
-                                    bottom: 0,
-                                    child: SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.orange,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 8),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'READY TO SHIP',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
+                            height: 45,
+                            child: Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed:_submitReadyToShip,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-
-                                  left: 0,right: 0,
-                                  top: 0,
-
-                                  child: SizedBox(
-                                    child: CircleAvatar(
-
-                                      // onPressed: (){},
-                                      // color: Colors.orange,
-
-                                        backgroundColor:Colors.orange,
-                                        radius: 22,
-                                        child: IconButton(
-                                          onPressed:(){
-                                            _scanOrderId(orderDetails!.orderId);
-                                          },
-                                          icon: const Icon(
-                                            Icons.document_scanner_outlined,
-                                            color: Colors.white,
-                                          ),
-                                        )),
+                                  child: const Text(
+                                    'READY TO SHIP',
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ),
-
-                              ],
+                              ),
                             ),
                           ),
                         ],
@@ -392,17 +365,17 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     String? scannedCode = await goToQrPage("your-phone-number");
     if (scannedCode != null) {
       if (skuCode == scannedCode) {
-        orderController.scanProduct(scannedCode,quantity);
+        orderController.scanProduct(scannedCode, quantity);
       } else {
         Get.snackbar(
           "Error",
           "SKUCODE not matching",
-          snackPosition: SnackPosition.TOP,
+          snackPosition: SnackPosition.BOTTOM,
           // Position at the top
           backgroundColor: Colors.red,
           colorText: Colors.white,
           duration: const Duration(seconds: 2),
-          margin: const EdgeInsets.only(top: 200, left: 20, right: 20),
+          margin: const EdgeInsets.only(bottom: 40, left: 20, right: 20),
           // Center-like effect
           animationDuration: const Duration(milliseconds: 500),
           forwardAnimationCurve: Curves.easeInOut,
@@ -416,12 +389,94 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
       // fetchProductDetails(scannedCode);
     }
   }
+
+  void _submitReadyToShip() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      List<Map<String, dynamic>> pickedItems = [];
+
+      // Iterate through selectedProductData to prepare JSON payload
+      orderController.selectedProductData.forEach((skuCode, data) {
+        pickedItems.add({
+          "Picked_MRP": data["mrp"] ?? 0.0,
+          // Ensure fallback value
+          "Picked_Qty": data["quantity"] ?? 0,
+          // Ensure fallback value
+          "Sku_code": skuCode,
+          "Order_id": orderDetails?.orderId ?? "",
+          // Ensure order ID is present
+          "sku_batch_no": data["batch_no"] ?? "UNKNOWN",
+          // Fallback batch number
+        });
+      });
+
+      // Ensure there is data to send
+      if (pickedItems.isEmpty) {
+
+        debugPrint("No items picked for shipping.");
+        Get.snackbar("Failure", "Failed to get location",overlayBlur: 2 );
+
+        return;
+      }
+
+      // Define API endpoint
+      const url =
+          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/order/readyToShip';
+
+      // Make API request
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(pickedItems),
+      );
+      print("_submitReadyToShip");
+      print(response.body);
+
+      setState(() {
+        isLoading = false;
+      });
+      if (response.statusCode == 200) {
+        var responseBody = jsonDecode(response.body);
+        if (responseBody['status'] == "ok") {
+          Get.snackbar('Success', responseBody['message'],
+              overlayBlur: 2,
+              backgroundColor: Colors.green,
+              colorText: Colors.white);
+        }
+        // debugPrint("Ready to Ship data submitted successfully!");
+        debugPrint("Response: ${response.body}");
+
+        // Optionally show a success message to the user
+      } else {
+        Get.snackbar('Failure', "${response.statusCode}",
+            overlayBlur: 2,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
+
+        debugPrint("Failed to submit data: ${response.statusCode}");
+        debugPrint("Response: ${response.body}");
+      }
+    } catch (e) {
+      Get.snackbar('Error', "Error submitting Ready to Ship data: $e",
+          overlayBlur: 2,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+
+      debugPrint("Error submitting Ready to Ship data: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   Future<void> _scanOrderId(String orderId) async {
     // Replace this with your QR scanning function.
     String? scannedCode = await goToQrPage("your-phone-number");
     if (scannedCode != null) {
-
-      if(scannedCode==orderId){
+      if (scannedCode == orderId) {
         setState(() {
           successOrderIdFlag = true;
         });
