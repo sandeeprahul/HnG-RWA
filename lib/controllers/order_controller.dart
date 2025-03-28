@@ -14,6 +14,16 @@ class OrderController extends GetxController {
   var orders = <Map<String, dynamic>>[].obs;
   final LocationController locationController = Get.put(LocationController());
 
+  var type = 0.obs; // Reactive variable
+
+  OrderController(int initialType) {
+    type.value = initialType;
+  }
+
+  void updateType(int newType) {
+    type.value = newType;
+  }
+
   @override
   void onInit() {
     // fetchOrders();
@@ -27,10 +37,22 @@ class OrderController extends GetxController {
       isLoading(true);
       isError(false);
 
-      final response = await http.get(Uri.parse(
-          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/StoreOrderlist/$locationCode'));
+      late String url;
+      if (type.value == -1) {
+        url =
+            "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/StoreOrderlist/$locationCode";
+      } else if (type.value == 1) {
+        url =
+            "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/StoreOrderlistOFD/$locationCode";
+      } else if (type.value == 0) {
+        url =
+            "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/StoreOrderlistRTS/$locationCode";
+      }
+
+      final response = await http.get(Uri.parse(url));
 
       print(response.body);
+      print(url);
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['status'] == 'ok') {

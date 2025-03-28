@@ -43,13 +43,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(GetMaterialApp(
-          theme: lightTheme,
-          getPages: AppPages.pages,
-          // initialBinding: loginBinding(),
-          debugShowCheckedModeBanner: false,
-          // home: const OrderListScreen())
-          home: const GifScreen())
-      );
+      theme: lightTheme,
+      getPages: AppPages.pages,
+      // initialBinding: loginBinding(),
+      debugShowCheckedModeBanner: false,
+      // home: const OrderListScreen())
+      home: const GifScreen()));
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   // WidgetsBinding.instance;

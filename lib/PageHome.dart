@@ -489,7 +489,7 @@ class _PageHomeState extends State<PageHome> {
 
             // const ScanQrWidget(),
             const Divider(),
-            GestureDetector(
+           /* GestureDetector(
               onTap: () {
                 Navigator.push(
                     context,
@@ -540,7 +540,7 @@ class _PageHomeState extends State<PageHome> {
               ),
             ),
             const Divider(),
-
+*/
             Align(
               alignment: Alignment.topLeft,
               child: Padding(

@@ -11,12 +11,15 @@ class OrderDetailsController extends GetxController {
   var selectedStockNo = "".obs; // Selected Stock Number
   var quantityController = TextEditingController(); // Quantity input
   final RxMap<String, dynamic> selectedProductData = <String, dynamic>{}.obs;
+  var quantityControllers = <String, TextEditingController>{}.obs;
 
   @override
   void onInit() {
     borderColors.clear();
     super.onInit();
   }
+
+
 
   Future<void> scanProduct(String skuCode, int originalQuantity, String selectedLocationCode) async {
     // borderColors[skuCode] = Colors.red; // Error case, keep red

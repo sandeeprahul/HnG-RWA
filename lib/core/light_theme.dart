@@ -16,6 +16,8 @@ lightTheme = ThemeData(
     backgroundColor: Color(0xffF5F5F5),
     // backgroundColor: Color.fromARGB(255, 242, 242, 247),
     foregroundColor: Colors.black,
+    iconTheme: IconThemeData(color: Colors.white),
+
   ),
   bottomSheetTheme: BottomSheetThemeData(
     backgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
@@ -37,12 +39,12 @@ lightTheme = ThemeData(
   dialogTheme: DialogTheme(
     backgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
     surfaceTintColor: const Color.fromRGBO(237, 237, 237, 1.0),
-    titleTextStyle: GoogleFonts.poppins(
+    titleTextStyle: GoogleFonts.montserrat(
       color: Colors.black,
       fontSize: 20.0,
       fontWeight: FontWeight.w500,
     ),
-    contentTextStyle: GoogleFonts.poppins(
+    contentTextStyle: GoogleFonts.montserrat(
       color: Colors.black,
       fontSize: 16,
       fontWeight: FontWeight.w400,
@@ -65,11 +67,11 @@ lightTheme = ThemeData(
       borderRadius: BorderRadius.circular(4.0),
     ),
     backgroundColor: const Color(0xfff76613),
-    textStyle: GoogleFonts.poppins(fontSize: 16.0, color: Colors.white),
+    textStyle: GoogleFonts.montserrat(fontSize: 16.0, color: Colors.white),
   )),
   filledButtonTheme: FilledButtonThemeData(
     style: FilledButton.styleFrom(
-      textStyle: GoogleFonts.poppins(
+      textStyle: GoogleFonts.montserrat(
         color: Colors.white,
         fontSize: 16.0,
       ),
@@ -80,23 +82,23 @@ lightTheme = ThemeData(
     size: 24.0,
   ),
   inputDecorationTheme: InputDecorationTheme(
-    labelStyle: GoogleFonts.poppins(
+    labelStyle: GoogleFonts.montserrat(
       color: Colors.black,
       fontSize: 16.0,
     ),
-    floatingLabelStyle: GoogleFonts.poppins(
+    floatingLabelStyle: GoogleFonts.montserrat(
       color: Colors.black,
       fontSize: 16.0,
     ),
-    errorStyle: GoogleFonts.poppins(
+    errorStyle: GoogleFonts.montserrat(
       color: Colors.red,
       fontSize: 14.0,
     ),
-    hintStyle: GoogleFonts.poppins(
+    hintStyle: GoogleFonts.montserrat(
       color: const Color.fromARGB(153, 61, 61, 66),
       fontSize: 16.0,
     ),
-    helperStyle: GoogleFonts.poppins(
+    helperStyle: GoogleFonts.montserrat(
       color: const Color.fromARGB(153, 61, 61, 66),
       fontSize: 16.0,
     ),
@@ -138,7 +140,7 @@ lightTheme = ThemeData(
       );
     }),
     labelTextStyle: MaterialStateTextStyle.resolveWith((states) {
-      return GoogleFonts.poppins(
+      return GoogleFonts.montserrat(
         color: Colors.black,
         fontSize: 14.0,
       );

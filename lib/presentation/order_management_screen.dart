@@ -4,6 +4,8 @@ import 'order_list_screen.dart';
 import 'out_for_delivery_screen.dart';
 
 class OrderManagementScreen extends StatelessWidget {
+  const OrderManagementScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,6 +14,8 @@ class OrderManagementScreen extends StatelessWidget {
           'Order Management Process',
           style: TextStyle(color: Colors.white,fontSize: 16),
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
+
         backgroundColor: Colors.orange,
         // centerTitle: true,
       ),
@@ -69,7 +73,7 @@ class CustomButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const CustomButton({
+  const CustomButton({super.key,
     required this.icon,
     required this.label,
     required this.onPressed,

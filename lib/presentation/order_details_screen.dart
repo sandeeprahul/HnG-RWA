@@ -15,7 +15,8 @@ class OrderDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> order;
   final String selectedLocationCode;
 
-  const OrderDetailsScreen({super.key, required this.order,required this.selectedLocationCode});
+  const OrderDetailsScreen(
+      {super.key, required this.order, required this.selectedLocationCode});
 
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -98,8 +99,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
                                     return InkWell(
                                       onTap: () {
-                                        _scanProduct(
-                                            item.skuCode, item.quantity,widget.selectedLocationCode);
+                                        /*  _scanProduct(
+                                            item.skuCode, item.quantity,widget.selectedLocationCode);*/
                                       },
                                       child: Stack(
                                         children: [
@@ -126,161 +127,208 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                   ]),
                                               margin: const EdgeInsets.only(
                                                   bottom: 6),
-                                              child: Row(
+                                              child: Column(
                                                 children: [
-                                                  /*     Container(
-                                                      height: 150,width: 4,
-                                                      // color: Colors.red,
-                                                    ),*/
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: SizedBox(
-                                                      height: 75,
-                                                      width: 75,
-                                                      child: Image.network(
-                                                        item.imageUrl,
+                                                  Row(
+                                                    children: [
+                                                      /*     Container(
+                                                          height: 150,width: 4,
+                                                          // color: Colors.red,
+                                                        ),*/
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: SizedBox(
+                                                          height: 75,
+                                                          width: 75,
+                                                          child: Image.network(
+                                                            item.imageUrl,
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 12,
-                                                              bottom: 12),
-                                                      child: Column(
-                                                        // mainAxisAlignment: MainAxisAlignment.start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 12,
+                                                                  bottom: 12),
+                                                          child: Column(
+                                                            // mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
 
-                                                        children: [
-                                                          Text(item.skuName,
-                                                              // maxLines: 4,
-                                                              // softWrap: true, // Enables word wrapping
-                                                              // overflow: TextOverflow.visible, // Ensures text doesn't get truncated
+                                                            children: [
+                                                              Text(item.skuName,
+                                                                  // maxLines: 4,
+                                                                  // softWrap: true, // Enables word wrapping
+                                                                  // overflow: TextOverflow.visible, // Ensures text doesn't get truncated
 
-                                                              style:
-                                                                  const TextStyle(
+                                                                  style: const TextStyle(
                                                                       fontSize:
                                                                           15)),
-                                                          const SizedBox(
-                                                            height: 14,
-                                                          ),
-                                                          Text(
-                                                              'Code: ${item.skuCode}',
-                                                              style: const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold)),
-                                                          const SizedBox(
-                                                            height: 14,
-                                                          ),
-                                                          Row(
-                                                            children: [
+                                                              const SizedBox(
+                                                                height: 14,
+                                                              ),
                                                               Text(
-                                                                  selectedData !=
-                                                                          null
-                                                                      ? '₹${selectedData["mrp"]}'
-                                                                      : '₹${item.listPrice}',
+                                                                  'Code: ${item.skuCode}',
                                                                   style: const TextStyle(
-                                                                      color: Colors
-                                                                          .red,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold)),
                                                               const SizedBox(
-                                                                width: 14,
+                                                                height: 14,
                                                               ),
-                                                              Container(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    vertical: 2,
-                                                                    horizontal:
-                                                                        6),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
+                                                              Row(
+                                                                children: [
+                                                                  Text(
+                                                                      selectedData !=
+                                                                              null
+                                                                          ? '₹${selectedData["mrp"]}'
+                                                                          : '₹${item.listPrice}',
+                                                                      style: const TextStyle(
+                                                                          color: Colors
+                                                                              .red,
+                                                                          fontWeight:
+                                                                              FontWeight.bold)),
+                                                                  const SizedBox(
+                                                                    width: 14,
+                                                                  ),
+                                                                  Container(
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        vertical:
+                                                                            2,
+                                                                        horizontal:
                                                                             6),
-                                                                    color: Colors
-                                                                        .white,
-                                                                    border: Border.all(
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                6),
                                                                         color: Colors
-                                                                            .grey)),
-                                                                child: Text(
-                                                                    selectedData !=
-                                                                            null
-                                                                        ? '₹${selectedData["mrp"]}'
-                                                                        : '₹${item.listPrice}',
-                                                                    style: const TextStyle(
+                                                                            .white,
+                                                                        border: Border.all(
+                                                                            color:
+                                                                                Colors.grey)),
+                                                                    child: Text(
+                                                                        selectedData !=
+                                                                                null
+                                                                            ? '₹${selectedData["mrp"]}'
+                                                                            : '₹${item.listPrice}',
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                Colors.black,
+                                                                            fontSize: 12)),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  const Text(
+                                                                      'X'),
+                                                                  const SizedBox(
+                                                                    width: 8,
+                                                                  ),
+                                                                  Container(
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        vertical:
+                                                                            2,
+                                                                        horizontal:
+                                                                            6),
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                6),
                                                                         color: Colors
-                                                                            .black,
-                                                                        fontSize:
-                                                                            12)),
+                                                                            .white,
+                                                                        border: Border.all(
+                                                                            color:
+                                                                                Colors.grey)),
+                                                                    child: Text(
+                                                                        selectedData !=
+                                                                                null
+                                                                            ? '${selectedData["quantity"]}'
+                                                                            : '${item.quantity}',
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                Colors.black,
+                                                                            fontSize: 12)),
+                                                                  ),
+                                                                ],
                                                               ),
                                                               const SizedBox(
-                                                                width: 8,
+                                                                height: 4,
                                                               ),
-                                                              const Text('X'),
-                                                              const SizedBox(
-                                                                width: 8,
-                                                              ),
-                                                              Container(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    vertical: 2,
-                                                                    horizontal:
-                                                                        6),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            6),
-                                                                    color: Colors
-                                                                        .white,
-                                                                    border: Border.all(
-                                                                        color: Colors
-                                                                            .grey)),
-                                                                child: Text(
-                                                                    selectedData !=
-                                                                            null
-                                                                        ? '${selectedData["quantity"]}'
-                                                                        : '${item.quantity}',
-                                                                    style: const TextStyle(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontSize:
-                                                                            12)),
-                                                              ),
+
+                                                              // **Condition to Show TextField if Quantity is Zero**
+                                                              /*    item.quantity == 0
+                                                                  ?
+                                                                  : const SizedBox
+                                                                      .shrink(),*/
                                                             ],
                                                           ),
-                                                        ],
+                                                        ),
                                                       ),
-                                                    ),
+                                                    ],
                                                   ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      ElevatedButton(
+                                                          onPressed: () {
+                                                            _showEnterCodeDialog(
+                                                                context,
+                                                                item.skuCode,
+                                                                item.quantity,
+                                                                widget
+                                                                    .selectedLocationCode);
+                                                          },
+                                                          child: const Row(
+                                                            children: [
+                                                              Text(
+                                                                  'Enter Code'),
+                                                              SizedBox(
+                                                                width: 2,
+                                                              ),
+                                                              Icon(
+                                                                  Icons
+                                                                      .keyboard,
+                                                                  size: 16)
+                                                            ],
+                                                          )),
+                                                      ElevatedButton(
+                                                          onPressed: () {
+                                                            _scanProduct(
+                                                                item.skuCode,
+                                                                item.quantity,
+                                                                widget
+                                                                    .selectedLocationCode,
+                                                                1);
+                                                          },
+                                                          child: const Row(
+                                                            children: [
+                                                              Text('Scan Code'),
+                                                              SizedBox(
+                                                                width: 2,
+                                                              ),
+                                                              Icon(
+                                                                Icons
+                                                                    .document_scanner_outlined,
+                                                                size: 14,
+                                                              )
+                                                            ],
+                                                          )),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 6,),
                                                 ],
                                               ),
                                             ),
                                           ),
-                                          Positioned(
-                                            right: 0,
-                                            bottom: 0,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: IconButton(
-                                                  onPressed: () {
-                                                    _scanProduct(item.skuCode,
-                                                        item.quantity,widget.selectedLocationCode);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons
-                                                        .document_scanner_outlined,
-                                                    color: Colors.orange,
-                                                  )),
-                                            ),
-                                          )
                                         ],
                                       ),
                                     );
@@ -324,6 +372,49 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     );
   }
 
+  void _showEnterCodeDialog(
+      BuildContext context, String skuCode, int quantity, String locationCode) {
+    TextEditingController codeController = TextEditingController();
+
+    Get.defaultDialog(
+      barrierDismissible: false,
+      title: "Enter Code",
+      content: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: codeController,
+              decoration: const InputDecoration(
+                labelText: "Enter Product Code",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          ElevatedButton(
+            onPressed: () {
+              String enteredCode = codeController.text.trim();
+              if (enteredCode.isNotEmpty) {
+                _scanProduct(enteredCode, quantity, locationCode, 0);
+
+                ///0 for text entry
+                Get.back(); // Close dialog
+              } else {
+                Get.snackbar("Error", "Please enter a valid code",
+                    snackPosition: SnackPosition.BOTTOM);
+              }
+            },
+            child: const Text(
+              "Submit",
+              style: TextStyle(color: Colors.white),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> fetchOrderDetails() async {
     final String apiUrl =
         "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/StoreOrderDetailslist/${widget.order['orderId']}";
@@ -351,33 +442,37 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   bool successOrderIdFlag = false;
 
-  Future<void> _scanProduct(String skuCode, int quantity, String selectedLocationCode) async {
+  Future<void> _scanProduct(String skuCode, int quantity,
+      String selectedLocationCode, int fromTextOrScan) async {
     // Replace this with your QR scanning function.
-    String? scannedCode = await goToQrPage("your-phone-number");
-    if (scannedCode != null) {
-      if (skuCode == scannedCode) {
-        orderController.scanProduct(scannedCode, quantity,selectedLocationCode);
-      } else {
-        Get.snackbar(
-          "Error",
-          "SKUCODE not matching",
-          snackPosition: SnackPosition.BOTTOM,
-          // Position at the top
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          duration: const Duration(seconds: 2),
-          margin: const EdgeInsets.only(bottom: 40, left: 20, right: 20),
-          // Center-like effect
-          animationDuration: const Duration(milliseconds: 500),
-          forwardAnimationCurve: Curves.easeInOut,
-          // Smooth animation
-          overlayBlur: 2, // No background blur
-        );
-        orderController.borderColors[skuCode] = Colors.red;
-      }
-      // _codeController.text = scannedCode;
 
-      // fetchProductDetails(scannedCode);
+    if (fromTextOrScan == 0) {
+      orderController.scanProduct(skuCode, quantity, selectedLocationCode);
+    } else {
+      String? scannedCode = await goToQrPage("your-phone-number");
+      if (scannedCode != null) {
+        if (skuCode == scannedCode) {
+          orderController.scanProduct(
+              scannedCode, quantity, selectedLocationCode);
+        } else {
+          Get.snackbar(
+            "Error",
+            "SKUCODE not matching",
+            snackPosition: SnackPosition.BOTTOM,
+            // Position at the top
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 2),
+            margin: const EdgeInsets.only(bottom: 40, left: 20, right: 20),
+            // Center-like effect
+            animationDuration: const Duration(milliseconds: 500),
+            forwardAnimationCurve: Curves.easeInOut,
+            // Smooth animation
+            overlayBlur: 2, // No background blur
+          );
+          orderController.borderColors[skuCode] = Colors.red;
+        }
+      }
     }
   }
 
@@ -413,7 +508,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
         return;
       }
-
 
       // Define API endpoint
       const url =

@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/widgets/order_list_widget.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/constants.dart';
@@ -24,7 +25,7 @@ class OutForDeliveryScreen extends StatefulWidget {
 }
 
 class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
-  final OrderController orderController = Get.put(OrderController());
+  late OrderController orderController;
 
   UserLocations? selectedLocation;
   TextEditingController searchController = TextEditingController();
@@ -158,7 +159,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                       ),
                       Expanded(
                         child: ListView.builder(
-                          shrinkWrap: true,
+                          // shrinkWrap: true,
                           itemCount: filteredLocations.length,
                           itemBuilder: (context, index) {
                             var location = filteredLocations[index];
@@ -170,8 +171,12 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                                 onTap: () async {
                                   print("Code: ${location.locationCode}");
                                   Navigator.pop(context); // Close popup
-                                  await checkDistanceAndProceed(
-                                      context, location);
+                                  if (orderController.type.value == 0) {
+                                    await checkDistanceAndProceed(
+                                        context, location);
+                                  } else {
+                                    onLocationSelected(location);
+                                  }
                                 },
                               ),
                             );
@@ -181,11 +186,11 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                     ],
                   ),
           ),
-          actions: [
-            TextButton(
+          actions: const [
+            /*  TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text("Cancel"),
-            ),
+            ),*/
           ],
         );
       },
@@ -196,6 +201,19 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
   Future<void> checkDistanceAndProceed(
       BuildContext context, UserLocations location) async {
     double userLat, userLng;
+
+    var status = await Permission.location.status;
+
+    if (!status.isGranted) {
+      status = await Permission.location.request();
+      if (!status.isGranted) {
+        Get.defaultDialog(
+          middleText: 'Please grant camera permission',
+        );
+        print('Camera permission denied');
+        return;
+      }
+    }
 
     // Get user location
     try {
@@ -234,7 +252,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
       double.parse(location.longitude),
     );
 
-    if (distance >= 100.0) {
+    if (distance <= 100.0) {
       // Max 100 meters
 
       // Get.snackbar("Failure", "You are near the store");
@@ -255,16 +273,21 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
   }
 
   /// **Example method called after successful selection**
-  void onLocationSelected(UserLocations selectedLocation) {
-    print("Proceed with location: ${selectedLocation.locationCode}");
+  void onLocationSelected(UserLocations selectedLocationn) {
+    print("Proceed with location: ${selectedLocationn.locationCode}");
     // Perform next actions like fetching orders, etc.
-    orderController.fetchOrders(selectedLocation.locationCode);
+    setState(() {
+      selectedLocation = selectedLocationn;
+    });
+    orderController.fetchOrders(selectedLocationn.locationCode);
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    orderController = Get.put(OrderController(widget.type));
+
     orderController.orders
         .clear(); // Removes all elements but keeps the observable list
 
@@ -275,8 +298,13 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
     if (widget.type == 0) {
       // No validation for delivery update
       await fetchLocations();
+      orderController.updateType(0); // Change type
     } else {
-      final SharedPreferences pref = await SharedPreferences.getInstance();
+      await fetchLocations();
+
+      orderController.updateType(1); // Change type
+
+      /* final SharedPreferences pref = await SharedPreferences.getInstance();
       String? locationCode = pref.getString('locationCode');
 
       if (locationCode != null && locationCode.isNotEmpty) {
@@ -284,7 +312,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
       } else {
         debugPrint("No location code found in SharedPreferences.");
         // Handle case when locationCode is null or empty (show a message, fallback, etc.)
-      }
+      }*/
     }
   }
 
@@ -296,6 +324,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
           widget.type == 0 ? 'Update Out For Delivery' : "Delivery Update",
           style: const TextStyle(color: Colors.white),
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.orange,
       ),
       body: loading
@@ -332,6 +361,9 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                         ),
                       );
                     } else {
+                      if (orderController.orders.isEmpty) {
+                        return const Center(child: Text('No data'));
+                      }
                       return OrderListWidget(
                           orders: orderController.orders,
                           onOrderTap: (order) {
@@ -419,6 +451,8 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                               mobile: mobileController.text,
                               minutes:
                                   int.tryParse(minutesController.text) ?? 0,
+                              orderId: order['orderId'],
+                              locationCode: selectedLocation!.locationCode,
                             );
                           }
                         },
@@ -512,8 +546,6 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
               onPressed: () {
                 if (otpController.text.isNotEmpty) {
                   controller.verifyOtp(otpController.text);
-                  mobileController.clear();
-                  nameController.clear();
                 } else {
                   Get.snackbar("Alert!", "Please enter otp",
                       backgroundColor: Colors.red,
@@ -545,7 +577,10 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                           orderId: order['orderId'],
                           mobile: mobileController.text,
                           name: nameController.text,
+                          locationCode: selectedLocation!.locationCode,
                         );
+                        // mobileController.clear();
+                        // nameController.clear();
                       }
                     : null,
                 style: ElevatedButton.styleFrom(

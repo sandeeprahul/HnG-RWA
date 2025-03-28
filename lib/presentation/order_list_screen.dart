@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/widgets/order_list_widget.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/constants.dart';
@@ -21,13 +22,14 @@ class OrderListScreen extends StatefulWidget {
 }
 
 class _OrderListScreenState extends State<OrderListScreen> {
-  final OrderController orderController = Get.put(OrderController());
+  late OrderController orderController ;
   UserLocations? selectedLocation;
   TextEditingController searchController = TextEditingController();
   List<UserLocations> filteredLocations = [];
   bool loading = false;
   List<UserLocations> userLocations = [];
   String statusText = "Loading..";
+  bool showLocationList = false;
 
   Future<List<UserLocations>?> fetchLocations() async {
     try {
@@ -154,7 +156,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       ),
                       Expanded(
                         child: ListView.builder(
-                          shrinkWrap: true,
+                          // shrinkWrap: true,
                           itemCount: filteredLocations.length,
                           itemBuilder: (context, index) {
                             var location = filteredLocations[index];
@@ -178,10 +180,10 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
+            // TextButton(
+            //   onPressed: () => Navigator.pop(context),
+            //   child: const Text("Cancel"),
+            // ),
           ],
         );
       },
@@ -192,7 +194,18 @@ class _OrderListScreenState extends State<OrderListScreen> {
   Future<void> checkDistanceAndProceed(
       BuildContext context, UserLocations location) async {
     double userLat, userLng;
+    var status = await Permission.location.status;
 
+    if (!status.isGranted) {
+      status = await Permission.location.request();
+      if (!status.isGranted) {
+        Get.defaultDialog(
+          middleText: 'Please grant camera permission',
+        );
+        print('Camera permission denied');
+        return;
+      }
+    }
     // Get user location
     try {
       setState(() {
@@ -226,7 +239,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
       double.parse(location.longitude),
     );
 
-    if (distance >= 100.0) {
+    if (distance <= 100.0) {
       // Max 100 meters
 
       // Get.snackbar("Failure", "You are near the store");
@@ -260,6 +273,9 @@ class _OrderListScreenState extends State<OrderListScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    orderController = Get.put(OrderController(-1));///or any other unique value not 0 or 1 (outForDelivery/delivered)
+    orderController.updateType(-1); // Change type
+
     orderController.orders
         .clear(); // Removes all elements but keeps the observable list
     fetchLocations();
@@ -273,86 +289,94 @@ class _OrderListScreenState extends State<OrderListScreen> {
           'All Orders',
           style: TextStyle(color: Colors.white),
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.orange,
       ),
       body: loading
           ? Center(
               child: Text(statusText),
             )
-          : Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        hintText: 'Search',
-                        suffixIcon: Icon(Icons.document_scanner_outlined),
-                        border: UnderlineInputBorder()),
-                  ),
-                ),
-                Expanded(
-                  child: Obx(() {
-                    if (orderController.isError.value) {
-                      return const Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text("Failed to load orders"),
-                            SizedBox(height: 10),
-                            /*  ElevatedButton(
-                        onPressed: () => orderController.fetchOrders(),
-                        child: const Text("Retry"),
-                      ),*/
-                          ],
-                        ),
-                      );
-                    } else if (orderController.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      if (orderController.orders.isEmpty) {
-                        return const Center(child: Text('No data'));
-                      }
-                      return OrderListWidget(
-                          orders: orderController.orders,
-                          onOrderTap: (order) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => OrderDetailsScreen(
-                                  order: order,
-                                  selectedLocationCode:
-                                      selectedLocation!.locationCode,
-                                ),
-                              ),
-                            );
-                          });
-                    }
-                  }),
-                ),
-                Container(
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.orange)),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Center(child: Text('ClearAll')),
+          : Stack(
+            children: [
+
+              Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TextField(
+                        decoration: InputDecoration(
+                            hintText: 'Search',
+                            suffixIcon: Icon(Icons.document_scanner_outlined),
+                            border: UnderlineInputBorder()),
                       ),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          color: Colors.orange,
-                          child: const Center(
-                              child: Text(
-                            'Filter',
-                            style: TextStyle(color: Colors.white),
-                          )),
-                        ),
+                    ),
+                    Expanded(
+                      child: Obx(() {
+                        if (orderController.isError.value) {
+                          return const Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text("Failed to load orders"),
+                                SizedBox(height: 10),
+                                /*  ElevatedButton(
+                            onPressed: () => orderController.fetchOrders(),
+                            child: const Text("Retry"),
+                          ),*/
+                              ],
+                            ),
+                          );
+                        } else if (orderController.isLoading.value) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else {
+                          if (orderController.orders.isEmpty) {
+                            return const Center(child: Text('No data'));
+                          }
+                          return OrderListWidget(
+                              orders: orderController.orders,
+                              onOrderTap: (order) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OrderDetailsScreen(
+                                      order: order,
+                                      selectedLocationCode:
+                                          selectedLocation!.locationCode,
+                                    ),
+                                  ),
+                                ).then((value){
+                                  orderController.fetchOrders(selectedLocation!.locationCode);
+                                });
+                              });
+                        }
+                      }),
+                    ),
+                    Container(
+                      decoration:
+                          BoxDecoration(border: Border.all(color: Colors.orange)),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: Center(child: Text('ClearAll')),
+                          ),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              color: Colors.orange,
+                              child: const Center(
+                                  child: Text(
+                                'Filter',
+                                style: TextStyle(color: Colors.white),
+                              )),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+            ],
+          ),
     );
   }
 }
