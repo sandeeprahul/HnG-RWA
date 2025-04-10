@@ -282,76 +282,73 @@ class _ViewProfileState extends State<ViewProfile> {
                 // const Divider(),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.only(top: 12),
-                    decoration: const BoxDecoration(
+                    padding: const EdgeInsets.symmetric(horizontal: 28,vertical: 18),
+                    margin: const EdgeInsets.all(8),
+                    decoration:  BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(18),
-                            topRight: Radius.circular(18))),
+                        boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withOpacity(0.5),)],
+                        borderRadius: BorderRadius.circular(18)),
                     child: Stack(
                       children: [
                         Column(
                           children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 25, right: 15),
-                              child: Column(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      'Branch Name',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
+                            Column(
+                              children: [
+                                const Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    'Branch Name',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
                                     ),
                                   ),
-                                  const Divider(
-                                    color: Colors.white,
-                                    height: 3,
-                                  ),
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      location_name,
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
+                                ),
+                                const SizedBox(
+                                  // color: Colors.white,
+                                  height: 3,
+                                ),
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    location_name,
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                             const Divider(),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 25, right: 15),
-                              child: Column(
-                                children: [
-                                  const Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      'Reporting Manager',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
+
+                            Column(
+                              children: [
+                                const Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    'Reporting Manager',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
                                     ),
                                   ),
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      reporting_manager_name,
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
+                                ),
+                                const SizedBox(
+                                  // color: Colors.white,
+                                  height: 3,
+                                ),
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    reporting_manager_name,
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                             const Divider(),
                             InkWell(
@@ -361,75 +358,72 @@ class _ViewProfileState extends State<ViewProfile> {
                                   changePasswordPopup = true;
                                 });
                               },
-                              child: const Padding(
-                                padding: EdgeInsets.only(left: 25, right: 15),
-                                child: Row(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 10, bottom: 10),
-                                        child: Text(
-                                          'Change Your Password',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                          ),
+                              child: const Row(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 10, bottom: 10),
+                                      child: Text(
+                                        'Change Your Password',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
                                         ),
                                       ),
                                     ),
-                                    Spacer(),
-                                    Icon(
-                                      Icons.arrow_forward_ios_outlined,
-                                      size: 15,
-                                    )
-                                  ],
-                                ),
+                                  ),
+                                  Spacer(),
+                                  Icon(
+                                    Icons.arrow_forward_ios_outlined,
+                                    size: 15,
+                                  )
+                                ],
                               ),
                             ),
                             const Divider(),
-                            Text(
-                              'Version ${Constants.appVersion}\nId:$deviceId',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 10,),
-                            )
+
                           ],
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 20,
-                              right: 20,
-                              top: 30,
-                            ),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          18.0), // Set the border radius here
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Version ${Constants.appVersion}\nId:$deviceId',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 10,),
+                              ),
+                              const SizedBox(height: 12,),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            18.0), // Set the border radius here
+                                      ),
                                     ),
-                                  ),
-                                  onPressed: () {
-                                    Fluttertoast.showToast(
-                                        msg:
-                                            "Please wait while logging out user");
+                                    onPressed: () {
+                                      Fluttertoast.showToast(
+                                          msg:
+                                              "Please wait while logging out user");
 
-                                    logoutUser(context);
-                                  },
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'Logout',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.white),
-                                    ),
-                                  )),
-                            ),
+                                      logoutUser(context);
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Logout',
+                                        style: TextStyle(
+                                            fontSize: 20, color: Colors.white),
+                                      ),
+                                    )),
+                              ),
+                            ],
                           ),
                         )
                       ],
