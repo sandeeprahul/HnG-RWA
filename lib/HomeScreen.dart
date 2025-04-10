@@ -165,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? const Color(0xfff76613)
                                 : Colors.transparent,
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(5)),
+                                const BorderRadius.all(Radius.circular(12)),
                           ),
                           duration: const Duration(milliseconds: 300),
                           child: Column(
@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? const Color(0xfff76613)
                                 : Colors.transparent,
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(5)),
+                                const BorderRadius.all(Radius.circular(12)),
                           ),
                           padding: const EdgeInsets.only(
                               left: 15, right: 15, bottom: 3, top: 3),
@@ -257,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? const Color(0xfff76613)
                                 : Colors.transparent,
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(5)),
+                                const BorderRadius.all(Radius.circular(12)),
                           ),
                           padding: const EdgeInsets.only(
                               left: 15, right: 15, bottom: 3, top: 3),
@@ -303,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? const Color(0xfff76613)
                                 : Colors.transparent,
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(5)),
+                                const BorderRadius.all(Radius.circular(12)),
                           ),
                           padding: const EdgeInsets.only(
                               left: 15, right: 15, bottom: 3, top: 3),
@@ -362,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   margin: const EdgeInsets.only(right: 10),
                                   decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(8)),
                                   child: const Text(
                                     'We care',
                                     style: TextStyle(fontSize: 16),
