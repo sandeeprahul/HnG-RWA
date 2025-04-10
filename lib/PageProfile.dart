@@ -10,6 +10,7 @@ import 'package:hng_flutter/main.dart';
 import 'package:hng_flutter/presentation/my_staff_movement_applied_page.dart';
 import 'package:hng_flutter/presentation/my_staff_movement_history_page.dart';
 import 'package:hng_flutter/presentation/profile/staff_movement_page.dart';
+import 'package:hng_flutter/widgets/menu_list_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'common/constants.dart';
 import 'presentation/attendance/attendence_screen.dart';
@@ -35,7 +36,6 @@ class _PageProfileState extends State<PageProfile> {
   }
 
   getProfileImage() async {
-
     try {
       final storageRef = FirebaseStorage.instanceFor(
               bucket: "gs://hng-offline-marketing.appspot.com")
@@ -48,7 +48,8 @@ class _PageProfileState extends State<PageProfile> {
       //        storageRef.child("$locationCode/Profile/$userCode/$empCode.jpg");
       final imageUrl = await storageRef
           .child("Profile/$userCode/$profile_image_url_")
-          .getDownloadURL().timeout(const Duration(seconds: 5));
+          .getDownloadURL()
+          .timeout(const Duration(seconds: 5));
       setState(() {
         // attachProof = true;
         profileImageUrl = imageUrl;
@@ -58,7 +59,6 @@ class _PageProfileState extends State<PageProfile> {
         loading = false;
       });
     }
-
   }
 
   var profileImageUrl = "";
@@ -102,13 +102,13 @@ class _PageProfileState extends State<PageProfile> {
                               // backgroundImage: ,
                             )
                           : Hero(
-                        tag: 'userImage',
-                            child: CircleAvatar(
+                              tag: 'userImage',
+                              child: CircleAvatar(
                                 backgroundColor: Colors.blue,
                                 radius: 38,
                                 backgroundImage: NetworkImage(profileImageUrl),
                               ),
-                          ),
+                            ),
                       Expanded(
                         child: Column(
                           children: [
@@ -152,291 +152,68 @@ class _PageProfileState extends State<PageProfile> {
                   ),
                 ),
               ),
-              Container(
-                // margin: EdgeInsets.all(15),
-                padding: const EdgeInsets.only(
-                    left: 20, top: 15, bottom: 15, right: 15),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12, spreadRadius: 1, blurRadius: 2)
-                  ],
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const AttendenceScreen()));
-                      },
-                      child: const Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.green,
-                            child: Icon(
-                              Icons.fact_check,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10, right: 5),
-                            child: Text(
-                              'Attendance',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                            ),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.arrow_forward_ios_outlined,
-                            size: 15,
-                          ),
-                        ],
-                      ),
-                    ),
-                    // const Divider(),
-                    /* Row(
-                      children: [
-                        CircleAvatar(
-                          child: Icon(
-                            Icons.calendar_month,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10, right: 5),
-                          child: Text(
-                            'Leaves',
-                            style: TextStyle(color: Colors.black, fontSize: 16),
-                          ),
-                        ),
-                        Spacer(),
-                        Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          size: 15,
-                        ),
-                      ],
-                    ),*/
-                  ],
-                ),
+              MenuListItem(
+                title: 'Attendance',
+                icon: Icons.fact_check,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AttendenceScreen()));
+                },
               ),
-              Container(
-                // margin: EdgeInsets.all(15),
-                padding: const EdgeInsets.only(
-                    left: 20, top: 15, bottom: 15, right: 15),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12, spreadRadius: 1, blurRadius: 2)
-                  ],
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const MyStaffMovementAppliedPage()));
-                      },
-                      child: const Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.green,
-                            child: Icon(
-                              Icons.fact_check,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10, right: 5),
-                            child: Text(
-                              'Staff Movement',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                            ),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.arrow_forward_ios_outlined,
-                            size: 15,
-                          ),
-                        ],
-                      ),
-                    ),
+              MenuListItem(
+                title: 'Staff Movement',
+                icon: Icons.moving,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const MyStaffMovementAppliedPage()));
+                },
+              ),
+              MenuListItem(
+                title: 'Staff Movement Apply',
+                icon: Icons.pending_actions,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const StaffMovementPage()));
+                },
+              ),
+              MenuListItem(
+                title: 'My Staff Movement History',
+                icon: Icons.history,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                          const MyStaffMovementHistoryPage()));
+                },
+              ),
+              MenuListItem(
+                title: 'Coupon Validation',
+                icon: Icons.discount,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CoupenGenPage()));
+                },
+              ),
 
-                  ],
-                ),
-              ),
-              Container(
-                // margin: EdgeInsets.all(15),
-                padding: const EdgeInsets.only(
-                    left: 20, top: 15, bottom: 15, right: 15),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12, spreadRadius: 1, blurRadius: 2)
-                  ],
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const StaffMovementPage()));
-                      },
-                      child: const Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.green,
-                            child: Icon(
-                              Icons.fact_check,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10, right: 5),
-                            child: Text(
-                              'Staff Movement Apply',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                            ),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.arrow_forward_ios_outlined,
-                            size: 15,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  ],
-                ),
-              ),
-              Container(
-                // margin: EdgeInsets.all(15),
-                padding: const EdgeInsets.only(
-                    left: 20, top: 15, bottom: 15, right: 15),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12, spreadRadius: 1, blurRadius: 2)
-                  ],
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                const MyStaffMovementHistoryPage()));
-                      },
-                      child: const Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.green,
-                            child: Icon(
-                              Icons.fact_check,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10, right: 5),
-                            child: Text(
-                              'My Staff Movement History',
-                              style:
-                              TextStyle(color: Colors.black, fontSize: 16),
-                            ),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.arrow_forward_ios_outlined,
-                            size: 15,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  ],
-                ),
-              ),
-              Container(
-                // margin: EdgeInsets.all(15),
-                padding: const EdgeInsets.only(
-                    left: 20, top: 15, bottom: 15, right: 15),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12, spreadRadius: 1, blurRadius: 2)
-                  ],
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                 CoupenGenPage()));
-                      },
-                      child: const Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.green,
-                            child: Icon(
-                              Icons.fact_check,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10, right: 5),
-                            child: Text(
-                              'Coupon Validation',
-                              style:
-                              TextStyle(color: Colors.black, fontSize: 16),
-                            ),
-                          ),
-                          Spacer(),
-                          Icon(
-                            Icons.arrow_forward_ios_outlined,
-                            size: 15,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  ],
-                ),
-              ),
 
               const Spacer(),
-                 const Text(
+              const Text(
                 'Version ${Constants.appVersion}',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10,),
+                style: TextStyle(
+                  fontSize: 10,
+                ),
               )
-
             ],
           ),
           Visibility(
@@ -491,11 +268,11 @@ class _PageProfileState extends State<PageProfile> {
       ModalRoute.withName('/SplashScreen'),
     );
   }
+
   var deviceId = "";
   var tokenFCM = "";
 
   Future<String> _getId() async {
-
     final SharedPreferences pref = await SharedPreferences.getInstance();
 
     String? id = await pref.getString(
@@ -511,8 +288,8 @@ class _PageProfileState extends State<PageProfile> {
 
     return deviceId;
   }
-  Future<String> _getDeviceToken() async {
 
+  Future<String> _getDeviceToken() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
 
     String? id = await pref.getString(
@@ -528,6 +305,4 @@ class _PageProfileState extends State<PageProfile> {
 
     return tokenFCM;
   }
-
 }
-

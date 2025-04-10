@@ -756,7 +756,7 @@ class _PageHomeState extends State<PageHome> {
               const EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10),
           decoration: BoxDecoration(
               color: Colors.green,
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
               border: Border.all(
                 color: Colors.green,
               )),
@@ -797,8 +797,8 @@ class _PageHomeState extends State<PageHome> {
               color: _expandedIndex == pos
                   ? const Color(0xfff76613)
                   : Colors.white,
-              boxShadow: [
-                const BoxShadow(color: Color(0xFFBDBDBD), blurRadius: 2)
+              boxShadow: const [
+                BoxShadow(color: Color(0xFFBDBDBD), blurRadius: 2)
               ],
               borderRadius: const BorderRadius.all(Radius.circular(5)),
             ),

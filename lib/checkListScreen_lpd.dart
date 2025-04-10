@@ -600,6 +600,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
               index_ = index;
             });
 
+            //A
             if (checkListEmployee[index].checklistEditStatus == "A") {
               // checkList[0].checklistAssignId;
               Navigator.pushReplacement(
@@ -616,7 +617,9 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                   () {
                 getActiveCheckListData();
               });
-            } else if (checkListEmployee[index].checklistEditStatus ==
+            }
+           //R
+            else if (checkListEmployee[index].checklistEditStatus ==
                 "R") {
               Navigator.pushReplacement(
                   context,
@@ -631,7 +634,8 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                   () {
                 getActiveCheckListData();
               });
-            } else {
+            } else
+            {
               if (checkListEmployee[index].checkinFlag == "1") {
                 setState(() {
                   popupVisible = true;

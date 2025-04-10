@@ -127,8 +127,19 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
   bool camVisible = false;
 
   getPhoto(int firstTime) async {
-    final ImagePicker _picker = ImagePicker();
 
+    final ImagePicker _picker = ImagePicker();
+    var status = await Permission.camera.status;
+    if (!status.isGranted) {
+      status = await Permission.camera.request();
+      if (!status.isGranted) {
+        Get.defaultDialog(
+          middleText: 'Please grant camera permission for Location CheckIn',
+        );
+        print('Camera permission denied');
+        return;
+      }
+    }
     if (Platform.isAndroid) {
       try {
         final cameras =

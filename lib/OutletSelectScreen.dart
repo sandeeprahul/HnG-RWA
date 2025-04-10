@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hng_flutter/checkListScreen_lpd.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/checkListScreen.dart';
+import 'package:hng_flutter/widgets/task_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -331,132 +332,133 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                   );
                                 }
                               },
-                              child: Container(
-                                // color: Colors.white,
-                                margin: const EdgeInsets.only(
-                                    left: 10, top: 10, right: 10),
-                                padding: const EdgeInsets.only(
-                                    left: 10, top: 20, right: 10, bottom: 15),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Color(0xFFBDBDBD), blurRadius: 2)
-                                  ],
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                ),
-                                // height: 125,
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.list_alt_outlined,
-                                          size: 40,
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 15),
-                                            child: Column(
-                                              // mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                Align(
-                                                  alignment: Alignment.topLeft,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2, bottom: 2),
-                                                    child: Text(
-                                                      locationsList[pos]
-                                                          .locationName,
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 19),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Align(
-                                                  alignment: Alignment.topLeft,
-                                                  child: Text(
-                                                    locationsList[pos]
-                                                        .locationCode,
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: Colors.grey[400],
-                                        )
-                                      ],
-                                    ),
-                                    Container(
-                                      height: 1,
-                                      margin:
-                                          const EdgeInsets.only(top: 10, bottom: 10),
-                                      width: double.infinity,
-                                      color: Colors.grey[300],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Column(
-                                          children:  [
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  bottom: 2, top: 2),
-                                              child: Text(
-                                                'Current',
-                                                style: TextStyle(
-                                                    color: Color(0xFF757575)),
-                                              ),
-                                            ),
-                                            Text(
-                                              '${locationsList[pos].currentCount}',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          height: 25,
-                                          width: 1,
-                                          color: Colors.grey[300],
-                                        ),
-                                        Column(
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  bottom: 2, top: 2),
-                                              child: Text(
-                                                'Pending',
-                                                style: TextStyle(
-                                                    color: Color(0xFF757575)),
-                                              ),
-                                            ),
-                                            Text(
-                                              '${locationsList[pos].pendingCount}',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
+                              child: TaskCard(title:      locationsList[pos].locationName, description:   locationsList[pos].locationCode, currentCount: 0, pendingCount: 0),
+                              // child: Container(
+                              //   // color: Colors.white,
+                              //   margin: const EdgeInsets.only(
+                              //       left: 10, top: 10, right: 10),
+                              //   padding: const EdgeInsets.only(
+                              //       left: 10, top: 20, right: 10, bottom: 15),
+                              //   decoration: const BoxDecoration(
+                              //     color: Colors.white,
+                              //     boxShadow: [
+                              //       BoxShadow(
+                              //           color: Color(0xFFBDBDBD), blurRadius: 2)
+                              //     ],
+                              //     borderRadius:
+                              //         BorderRadius.all(Radius.circular(5)),
+                              //   ),
+                              //   // height: 125,
+                              //   child: Column(
+                              //     children: [
+                              //       Row(
+                              //         children: [
+                              //           const Icon(
+                              //             Icons.list_alt_outlined,
+                              //             size: 40,
+                              //           ),
+                              //           Expanded(
+                              //             child: Padding(
+                              //               padding:
+                              //                   const EdgeInsets.only(left: 15),
+                              //               child: Column(
+                              //                 // mainAxisAlignment: MainAxisAlignment.start,
+                              //                 children: [
+                              //                   Align(
+                              //                     alignment: Alignment.topLeft,
+                              //                     child: Padding(
+                              //                       padding:
+                              //                           const EdgeInsets.only(
+                              //                               top: 2, bottom: 2),
+                              //                       child: Text(
+                              //                         locationsList[pos]
+                              //                             .locationName,
+                              //                         style: const TextStyle(
+                              //                             fontWeight:
+                              //                                 FontWeight.bold,
+                              //                             fontSize: 19),
+                              //                       ),
+                              //                     ),
+                              //                   ),
+                              //                   Align(
+                              //                     alignment: Alignment.topLeft,
+                              //                     child: Text(
+                              //                       locationsList[pos]
+                              //                           .locationCode,
+                              //                       style: const TextStyle(
+                              //                         fontSize: 12,
+                              //                       ),
+                              //                     ),
+                              //                   )
+                              //                 ],
+                              //               ),
+                              //             ),
+                              //           ),
+                              //           Icon(
+                              //             Icons.arrow_forward_ios,
+                              //             color: Colors.grey[400],
+                              //           )
+                              //         ],
+                              //       ),
+                              //       Container(
+                              //         height: 1,
+                              //         margin:
+                              //             const EdgeInsets.only(top: 10, bottom: 10),
+                              //         width: double.infinity,
+                              //         color: Colors.grey[300],
+                              //       ),
+                              //       Row(
+                              //         mainAxisAlignment:
+                              //             MainAxisAlignment.spaceAround,
+                              //         children: [
+                              //           Column(
+                              //             children:  [
+                              //               const Padding(
+                              //                 padding: EdgeInsets.only(
+                              //                     bottom: 2, top: 2),
+                              //                 child: Text(
+                              //                   'Current',
+                              //                   style: TextStyle(
+                              //                       color: Color(0xFF757575)),
+                              //                 ),
+                              //               ),
+                              //               Text(
+                              //                 '${locationsList[pos].currentCount}',
+                              //                 style: const TextStyle(
+                              //                     fontWeight: FontWeight.bold,
+                              //                     fontSize: 15),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //           Container(
+                              //             height: 25,
+                              //             width: 1,
+                              //             color: Colors.grey[300],
+                              //           ),
+                              //           Column(
+                              //             children: [
+                              //               const Padding(
+                              //                 padding: EdgeInsets.only(
+                              //                     bottom: 2, top: 2),
+                              //                 child: Text(
+                              //                   'Pending',
+                              //                   style: TextStyle(
+                              //                       color: Color(0xFF757575)),
+                              //                 ),
+                              //               ),
+                              //               Text(
+                              //                 '${locationsList[pos].pendingCount}',
+                              //                 style: const TextStyle(
+                              //                     fontWeight: FontWeight.bold,
+                              //                     fontSize: 15),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //         ],
+                              //       )
+                              //     ],
+                              //   ),
+                              // ),
                             );
                           }),
                 ),

@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'HomeScreen.dart';
+import 'widgets/task_card.dart';
 
 class PageRetail extends StatefulWidget {
   const PageRetail({Key? key}) : super(key: key);
@@ -50,7 +51,73 @@ class _PageRetailState extends State<PageRetail> {
           child: ListView.builder(
               itemCount: checkList.isEmpty ? 0 : checkList.length,
               itemBuilder: (BuildContext context, int pos) {
-                return item(pos);
+                // return item(pos);
+                return TaskCard(
+                  title: checkList[pos].auditName,
+                  description: checkList[pos].description,
+                  imageUrl: checkList[pos].apiUrl ?? '',
+                  currentCount: checkList[pos].currentCount,
+                  pendingCount: checkList[pos].pendingCount,
+                  onTap: () {
+                    print(checkList[pos].auditId);
+                    if (checkList[pos].auditId == "1" || checkList[pos].auditId == "4") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                OutletSelectionScreen(checkList[pos])), //checkListScreen
+                      ).then((value) => () {
+                        getActiveCheckListData();
+                      });
+                    }
+                    else if (checkList[pos].auditId == "2") {
+                      //storeaudit
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => OutletSelectionScreen(checkList[pos])),
+                      ).then((value) => () {
+                        getActiveCheckListData();
+                      });
+                      /* Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => checkListScreen(
+                  checkList[pos].checklistAssignId, checkList[pos])),
+        );*/
+                    }
+                    else if (checkList[pos].auditId == "3") {
+                      //LPD
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                OutletSelectionScreen(checkList[pos])), //checkListScreen
+                      ).then((value) => () {
+                        getActiveCheckListData();
+                      });
+                    }
+                    else if (checkList[pos].auditId == "5") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                OutletSelectionScreen(checkList[pos])), //checkListScreen
+                      ).then((value) => () {
+                        getActiveCheckListData();
+                      });
+                    }else{
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                OutletSelectionScreen(checkList[pos])), //checkListScreen
+                      ).then((value) => () {
+                        getActiveCheckListData();
+                      });
+                    }
+                  },
+                );
               }),
         ),
         Center(
@@ -61,7 +128,7 @@ class _PageRetailState extends State<PageRetail> {
     );
   }
 
-  Widget item(int pos) {
+  Widget itemdd(int pos) {
     return InkWell(
       onTap: () {
         print(checkList[pos].auditId);
@@ -234,7 +301,179 @@ class _PageRetailState extends State<PageRetail> {
       ),
     );
   }
-
+  Widget item(int pos) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: InkWell(
+        onTap: () {
+          print(checkList[pos].auditId);
+          if (checkList[pos].auditId == "1" || checkList[pos].auditId == "4") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      OutletSelectionScreen(checkList[pos])), //checkListScreen
+            ).then((value) => () {
+              getActiveCheckListData();
+            });
+          }
+          else if (checkList[pos].auditId == "2") {
+            //storeaudit
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => OutletSelectionScreen(checkList[pos])),
+            ).then((value) => () {
+              getActiveCheckListData();
+            });
+            /* Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => checkListScreen(
+                  checkList[pos].checklistAssignId, checkList[pos])),
+        );*/
+          }
+          else if (checkList[pos].auditId == "3") {
+            //LPD
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      OutletSelectionScreen(checkList[pos])), //checkListScreen
+            ).then((value) => () {
+              getActiveCheckListData();
+            });
+          }
+          else if (checkList[pos].auditId == "5") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      OutletSelectionScreen(checkList[pos])), //checkListScreen
+            ).then((value) => () {
+              getActiveCheckListData();
+            });
+          }else{
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      OutletSelectionScreen(checkList[pos])), //checkListScreen
+            ).then((value) => () {
+              getActiveCheckListData();
+            });
+          }
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.purple.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: checkList[pos].apiUrl.isEmpty
+                        ? Icon(
+                      Icons.task,
+                      size: 28,
+                      color: Theme.of(context).primaryColor,
+                    )
+                        : ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        checkList[pos].apiUrl ??
+                            'https://health-and-glow-dev.s3.ap-south-1.amazonaws.com/1580384272.png',
+                        width: 28,
+                        height: 28,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          checkList[pos].auditName,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          checkList[pos].description,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Colors.grey[400],
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Divider(height: 1),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatusColumn(
+                      context,
+                      'Current',
+                      checkList[pos].currentCount.toString(),
+                    ),
+                  ),
+                  Container(
+                    height: 40,
+                    width: 1,
+                    color: Colors.grey[200],
+                  ),
+                  Expanded(
+                    child: _buildStatusColumn(
+                      context,
+                      'Pending',
+                      checkList[pos].pendingCount.toString(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  Widget _buildStatusColumn(BuildContext context, String label, String count) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          count,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
   List<GetActvityTypes> checkList = [];
 
   void logoutUser(BuildContext context) async {

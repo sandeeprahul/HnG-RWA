@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationSearchDialog extends StatefulWidget {
   final String userId;
@@ -25,9 +26,12 @@ class _LocationSearchDialogState extends State<LocationSearchDialog> {
 
   Future<void> fetchLocations() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      var userId = prefs.getString("userCode");
+
       final response = await http.get(
         // Uri.parse('https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/GetLocation/9999'),
-        Uri.parse('https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/GetLocation/${widget.userId}'),
+        Uri.parse('https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/GetLocation/$userId'),
       );
 
       if (response.statusCode == 200) {

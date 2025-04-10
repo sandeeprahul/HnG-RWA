@@ -59,115 +59,150 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                   final formattedAuditName =
                       StringUtils.formatWithSpaces(audit.auditName);
 
-                  return ElevatedButton(
-                    onPressed: () {
-                      if (audit.auditId == 101) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EmployeeListScreen(
-                              formattedAuditName: formattedAuditName,
-                            ),
-                            // builder: (context) => const WeekOffEmployeeListPage(),
-                          ),
-                        );
-                      } else if (audit.auditId == 102) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              // fullscreenDialog: true,
-                              builder: (context) =>
-                                  const SupportTeamPage()), //true permanent//false temporary
-                        );
-                      } else if (audit.auditId == 103) {
-                        sendTOStoreTransferPage(false);
-                      } else if (audit.auditId == 104) {
-                        sendTOStoreTransferPage(true);
-                      } else if (audit.auditId == 105) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              // fullscreenDialog: true,
-                              builder: (context) => StoreVisitPage(
-                                  1)), //true permanent//false temporary
-                        );
-                      } else if (audit.auditId == 107) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              // fullscreenDialog: true,
-                              builder: (context) => const WebViewExample()),
-                        );
-                      } else if (audit.auditId == 108) {
-                        Navigator.push(
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        // colors: [Colors.teal.shade200, Colors.teal.shade400],
+                        // colors:  [Colors.pink.shade200, Colors.pink.shade400],
+                        // colors:  [Colors.indigo.shade200, Colors.indigo.shade400],
+                        // colors:  [Colors.red.shade200, Colors.red.shade400],
+                        // colors:  [Colors.green.shade200, Colors.green.shade400],
+                        // colors:  [Colors.deepOrange.shade200, Colors.deepOrange.shade400],
+                        colors:  [Colors.blue.shade200, Colors.blue.shade400],
+                        // colors:   [Colors.purple.shade200, Colors.purple.shade400],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.teal.shade200.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        if (audit.auditId == 101) {
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const OrderManagementScreen()));
-                      }
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (audit.auditId == 101)
-                          Center(
-                            child: Image.asset(
-                              'assets/weekoff_icon.png',
-                              // color: Colors.white,
-                              scale: 2,
+                              builder: (context) => EmployeeListScreen(
+                                formattedAuditName: formattedAuditName,
+                              ),
+                              // builder: (context) => const WeekOffEmployeeListPage(),
                             ),
-                          )
-                        else if (audit.auditId == 102)
-                          const Center(
-                              child: Icon(
-                            Icons.headset_mic_outlined,
-                            // color: Colors.white,
-                            size: 60,
-                          ))
-                        else if (audit.auditId == 103)
-                          const Center(
-                              child: Icon(
-                            Icons.transfer_within_a_station,
-                            // color: Colors.white,
-                            size: 60,
-                          ))
-                        else if (audit.auditId == 104)
-                          const Center(
-                              child: Icon(
-                            Icons.transfer_within_a_station,
-                            // color: Colors.white,
-                            size: 60,
-                          ))
-                        else if (audit.auditId == 105)
-                          const Center(
-                              child: Icon(
-                            Icons.store,
-                            // color: Colors.white,
-                            size: 60,
-                          ))
-                        else if (audit.auditId == 106)
-                          const Center(
-                              child: Icon(
-                            Icons.map_outlined,
-                            // color: Colors.white,
-                            size: 60,
-                          ))
-                        else if (audit.auditId == 107)
-                          const Center(
-                              child: Icon(
-                            Icons.dashboard,
-                            // color: Colors.white,
-                            size: 60,
+                          );
+                        } else if (audit.auditId == 102) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                // fullscreenDialog: true,
+                                builder: (context) =>
+                                    const SupportTeamPage()), //true permanent//false temporary
+                          );
+                        } else if (audit.auditId == 103) {
+                          sendTOStoreTransferPage(false);
+                        } else if (audit.auditId == 104) {
+                          sendTOStoreTransferPage(true);
+                        } else if (audit.auditId == 105) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                // fullscreenDialog: true,
+                                builder: (context) => StoreVisitPage(
+                                    1)), //true permanent//false temporary
+                          );
+                        } else if (audit.auditId == 107) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                // fullscreenDialog: true,
+                                builder: (context) => const WebViewExample()),
+                          );
+                        } else if (audit.auditId == 108) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const OrderManagementScreen()));
+                        }
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (audit.auditId == 101)
+                            Center(
+                              child: Image.asset(
+                                'assets/weekoff_icon.png',
+                                color: Colors.white,
+                                scale: 2,
+                              ),
+                            )
+                          else if (audit.auditId == 102)
+                            const Center(
+                                child: Icon(
+                              Icons.headset_mic_outlined,
+                              color: Colors.white,
+                              size: 60,
+                            ))
+                          else if (audit.auditId == 103)
+                            const Center(
+                                child: Icon(
+                              Icons.transfer_within_a_station,
+                              color: Colors.white,
+                              size: 60,
+                            ))
+                          else if (audit.auditId == 104)
+                            const Center(
+                                child: Icon(
+                              Icons.transfer_within_a_station,
+                              color: Colors.white,
+                              size: 60,
+                            ))
+                          else if (audit.auditId == 105)
+                            const Center(
+                                child: Icon(
+                              Icons.store,
+                              color: Colors.white,
+                              size: 60,
+                            ))
+                          else if (audit.auditId == 106)
+                            const Center(
+                                child: Icon(
+                              Icons.map_outlined,
+                              color: Colors.white,
+                              size: 60,
+                            ))
+                          else if (audit.auditId == 107)
+                            const Center(
+                                child: Icon(
+                              Icons.dashboard,
+                              color: Colors.white,
+                              size: 60,
+                            ))
+                                    else if (audit.auditId == 108)
+                            const Center(
+                                child: Icon(
+                              Icons.playlist_add_check,
+                              color: Colors.white,
+                              size: 60,
+                            )),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Center(
+                              child: Text(
+                            formattedAuditName,
+                            textAlign: TextAlign.center,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
                           )),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Center(
-                            child: Text(
-                          formattedAuditName,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },

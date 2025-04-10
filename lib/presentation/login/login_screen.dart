@@ -468,7 +468,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                             child: Text(
                               'Reset Password',
                               style:
-                                  TextStyle(fontSize: 20, color: Colors.white),
+                                  TextStyle(fontSize: 20, color: Colors.black),
                             ),
                           )),
                     ],
@@ -1035,7 +1035,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           loading = false;
         });
 
-        var msg = respo['statusCode'] ?? 'Please try after sometime.';
+        var msg = "${respo['statusCode']}\n${respo['status']}" ?? 'Please try after sometime.';
         alertFailure(msg);
       }
     } catch (e) {
@@ -1043,7 +1043,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         loading = false;
         changePasswordPopup = false;
       });
-      alertFailure(Constants.networkIssue);
+      alertFailure(e.toString());
     }
     mobileNumberController.clear();
     // usernameController.clear();
