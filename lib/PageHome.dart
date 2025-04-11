@@ -23,8 +23,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'checkInOutScreenIOS.dart';
 import 'common/constants.dart';
 import 'common/permission_popup.dart';
+import 'controllers/checkin_controller.dart';
 import 'controllers/taskCheckerController.dart';
 import 'core/light_theme.dart';
+import 'data/CheckinStatusModel.dart';
 import 'presentation/attendance/attendence_screen.dart';
 import 'data/GetProgressStatus.dart';
 import 'checkInOutScreen_TEMP.dart';
@@ -56,6 +58,8 @@ Geolocator geolocator = Geolocator();
 // final AsyncMemoizer _memoizer = AsyncMemoizer();
 
 class _PageHomeState extends State<PageHome> {
+  final checkinController = Get.put(CheckinController());
+
   @override
   void initState() {
     // TODO: implement initState
@@ -65,6 +69,7 @@ class _PageHomeState extends State<PageHome> {
     _future = getActiveCheckListData();
     getUserCheckInStatus();
     getTime();
+
     getuserType();
   }
 
@@ -372,64 +377,65 @@ class _PageHomeState extends State<PageHome> {
                       )
                     ],
                   ),
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 15),
-                      padding:
-                          const EdgeInsets.only(left: 15, right: 15, top: 15),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
-                      child: noInterNet == false
-                          ? Text(
-                              Constants.networkIssue,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            )
-                          : Column(
-                              // mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      startendTimeText,
-                                      // style: const TextStyle(fontSize: 12),
-                                      style: lightTheme.textTheme.bodySmall!
-                                          .copyWith(fontSize: 12),
-                                    ),
-                                    Text(
-                                      checkOutbnt
-                                          ? '$chekinTime'
+                  Visibility(
+                    visible: true,
+                    child: Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 15),
+                        padding:
+                            const EdgeInsets.only(left: 15, right: 15, top: 15),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        child:  Column(
+                                // mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        startendTimeText,
+                                        // style: const TextStyle(fontSize: 12),
+                                        style: lightTheme.textTheme.bodySmall!
+                                            .copyWith(fontSize: 12),
+                                      ),
+                                      Text(
+                                        checkOutbnt
+                                            ? '$chekinTime'
+                                            : checkInBool
+                                                ? '09:30 AM'
+                                                : '$chekinTime',
+                                        style: lightTheme.textTheme.labelMedium!
+                                            .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12),
+                                        /* style: const TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 12),*/
+                                      ),
+                                    ],
+                                  ),
+                                  Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: checkOutbnt
+                                          ? checkoutBtnWidget()
                                           : checkInBool
-                                              ? '09:30 AM'
-                                              : '$chekinTime',
-                                      style: lightTheme.textTheme.labelMedium!
-                                          .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12),
-                                      /* style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 12),*/
-                                    ),
-                                  ],
-                                ),
-                                Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: checkOutbnt
-                                        ? checkoutBtnWidget()
-                                        : checkInBool
-                                            ? checkInBtn()
-                                            : const Text('')),
-                              ],
-                            ),
+                                              ? checkInBtn()
+                                              : const Text('')),
+                                ],
+                              ),
+                      ),
                     ),
                   )
                 ],
               ),
             ),
 
-            Visibility(
-              visible: true,
-              child: InkWell(
+
+
+
+            Obx(() {
+              return checkinController.isMyTeamActivitiesEnabled
+                  ?  InkWell(
                 onTap: () {
                   Navigator.push(
                       context,
@@ -482,14 +488,181 @@ class _PageHomeState extends State<PageHome> {
                     ],
                   ),
                 ),
-              ),
-            ),
+              )
+                  : const SizedBox();
+            }),
 
-            const ProductQuickEnquiryWidget(),
+            Obx(() {
+              return checkinController.isProductEnquiryEnabled
+                  ? const ProductQuickEnquiryWidget()
+                  : const SizedBox();
+            }),
+
+
+            const Divider(),
+
+            Obx(() {
+              return checkinController.isExploreCompanyEnabled
+                  ? Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 15, top: 10, right: 10, bottom: 15),
+                      child: Text(
+                        'Explore Company',
+                        // style: TextStyle(fontSize: 15),
+                        style: lightTheme.textTheme.labelSmall!
+                            .copyWith(fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: false,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Row(
+                        children: [
+                          Container(
+                            margin:
+                            const EdgeInsets.only(left: 15, right: 15, top: 10),
+                            padding: const EdgeInsets.only(left: 15, bottom: 10),
+                            width: 100,
+                            height: 100,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                                boxShadow: [
+                                  BoxShadow(color: Colors.grey, blurRadius: 3)
+                                ]),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Icon(
+                                    Icons.list_alt,
+                                    color: Colors.grey,
+                                    size: 35,
+                                  ),
+                                ),
+                                Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      'Policies',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ))
+                              ],
+                            ),
+                          ),
+                          Container(
+                            margin:
+                            const EdgeInsets.only(left: 5, right: 15, top: 10),
+                            padding: const EdgeInsets.only(left: 15, bottom: 10),
+                            width: 100,
+                            height: 100,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                                boxShadow: [
+                                  BoxShadow(color: Colors.grey, blurRadius: 3)
+                                ]),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Icon(
+                                      Icons.list_alt,
+                                      color: Colors.grey,
+                                      size: 35,
+                                    )),
+                                Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      'Holidays',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(7),
+                    margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: CupertinoColors.systemBlue,
+                    ),
+                    child: Center(
+                      child: Text(
+                        // "303030",
+                        'Activity Status Report',
+                        // checkList.length == 0 ? '' : checkList[0].userId,
+                        /*style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),*/
+                        style: lightTheme.textTheme.labelSmall!.copyWith(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Divider(),
+                  FutureBuilder<dynamic>(
+                      future: _future,
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        // print('atten $snapshot.data');
+                        if (snapshot.data == null) {
+                          return const Center(
+                            child: Text('No data'),
+                          );
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else {
+                          return checkList.isEmpty
+                              ? const Text(
+                            'No Records',
+                          )
+                              : checkList[0].audittypes.isEmpty
+                              ? const Text('No Records')
+                              : Expanded(
+                            // height: 200,
+                            child: ListView.builder(
+                                itemCount: checkList.isEmpty
+                                    ? 0
+                                    : checkList[0].audittypes.length,
+                                itemBuilder:
+                                    (BuildContext context, int pos) {
+                                  return item(pos);
+                                }),
+                          );
+                        }
+                      }),
+                  SizedBox(
+                    height: checkList.isEmpty ? 0 : 50,
+                  ),
+                ],
+              )
+                  : const SizedBox();
+            }),
 
             // const ScanQrWidget(),
-            const Divider(),
-           /* GestureDetector(
+            /* GestureDetector(
               onTap: () {
                 Navigator.push(
                     context,
@@ -541,157 +714,7 @@ class _PageHomeState extends State<PageHome> {
             ),
             const Divider(),
 */
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 15, top: 10, right: 10, bottom: 15),
-                child: Text(
-                  'Explore Company',
-                  // style: TextStyle(fontSize: 15),
-                  style: lightTheme.textTheme.labelSmall!
-                      .copyWith(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Visibility(
-              visible: false,
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Row(
-                  children: [
-                    Container(
-                      margin:
-                          const EdgeInsets.only(left: 15, right: 15, top: 10),
-                      padding: const EdgeInsets.only(left: 15, bottom: 10),
-                      width: 100,
-                      height: 100,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          boxShadow: [
-                            BoxShadow(color: Colors.grey, blurRadius: 3)
-                          ]),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: Icon(
-                              Icons.list_alt,
-                              color: Colors.grey,
-                              size: 35,
-                            ),
-                          ),
-                          Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Policies',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin:
-                          const EdgeInsets.only(left: 5, right: 15, top: 10),
-                      padding: const EdgeInsets.only(left: 15, bottom: 10),
-                      width: 100,
-                      height: 100,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          boxShadow: [
-                            BoxShadow(color: Colors.grey, blurRadius: 3)
-                          ]),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Align(
-                              alignment: Alignment.topLeft,
-                              child: Icon(
-                                Icons.list_alt,
-                                color: Colors.grey,
-                                size: 35,
-                              )),
-                          Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Holidays',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(7),
-              margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: CupertinoColors.systemBlue,
-              ),
-              child: Center(
-                child: Text(
-                  // "303030",
-                  'Activity Status Report',
-                  // checkList.length == 0 ? '' : checkList[0].userId,
-                  /*style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),*/
-                  style: lightTheme.textTheme.labelSmall!.copyWith(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            // Divider(),
-            FutureBuilder<dynamic>(
-                future: _future,
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  // print('atten $snapshot.data');
-                  if (snapshot.data == null) {
-                    return const Center(
-                      child: Text('No data'),
-                    );
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    return checkList.isEmpty
-                        ? const Text(
-                            'No Records',
-                          )
-                        : checkList[0].audittypes.isEmpty
-                            ? const Text('No Records')
-                            : Expanded(
-                                // height: 200,
-                                child: ListView.builder(
-                                    itemCount: checkList.isEmpty
-                                        ? 0
-                                        : checkList[0].audittypes.length,
-                                    itemBuilder:
-                                        (BuildContext context, int pos) {
-                                      return item(pos);
-                                    }),
-                              );
-                  }
-                }),
-            SizedBox(
-              height: checkList.isEmpty ? 0 : 50,
-            ),
+
           ],
         ),
         Visibility(
@@ -1097,15 +1120,30 @@ class _PageHomeState extends State<PageHome> {
       final prefs = await SharedPreferences.getInstance();
       var userID = prefs.getString('userCode') ?? '';
       // String url = "${Constants.apiHttpsUrl}/Login/checkinstatus/70002";
-      String url = "${Constants.apiHttpsUrl}/Login/checkinstatus/$userID";
+      // String url = "${Constants.apiHttpsUrl}/Login/checkinstatus/$userID";
+      String url =
+          "https://rwaweb.healthandglowonline.co.in/RWAAPIDEVELOPMENT/api/Login/checkinstatus/$userID";
 
-      print(url);
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
+
       var responseData = json.decode(response.body);
+
       if (response.statusCode == 200) {
+
         if (responseData['statusCode'] == "200") {
+
+          if (responseData["menu_json"] != "") {
+            checkinController.checkinStatus.value = CheckinStatusModel.fromJson(responseData);;
+            print("MENU JSON");
+            print("$responseData");
+          }
+          else{
+            print("NOMENU JSON");
+            print("$responseData");
+          }
+
           if (responseData['checkin_flag'] == "Y" &&
               responseData['checkiout_flag'] == "Y") {
             print('Y&Y');
@@ -1174,6 +1212,8 @@ class _PageHomeState extends State<PageHome> {
             taskCheckController.checkTaskStatus();
           }
         }
+
+
       } else {
         Get.snackbar(
           "Alert!", // SnackBar title
@@ -1191,6 +1231,7 @@ class _PageHomeState extends State<PageHome> {
         noInterNet = false;
         checkOutbnt = false;
       });
+      print("CheckInSTatus ERROR$e");
     }
   }
 

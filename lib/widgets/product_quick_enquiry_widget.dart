@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hng_flutter/controllers/checkin_controller.dart';
 import 'package:hng_flutter/presentation/product_quick_enquiry_page.dart';
 
 import '../core/light_theme.dart';
 import '../presentation/scan_qr_page.dart';
 
 class ProductQuickEnquiryWidget extends StatelessWidget {
-  const ProductQuickEnquiryWidget({super.key});
+   const ProductQuickEnquiryWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:hng_flutter/controllers/checkin_controller.dart';
 import 'package:hng_flutter/presentation/coupen_generation_page.dart';
 import 'package:hng_flutter/presentation/login/login_screen.dart';
 import 'package:hng_flutter/extensions/string_extension.dart';
@@ -65,6 +66,7 @@ class _PageProfileState extends State<PageProfile> {
 
   bool loading = false;
 
+  CheckinController checkinController = Get.put(CheckinController());
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -152,58 +154,90 @@ class _PageProfileState extends State<PageProfile> {
                   ),
                 ),
               ),
-              MenuListItem(
-                title: 'Attendance',
-                icon: Icons.fact_check,
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AttendenceScreen()));
-                },
-              ),
-              MenuListItem(
-                title: 'Staff Movement',
-                icon: Icons.moving,
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const MyStaffMovementAppliedPage()));
-                },
-              ),
-              MenuListItem(
-                title: 'Staff Movement Apply',
-                icon: Icons.pending_actions,
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const StaffMovementPage()));
-                },
-              ),
-              MenuListItem(
-                title: 'My Staff Movement History',
-                icon: Icons.history,
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                          const MyStaffMovementHistoryPage()));
-                },
-              ),
-              MenuListItem(
-                title: 'Coupon Validation',
-                icon: Icons.discount,
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CoupenGenPage()));
-                },
-              ),
+
+
+
+              Obx(() {
+                return checkinController.isAttendanceEnabled
+                    ?  MenuListItem(
+                  title: 'Attendance',
+                  icon: Icons.fact_check,
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AttendenceScreen()));
+                  },
+                )
+                    : const SizedBox();
+              }),
+
+              Obx(() {
+                return checkinController.isStaffMovementEnabled
+                    ?  MenuListItem(
+                  title: 'Staff Movement',
+                  icon: Icons.moving,
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                            const MyStaffMovementAppliedPage()));
+                  },
+                )
+                    : const SizedBox();
+              }),
+
+              Obx(() {
+                return checkinController.isStaffMovementApplyEnabled
+                    ?  MenuListItem(
+                  title: 'Staff Movement Apply',
+                  icon: Icons.pending_actions,
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const StaffMovementPage()));
+                  },
+                )
+                    : const SizedBox();
+              }),
+
+
+              Obx(() {
+                return checkinController.isStaffMovementHistoryEnabled
+                    ?  MenuListItem(
+                  title: 'My Staff Movement History',
+                  icon: Icons.history,
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                            const MyStaffMovementHistoryPage()));
+                  },
+                )
+                    : const SizedBox();
+              }),
+              Obx(() {
+                return checkinController.isCouponValidationEnabled
+                    ?   MenuListItem(
+                  title: 'Coupon Validation',
+                  icon: Icons.discount,
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CoupenGenPage()));
+                  },
+                )
+                    : const SizedBox();
+              }),
+
+
+
+
+
 
 
               const Spacer(),
