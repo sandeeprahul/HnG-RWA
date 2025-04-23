@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +19,8 @@ import 'package:hng_flutter/PageRetail.dart';
 import 'package:hng_flutter/ThemeData_.dart';
 import 'package:hng_flutter/core/light_theme.dart';
 import 'package:hng_flutter/loginBinding.dart';
+
+// import 'package:hng_flutter/presentation/ai_home_page.dart';
 import 'package:hng_flutter/presentation/order_list_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -37,6 +41,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Add this for Android initialization
+
   final dbPath = await getDatabasesPath();
   print('Database path: $dbPath');
   await Firebase.initializeApp(
@@ -243,6 +249,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: loading
                       ? const CircularProgressIndicator()
                       : loggedIIn
+                          // ? const HomePage()
                           ? const HomeScreen()
                           // : PageRetail()
                           : const LoginScreen()))),

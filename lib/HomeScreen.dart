@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:hng_flutter/widgets/image_preview.dart';
@@ -135,203 +136,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     PageHome(),
                     PageSurvey(),
                     PageRetail(),
-                    // NewPageProfilePage(),
                     PageProfile(),
                   ],
                 )),
-                Container(
-                  padding: const EdgeInsets.only(top: 10, bottom: 10),
-                  color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isSelected = 0;
-                            _pageController.jumpToPage(0);
-                            /*_pageController.animateToPage(
-                                    0,
-                                    duration: const Duration(milliseconds: 400),
-                                    curve: Curves.easeInOut,
-                                  );*/
-                          });
-                        },
-                        child: AnimatedContainer(
-                          padding: const EdgeInsets.only(
-                              left: 15, right: 15, bottom: 3, top: 3),
-                          decoration: BoxDecoration(
-                            color: isSelected == 0
-                                ? const Color(0xfff76613)
-                                : Colors.transparent,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                          ),
-                          duration: const Duration(milliseconds: 300),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.home_filled,
-                                color: isSelected == 0
-                                    ? Colors.white
-                                    : Colors.grey,
-                              ),
-                              Text(
-                                'Home',
-                                style: lightTheme.textTheme.labelSmall!
-                                    .copyWith(
-                                        fontSize: 12,
-                                        color: isSelected == 0
-                                            ? Colors.white
-                                            : Colors.grey),
 
-                                /*    style: TextStyle(
-                                    fontSize: 12,
-                                    ),*/
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isSelected = 1;
-                            _pageController.jumpToPage(1);
-                            //
-                            // _pageController.animateToPage(
-                            //   1,
-                            //   duration: const Duration(milliseconds: 400),
-                            //   curve: Curves.easeInOut,
-                            // );
-                          });
-                        },
-                        child: AnimatedContainer(
-                          decoration: BoxDecoration(
-                            color: isSelected == 1
-                                ? const Color(0xfff76613)
-                                : Colors.transparent,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                          ),
-                          padding: const EdgeInsets.only(
-                              left: 15, right: 15, bottom: 3, top: 3),
-                          duration: const Duration(milliseconds: 300),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.check_box_outlined,
-                                color: isSelected == 1
-                                    ? Colors.white
-                                    : Colors.grey,
-                              ),
-                              Text(
-                                'Operations',
-                                style: lightTheme.textTheme.labelSmall!
-                                    .copyWith(
-                                        fontSize: 12,
-                                        color: isSelected == 1
-                                            ? Colors.white
-                                            : Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isSelected = 2;
-                            _pageController.jumpToPage(2);
-
-                            /*_pageController.animateToPage(
-                                    2,
-                                    duration: const Duration(milliseconds: 400),
-                                    curve: Curves.easeInOut,
-                                  );*/
-                          });
-                        },
-                        child: AnimatedContainer(
-                          decoration: BoxDecoration(
-                            color: isSelected == 2
-                                ? const Color(0xfff76613)
-                                : Colors.transparent,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                          ),
-                          padding: const EdgeInsets.only(
-                              left: 15, right: 15, bottom: 3, top: 3),
-                          duration: const Duration(milliseconds: 300),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.shop_outlined,
-                                color: isSelected == 2
-                                    ? Colors.white
-                                    : Colors.grey,
-                              ),
-                              Text(
-                                'Retail',
-                                style: lightTheme.textTheme.labelSmall!
-                                    .copyWith(
-                                        fontSize: 12,
-                                        color: isSelected == 2
-                                            ? Colors.white
-                                            : Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isSelected = 3;
-                            // _pageController.position==3;
-                            _pageController.jumpToPage(3);
-
-                            /*  _pageController.animateToPage(
-                                    3,
-                                    duration: const Duration(milliseconds: 400),
-                                    curve: Curves.easeInOut,
-                                  );*/
-                          });
-                        },
-                        child: AnimatedContainer(
-                          decoration: BoxDecoration(
-                            color: isSelected == 3
-                                ? const Color(0xfff76613)
-                                : Colors.transparent,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                          ),
-                          padding: const EdgeInsets.only(
-                              left: 15, right: 15, bottom: 3, top: 3),
-                          duration: const Duration(milliseconds: 300),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.perm_identity_sharp,
-                                color: isSelected == 3
-                                    ? Colors.white
-                                    : Colors.grey,
-                              ),
-                              Text(
-                                'Profile',
-                                style: lightTheme.textTheme.labelSmall!
-                                    .copyWith(
-                                        fontSize: 12,
-                                        color: isSelected == 3
-                                            ? Colors.white
-                                            : Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ///bottom nav widget
+                bottomNavigationWidget(),
               ],
             ),
             Visibility(
@@ -498,6 +308,146 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       // _showRetryAlert(Constants.networkIssue);
     }
+  }
+
+  Widget bottomNavigationWidget(){
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(
+            context: context,
+            icon: Icons.home_filled,
+            label: 'Home',
+            isSelected: isSelected == 0,
+            onTap: () {
+              setState(() {
+                isSelected = 0;
+                _pageController.animateToPage(
+                  0,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              });
+            },
+          ),
+          _buildNavItem(
+            context: context,
+            icon: Icons.check_box_outlined,
+            label: 'Operations',
+            isSelected: isSelected == 1,
+            onTap: () {
+              setState(() {
+                isSelected = 1;
+                _pageController.animateToPage(
+                  1,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              });
+            },
+          ),
+          _buildNavItem(
+            context: context,
+            icon: Icons.shop_outlined,
+            label: 'Retail',
+            isSelected: isSelected == 2,
+            onTap: () {
+              setState(() {
+                isSelected = 2;
+                _pageController.animateToPage(
+                  2,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              });
+            },
+          ),
+          _buildNavItem(
+            context: context,
+            icon: Icons.perm_identity_sharp,
+            label: 'Profile',
+            isSelected: isSelected == 3,
+            onTap: () {
+              setState(() {
+                isSelected = 3;
+                _pageController.animateToPage(
+                  3,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildNavItem({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xfff76613) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isSelected
+              ? [
+            BoxShadow(
+              color: const Color(0xfff76613).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ]
+              : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.grey[600],
+              size: 24,
+            ).animate().scale(
+              duration: 300.ms,
+              curve: Curves.easeInOut,
+              begin: const Offset(1, 1),
+              end: isSelected ? const Offset(1.2, 1.2) : const Offset(1, 1),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? Colors.white : Colors.grey[600],
+              ),
+            ).animate().fade(
+              duration: 300.ms,
+              curve: Curves.easeInOut,
+            ),
+          ],
+        ),
+      ),
+    );
   }
   void showAuditSummaryDialog(BuildContext context) async {
     AuditSummary? summary = await fetchAuditSummary();

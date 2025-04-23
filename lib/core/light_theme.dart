@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 final ThemeData
 lightTheme = ThemeData(
   useMaterial3: true,
+  // primaryColor:  const Color(0xFF81D4FA),
   primaryColor: Colors.orange,
 
   // colorScheme: lightColorScheme,

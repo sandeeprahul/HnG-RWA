@@ -6,9 +6,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/presentation/order_list_screen.dart';
 import 'package:hng_flutter/presentation/order_management_screen.dart';
+import 'package:hng_flutter/presentation/product_quick_enquiry_page.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:hng_flutter/widgets/product_quick_enquiry_widget.dart';
 import 'package:hng_flutter/widgets/scan_qr_widget.dart';
@@ -319,132 +322,608 @@ class _PageHomeState extends State<PageHome> {
   final TaskCheckerController taskCheckController =
       Get.put(TaskCheckerController());
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 15, right: 15, top: 15),
-              padding: const EdgeInsets.only(
-                  left: 15, right: 15, top: 15, bottom: 10),
-              height: 170,
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      color: (Colors.grey[200])!,
-                      spreadRadius: 5,
-                      blurRadius: 5)
-                ],
-                color: const Color(0xfff76613),
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(15),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      profile_image_url.isEmpty
+  Widget newProfileCard() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xfff76613),
+            const Color(0xfff76613).withOpacity(0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xfff76613).withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            // Handle card tap
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Profile Section
+                Row(
+                  children: [
+                    // Profile Image
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: profile_image_url.isEmpty
                           ? const CircleAvatar(
                               backgroundColor: Colors.white,
-                              radius: 20,
-                              // backgroundImage: ,
-                            )
-                          : InkWell(
-                              onTap: () {
-                                setState(() {
-                                  showImage = true;
-                                });
-                              },
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 20,
-                                backgroundImage:
-                                    NetworkImage(profile_image_url),
+                              radius: 25,
+                              child: Icon(
+                                Icons.person,
+                                color: Color(0xfff76613),
+                                size: 30,
                               ),
+                            )
+                          : CircleAvatar(
+                              radius: 25,
+                              backgroundImage: NetworkImage(profile_image_url),
                             ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: Text(
-                          'Hi, $userName\nEmp ID : $userCode',
-                          /*    style: const TextStyle(
-                              color: Colors.white, fontSize: 13),*/
-                          style: lightTheme.textTheme.labelSmall!
-                              .copyWith(fontSize: 13, color: Colors.white),
+                    ),
+                    const SizedBox(width: 16),
+                    // User Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Hi, $userName',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Emp ID: $userCode',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Attendance Section
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 5,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        // Time Display
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  startendTimeText,
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  checkOutbnt
+                                      ? chekinTime
+                                      : checkInBool
+                                          ? '09:30 AM'
+                                          : chekinTime,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Status Indicator
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        // Action Button
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: checkOutbnt
+                              ? checkoutBtnWidget()
+                              : checkInBool
+                                  ? checkInBtn()
+                                  : const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget menuHomeWidgets({required String title, required String tag}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Avatar with gradient background
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.group_outlined,
+              size: 24,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // Title with better typography
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  tag,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Arrow with animation
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 500.ms).slideX();
+  }
+// decoration: const BoxDecoration(
+//         gradient: LinearGradient(
+//           begin: Alignment.topCenter,
+//           end: Alignment.bottomCenter,
+//           colors: [
+//            Colors.white70,
+//            Colors.white,
+//
+//           ],
+//         ),
+//       ),
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+           Colors.white70,
+           Colors.white,
+
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              newProfileCard(),
+              Visibility(
+                visible: false,
+                child: Container(
+                  margin: const EdgeInsets.only(left: 15, right: 15, top: 15),
+                  padding: const EdgeInsets.only(
+                      left: 15, right: 15, top: 15, bottom: 10),
+                  height: 170,
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                          color: (Colors.grey[200])!,
+                          spreadRadius: 5,
+                          blurRadius: 5)
+                    ],
+                    color: const Color(0xfff76613),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(15),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          profile_image_url.isEmpty
+                              ? const CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 20,
+                                  // backgroundImage: ,
+                                )
+                              : InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      showImage = true;
+                                    });
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 20,
+                                    backgroundImage:
+                                        NetworkImage(profile_image_url),
+                                  ),
+                                ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Text(
+                              'Hi, $userName\nEmp ID : $userCode',
+                              /*    style: const TextStyle(
+                                  color: Colors.white, fontSize: 13),*/
+                              style: const TextStyle(fontSize: 13, color: Colors.white),
+                            ),
+                          )
+                        ],
+                      ),
+                      Visibility(
+                        visible: true,
+                        child: Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 15),
+                            padding: const EdgeInsets.only(
+                                left: 15, right: 15, top: 15),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                            ),
+                            child: Column(
+                              // mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      startendTimeText,
+                                      // style: const TextStyle(fontSize: 12),
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                    Text(
+                                      checkOutbnt
+                                          ? '$chekinTime'
+                                          : checkInBool
+                                              ? '09:30 AM'
+                                              : '$chekinTime',
+                                      style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12),
+                                      /* style: const TextStyle(
+                                          fontWeight: FontWeight.bold, fontSize: 12),*/
+                                    ),
+                                  ],
+                                ),
+                                Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: checkOutbnt
+                                        ? checkoutBtnWidget()
+                                        : checkInBool
+                                            ? checkInBtn()
+                                            : const Text('')),
+                              ],
+                            ),
+                          ),
                         ),
                       )
                     ],
                   ),
-                  Visibility(
-                    visible: true,
-                    child: Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 15),
-                        padding:
-                            const EdgeInsets.only(left: 15, right: 15, top: 15),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
-                        child:  Column(
-                                // mainAxisAlignment: MainAxisAlignment.end,
+                ),
+              ),
+
+              Obx(() {
+                return checkinController.isMyTeamActivitiesEnabled
+                    ? InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AttendenceScreen()));
+                        },
+                        child: menuHomeWidgets(
+                            title: "My Team Activities",
+                            tag: "View team activities."),
+                      )
+                    : const SizedBox();
+              }),
+
+              Obx(() {
+                return checkinController.isProductEnquiryEnabled
+                    ? InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ProductQuickEnquiryPage()));
+                        },
+                        child: menuHomeWidgets(
+                            title: "Product Quick Enquiry",
+                            tag: "Get Product Details."))
+                    : const SizedBox();
+              }),
+
+              const Divider(),
+
+              Obx(() {
+                return checkinController.isExploreCompanyEnabled
+                    ? Column(
+                        children: [
+                          const Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: 15, top: 10, right: 10, bottom: 15),
+                              child: Text(
+                                'Explore Company',
+                                // style: TextStyle(fontSize: 15),
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          Visibility(
+                            visible: false,
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        startendTimeText,
-                                        // style: const TextStyle(fontSize: 12),
-                                        style: lightTheme.textTheme.bodySmall!
-                                            .copyWith(fontSize: 12),
-                                      ),
-                                      Text(
-                                        checkOutbnt
-                                            ? '$chekinTime'
-                                            : checkInBool
-                                                ? '09:30 AM'
-                                                : '$chekinTime',
-                                        style: lightTheme.textTheme.labelMedium!
-                                            .copyWith(
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 15, right: 15, top: 10),
+                                    padding: const EdgeInsets.only(
+                                        left: 15, bottom: 10),
+                                    width: 100,
+                                    height: 100,
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(5)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.grey, blurRadius: 3)
+                                        ]),
+                                    child: const Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Icon(
+                                            Icons.list_alt,
+                                            color: Colors.grey,
+                                            size: 35,
+                                          ),
+                                        ),
+                                        Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Text(
+                                              'Policies',
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 12),
-                                        /* style: const TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 12),*/
-                                      ),
-                                    ],
+                                              ),
+                                            ))
+                                      ],
+                                    ),
                                   ),
-                                  Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: checkOutbnt
-                                          ? checkoutBtnWidget()
-                                          : checkInBool
-                                              ? checkInBtn()
-                                              : const Text('')),
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 5, right: 15, top: 10),
+                                    padding: const EdgeInsets.only(
+                                        left: 15, bottom: 10),
+                                    width: 100,
+                                    height: 100,
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(5)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.grey, blurRadius: 3)
+                                        ]),
+                                    child: const Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Icon(
+                                              Icons.list_alt,
+                                              color: Colors.grey,
+                                              size: 35,
+                                            )),
+                                        Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Text(
+                                              'Holidays',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            )),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(7),
+                            margin: const EdgeInsets.only(
+                                left: 10, right: 10, bottom: 5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            child: const Center(
+                              child: Text(
+                                // "303030",
+                                'Activity Status Report',
+                                // checkList.length == 0 ? '' : checkList[0].userId,
+                                /*style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),*/
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Divider(),
+                          FutureBuilder<dynamic>(
+                              future: _future,
+                              builder:
+                                  (BuildContext context, AsyncSnapshot snapshot) {
+                                // print('atten $snapshot.data');
+                                if (snapshot.data == null) {
+                                  return const Center(
+                                    child: Text('No data'),
+                                  );
+                                } else if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return checkList.isEmpty
+                                      ? const Text(
+                                          'No Records',
+                                        )
+                                      : checkList[0].audittypes.isEmpty
+                                          ? const Text('No Records')
+                                          : Expanded(
+                                              // height: 200,
+                                              child: ListView.builder(
+                                                  itemCount: checkList.isEmpty
+                                                      ? 0
+                                                      : checkList[0]
+                                                          .audittypes
+                                                          .length,
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int pos) {
+                                                    return item(pos);
+                                                  }),
+                                            );
+                                }
+                              }),
+                          SizedBox(
+                            height: checkList.isEmpty ? 0 : 50,
+                          ),
+                        ],
+                      )
+                    : const SizedBox();
+              }),
 
-
-
-
-            Obx(() {
-              return checkinController.isMyTeamActivitiesEnabled
-                  ?  InkWell(
+              // const ScanQrWidget(),
+              /* GestureDetector(
                 onTap: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const AttendenceScreen()));
+                          builder: (context) => OrderManagementScreen()));
                 },
                 child: Container(
-                  margin: const EdgeInsets.only(
-                      top: 20, left: 15, right: 15, bottom: 5),
+                  margin: const EdgeInsets.only(left: 15, right: 15, bottom: 5),
                   padding: const EdgeInsets.only(
                       left: 15, right: 15, top: 15, bottom: 10),
                   decoration: BoxDecoration(
@@ -463,7 +942,7 @@ class _PageHomeState extends State<PageHome> {
                         radius: 15,
                         backgroundColor: Color(0xFFE0E0E0),
                         child: Icon(
-                          Icons.group_outlined,
+                          Icons.help_outline,
                           size: 20,
                           color: Colors.grey,
                         ),
@@ -471,12 +950,9 @@ class _PageHomeState extends State<PageHome> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          'My team Activities ',
+                          'HyperLocal ',
                           style: lightTheme.textTheme.labelSmall!.copyWith(
                               fontSize: 14, fontWeight: FontWeight.bold),
-
-                          /* style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),*/
                         ),
                       ),
                       const Spacer(),
@@ -488,269 +964,46 @@ class _PageHomeState extends State<PageHome> {
                     ],
                   ),
                 ),
-              )
-                  : const SizedBox();
-            }),
-
-            Obx(() {
-              return checkinController.isProductEnquiryEnabled
-                  ? const ProductQuickEnquiryWidget()
-                  : const SizedBox();
-            }),
-
-
-            const Divider(),
-
-            Obx(() {
-              return checkinController.isExploreCompanyEnabled
-                  ? Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 15, top: 10, right: 10, bottom: 15),
-                      child: Text(
-                        'Explore Company',
-                        // style: TextStyle(fontSize: 15),
-                        style: lightTheme.textTheme.labelSmall!
-                            .copyWith(fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  Visibility(
-                    visible: false,
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Row(
-                        children: [
-                          Container(
-                            margin:
-                            const EdgeInsets.only(left: 15, right: 15, top: 10),
-                            padding: const EdgeInsets.only(left: 15, bottom: 10),
-                            width: 100,
-                            height: 100,
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.all(Radius.circular(5)),
-                                boxShadow: [
-                                  BoxShadow(color: Colors.grey, blurRadius: 3)
-                                ]),
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Icon(
-                                    Icons.list_alt,
-                                    color: Colors.grey,
-                                    size: 35,
-                                  ),
-                                ),
-                                Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      'Policies',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ))
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin:
-                            const EdgeInsets.only(left: 5, right: 15, top: 10),
-                            padding: const EdgeInsets.only(left: 15, bottom: 10),
-                            width: 100,
-                            height: 100,
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.all(Radius.circular(5)),
-                                boxShadow: [
-                                  BoxShadow(color: Colors.grey, blurRadius: 3)
-                                ]),
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Icon(
-                                      Icons.list_alt,
-                                      color: Colors.grey,
-                                      size: 35,
-                                    )),
-                                Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      'Holidays',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(7),
-                    margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: CupertinoColors.systemBlue,
-                    ),
-                    child: Center(
-                      child: Text(
-                        // "303030",
-                        'Activity Status Report',
-                        // checkList.length == 0 ? '' : checkList[0].userId,
-                        /*style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),*/
-                        style: lightTheme.textTheme.labelSmall!.copyWith(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Divider(),
-                  FutureBuilder<dynamic>(
-                      future: _future,
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        // print('atten $snapshot.data');
-                        if (snapshot.data == null) {
-                          return const Center(
-                            child: Text('No data'),
-                          );
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else {
-                          return checkList.isEmpty
-                              ? const Text(
-                            'No Records',
-                          )
-                              : checkList[0].audittypes.isEmpty
-                              ? const Text('No Records')
-                              : Expanded(
-                            // height: 200,
-                            child: ListView.builder(
-                                itemCount: checkList.isEmpty
-                                    ? 0
-                                    : checkList[0].audittypes.length,
-                                itemBuilder:
-                                    (BuildContext context, int pos) {
-                                  return item(pos);
-                                }),
-                          );
-                        }
-                      }),
-                  SizedBox(
-                    height: checkList.isEmpty ? 0 : 50,
-                  ),
-                ],
-              )
-                  : const SizedBox();
-            }),
-
-            // const ScanQrWidget(),
-            /* GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => OrderManagementScreen()));
-              },
+              ),
+              const Divider(),
+      */
+            ],
+          ),
+          Visibility(
+              visible: showImage,
               child: Container(
-                margin: const EdgeInsets.only(left: 15, right: 15, bottom: 5),
-                padding: const EdgeInsets.only(
-                    left: 15, right: 15, top: 15, bottom: 10),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.all(Radius.circular(15)),
-                    boxShadow: [
-                      BoxShadow(
-                          spreadRadius: 1,
-                          blurRadius: 4,
-                          color: (Colors.grey[200]!))
-                    ]),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                color: Colors.black.withOpacity(0.5),
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.all(20),
+                child: Stack(
                   children: [
-                    const CircleAvatar(
-                      radius: 15,
-                      backgroundColor: Color(0xFFE0E0E0),
-                      child: Icon(
-                        Icons.help_outline,
-                        size: 20,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'HyperLocal ',
-                        style: lightTheme.textTheme.labelSmall!.copyWith(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 20,
-                      color: Colors.grey,
+                    // Icon(Icons.close,color: Colors.red,),
+                    profile_image_url.isEmpty
+                        ? const SizedBox()
+                        : Center(
+                            child: Image.network(profile_image_url.isNotEmpty
+                                ? profile_image_url
+                                : ''),
+                          ),
+                    Container(
+                      color: Colors.white,
+                      child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              showImage = false;
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.red,
+                          )),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const Divider(),
-*/
-
-          ],
-        ),
-        Visibility(
-            visible: showImage,
-            child: Container(
-              color: Colors.black.withOpacity(0.5),
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.all(20),
-              child: Stack(
-                children: [
-                  // Icon(Icons.close,color: Colors.red,),
-                  profile_image_url.isEmpty
-                      ? const SizedBox()
-                      : Center(
-                          child: Image.network(profile_image_url.isNotEmpty
-                              ? profile_image_url
-                              : ''),
-                        ),
-                  Container(
-                    color: Colors.white,
-                    child: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            showImage = false;
-                          });
-                        },
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.red,
-                        )),
-                  ),
-                ],
-              ),
-            )),
-      ],
+              )),
+        ],
+      ),
     );
   }
 
@@ -791,10 +1044,9 @@ class _PageHomeState extends State<PageHome> {
                 child: CircularProgressIndicator(),
               );
             }
-            return Text(
+            return const Text(
               'Check In',
-              style: lightTheme.textTheme.labelSmall!
-                  .copyWith(fontSize: 13, color: Colors.white),
+              style: TextStyle(fontSize: 13, color: Colors.white),
             );
           }),
         ));
@@ -943,10 +1195,9 @@ class _PageHomeState extends State<PageHome> {
             border: Border.all(
               color: const Color(0xfff76613),
             )),
-        child: Text(
+        child: const Text(
           'Check Out',
-          style: lightTheme.textTheme.labelSmall!
-              .copyWith(fontSize: 13, color: const Color(0xfff76613)),
+          style: TextStyle(fontSize: 13, color: Color(0xfff76613)),
 
 /*          style: TextStyle(
               color: Colors.orange, fontSize: 13, fontWeight: FontWeight.bold),*/
@@ -1099,6 +1350,7 @@ class _PageHomeState extends State<PageHome> {
   Future<dynamic> getActiveCheckListData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // var userID = "70002";
       var userID = prefs.getString('userCode') ?? '';
       String url = "${Constants.apiHttpsUrl}/Login/GetProgressStatus/$userID";
 
@@ -1127,19 +1379,17 @@ class _PageHomeState extends State<PageHome> {
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
-
       var responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
-
         if (responseData['statusCode'] == "200") {
-
           if (responseData["menu_json"] != "") {
-            checkinController.checkinStatus.value = CheckinStatusModel.fromJson(responseData);;
+            checkinController.checkinStatus.value =
+                CheckinStatusModel.fromJson(responseData);
+            ;
             print("MENU JSON");
             print("$responseData");
-          }
-          else{
+          } else {
             print("NOMENU JSON");
             print("$responseData");
           }
@@ -1212,8 +1462,6 @@ class _PageHomeState extends State<PageHome> {
             taskCheckController.checkTaskStatus();
           }
         }
-
-
       } else {
         Get.snackbar(
           "Alert!", // SnackBar title

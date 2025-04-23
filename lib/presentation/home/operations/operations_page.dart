@@ -3,12 +3,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:hng_flutter/common/constants.dart';
 import 'package:hng_flutter/presentation/home/operations/store_transfer_page.dart';
 import 'package:hng_flutter/presentation/home/operations/store_visit/store_visit_page.dart';
 import 'package:hng_flutter/presentation/home/operations/support_team_page.dart';
 import 'package:hng_flutter/presentation/home/operations/weekoff_apply_page.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../data/opeartions/audit.dart';
@@ -117,11 +119,13 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                                     1)), //true permanent//false temporary
                           );
                         } else if (audit.auditId == 107) {
+
+                          askPeremission();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                                 // fullscreenDialog: true,
-                                builder: (context) => const WebViewExample()),
+                                builder: (context) =>  WebViewExample()),
                           );
                         } else if (audit.auditId == 108) {
                           Navigator.push(
@@ -306,4 +310,17 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
       },
     );
   }
-}
+
+  Future<void> askPeremission() async {
+    var status = await Permission.storage.status;
+
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+      if (!status.isGranted) {
+        Get.defaultDialog(
+          middleText: 'Please grant Storage permission',
+        );
+        return;
+      }
+  }
+}}
