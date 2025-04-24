@@ -25,9 +25,12 @@ class CameraPageController extends GetxController {
         preferredCameraDevice: CameraDevice.front,
       );
 
-      if (photo != null) {
+      if (photo != null&& await File(photo.path).exists()) {
+        await Future.delayed(const Duration(milliseconds: 300));
+
         imagePath.value = photo.path;
         camVisible.value = false; // Hide camera preview after capture
+
         await _cropImage(photo); // Crop the image after capture
         Get.back(); // Go back after capturing the image
       }
@@ -38,33 +41,39 @@ class CameraPageController extends GetxController {
 
   // Function to crop the image
   Future<void> _cropImage(XFile? photo) async {
-    if (photo != null) {
-      final croppedFile = await ImageCropper().cropImage(
-        sourcePath: Platform.isAndroid ? photo.path : photo.path,
-        compressFormat: ImageCompressFormat.jpg,
+    if (photo == null || !(await File(photo.path).exists())) return;
 
-        maxWidth: 1920,
-        maxHeight: 1080,
-        compressQuality: 50,
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarTitle: 'Cropper',
-            toolbarColor: Colors.deepOrange,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false,
-          ),
-        ],
-      );
+    try{
+        final croppedFile = await ImageCropper().cropImage(
+          sourcePath: Platform.isAndroid ? photo.path : photo.path,
+          compressFormat: ImageCompressFormat.jpg,
 
-      if (croppedFile != null) {
-        final imageBytes = await File(croppedFile.path).readAsBytes();
-        croppedImageFile.value = XFile(croppedFile.path);
-        croppedImageFiles.add(XFile(croppedFile.path)); // Add to the list
-        base64img.value = base64.encode(imageBytes); // Update base64 image
-        print("Base64 Image: ${base64img.value}");
+          maxWidth: 1920,
+          maxHeight: 1080,
+          compressQuality: 50,
+          uiSettings: [
+            AndroidUiSettings(
+              toolbarTitle: 'Cropper',
+              toolbarColor: Colors.deepOrange,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.original,
+              lockAspectRatio: false,
+            ),
+          ],
+        );
+
+        if (croppedFile != null) {
+          final imageBytes = await File(croppedFile.path).readAsBytes();
+          croppedImageFile.value = XFile(croppedFile.path);
+          croppedImageFiles.add(XFile(croppedFile.path)); // Add to the list
+          base64img.value = base64.encode(imageBytes); // Update base64 image
+          print("Base64 Image: ${base64img.value}");
+        }
+      }catch(e){
+        Get.snackbar('Alert!', "Error:$e",overlayBlur: 2.0,backgroundColor: Colors.red,colorText: Colors.white);
       }
-    }
+
+
   }
 
   void clearCroppedImageFile() {

@@ -25,6 +25,7 @@ class _CameraPageState extends State<CameraPage> {
     _captureAndCropImageOnInit();
   }
 
+
   // Define a separate async function to handle async operations
   Future<void> _captureAndCropImageOnInit() async {
     await controller.captureAndCropImage(); // Capture and crop image on page init
