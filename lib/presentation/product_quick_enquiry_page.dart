@@ -31,14 +31,14 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
   Map<String, dynamic>? productData;
 
   Future<void> fetchProductDetails(String code) async {
-    // SharedPreferences pref = await SharedPreferences.getInstance();
-    // var locationCode = pref.getString('locationCode');
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var userCode = pref.getString('userCode');
     // var locationCode = "106";
     final url = Uri.parse(
-        "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Coupon/productenquiry/$code/$locationCode");
-
+        "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/Coupon/Newproductenquiry/$code/$locationCode/$userCode");
     print(
-        "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Coupon/productenquiry/$code/$locationCode");
+        "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/Coupon/Newproductenquiry/$code/$locationCode/$userCode");
     setState(() {
       _isLoading = true;
       productData = null;
