@@ -312,13 +312,16 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
   }
 
   Future<void> askPeremission() async {
-    var status = await Permission.storage.status;
+    var status = await Permission.photos.status;
 
     if (!status.isGranted) {
-      status = await Permission.storage.request();
+      status = await Permission.photos.request();
       if (!status.isGranted) {
         Get.defaultDialog(
           middleText: 'Please grant Storage permission',
+          onConfirm: () async {
+            await openAppSettings();
+          }
         );
         return;
       }

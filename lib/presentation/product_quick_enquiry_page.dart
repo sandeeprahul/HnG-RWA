@@ -45,7 +45,7 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
     });
 
     try {
-      final response = await http.get(url).timeout(const Duration(seconds: 10), onTimeout: () {
+      final response = await http.get(url).timeout(const Duration(seconds: 100), onTimeout: () {
         throw TimeoutException('The connection has timed out. Please try again.');
       });
       if (response.statusCode == 200) {

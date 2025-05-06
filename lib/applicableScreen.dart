@@ -315,18 +315,18 @@ class _applicableScreenState extends State<applicableScreen>
       setState(() {
         loading = false;
       });
-      _showRetryAlert();
+      _showRetryAlert(e.toString());
     }
   }
 
-  Future<void> _showRetryAlert() async {
+  Future<void> _showRetryAlert(String msg) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content: const Text('Network issue\nPlease retry'),
+          content:  Text('Something went wrong!\n$msg'),
           actions: <Widget>[
             /*  Container(
               padding: EdgeInsets.all(15),
@@ -453,7 +453,7 @@ class _applicableScreenState extends State<applicableScreen>
       setState(() {
         loading = false;
       });
-      _showRetryAlert();
+      _showRetryAlert(e.toString());
     }
   }
 
@@ -555,7 +555,7 @@ class _applicableScreenState extends State<applicableScreen>
       setState(() {
         loading = false;
       });
-      _showRetryAlert();
+      _showRetryAlert(e.toString());
     }
   }
 
@@ -662,7 +662,7 @@ class _applicableScreenState extends State<applicableScreen>
       setState(() {
         loading = false;
       });
-      _showRetryAlert();
+      _showRetryAlert(e.toString());
     }
   }
 
@@ -768,7 +768,7 @@ class _applicableScreenState extends State<applicableScreen>
       setState(() {
         loading = false;
       });
-      _showRetryAlert();
+      _showRetryAlert(e.toString());
     }
   }
 
