@@ -123,10 +123,10 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                               widget.checkList,
                                               locationsList_Filter[pos]
                                                   .locationCode,
-
-                                        )),
+                                            )),
                                   );
-                                } else if (widget.checkList.auditId == "2"||widget.checkList.auditId == "6") {
+                                } else if (widget.checkList.auditId == "2" ||
+                                    widget.checkList.auditId == "6") {
                                   //storeAudit//||widget.checkList.auditId == "4"
                                   Navigator.push(
                                     context,
@@ -134,9 +134,10 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                         builder: (context) => applicableScreen(
                                             1,
                                             widget.checkList,
-                                            locationsList_Filter[pos].locationCode)),
+                                            locationsList_Filter[pos]
+                                                .locationCode)),
                                   );
-                                } else if(widget.checkList.auditId == "4"){
+                                } else if (widget.checkList.auditId == "4") {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -146,7 +147,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                             locationsList_Filter[pos]
                                                 .locationCode)),
                                   );
-                                }else {
+                                } else {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -158,131 +159,11 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                   );
                                 }
                               },
-                              child: Container(
-                                // color: Colors.white,
-                                margin: const EdgeInsets.only(
-                                    left: 10, top: 10, right: 10),
-                                padding: const EdgeInsets.only(
-                                    left: 10, top: 20, right: 10, bottom: 15),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Color(0xFFBDBDBD), blurRadius: 2)
-                                  ],
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                ),
-                                // height: 125,
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.list_alt_outlined,
-                                          size: 40,
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 15),
-                                            child: Column(
-                                              // mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                Align(
-                                                  alignment: Alignment.topLeft,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2, bottom: 2),
-                                                    child: Text(
-                                                      locationsList_Filter[pos]
-                                                          .locationName,
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 19),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Align(
-                                                  alignment: Alignment.topLeft,
-                                                  child: Text(
-                                                    locationsList_Filter[pos]
-                                                        .locationCode,
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: Colors.grey[400],
-                                        )
-                                      ],
-                                    ),
-                                    Container(
-                                      height: 1,
-                                      margin:
-                                          const EdgeInsets.only(top: 10, bottom: 10),
-                                      width: double.infinity,
-                                      color: Colors.grey[300],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Column(
-                                          children:  [
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  bottom: 2, top: 2),
-                                              child: Text(
-                                                'Current',
-                                                style: TextStyle(
-                                                    color: Color(0xFF757575)),
-                                              ),
-                                            ),
-                                            Text('${locationsList_Filter[pos].currentCount}',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          height: 25,
-                                          width: 1,
-                                          color: Colors.grey[300],
-                                        ),
-                                        Column(
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  bottom: 2, top: 2),
-                                              child: Text(
-                                                'Pending',
-                                                style: TextStyle(
-                                                    color: Color(0xFF757575)),
-                                              ),
-                                            ),
-                                            Text(
-                                              '${locationsList_Filter[pos].pendingCount}',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
+                              child: TaskCard(
+                                  title: locationsList_Filter[pos].locationName,
+                                  description: locationsList_Filter[pos].locationCode,
+                                  currentCount: locationsList_Filter[pos].pendingCount??0,
+                                  pendingCount: locationsList_Filter[pos].pendingCount??0),
                             );
                           })
                       : ListView.builder(
@@ -297,11 +178,13 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => applicableScreen(
-                                            1,
-                                            widget.checkList,
-                                            locationsList[pos].locationCode,)),
+                                              1,
+                                              widget.checkList,
+                                              locationsList[pos].locationCode,
+                                            )),
                                   );
-                                } else if (widget.checkList.auditId == "2"||widget.checkList.auditId == "6") {
+                                } else if (widget.checkList.auditId == "2" ||
+                                    widget.checkList.auditId == "6") {
                                   //storeAudit
                                   Navigator.push(
                                     context,
@@ -311,17 +194,18 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                             widget.checkList,
                                             locationsList[pos].locationCode)),
                                   );
-                                } else if(widget.checkList.auditId == "4"){
+                                } else if (widget.checkList.auditId == "4") {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => checkListScreen_lpd(
-                                            1,
-                                            widget.checkList,
-                                            locationsList[pos]
-                                                .locationCode)),
+                                        builder: (context) =>
+                                            checkListScreen_lpd(
+                                                1,
+                                                widget.checkList,
+                                                locationsList[pos]
+                                                    .locationCode)),
                                   );
-                                }else {
+                                } else {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -332,133 +216,11 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                   );
                                 }
                               },
-                              child: TaskCard(title:      locationsList[pos].locationName, description:   locationsList[pos].locationCode, currentCount: 0, pendingCount: 0),
-                              // child: Container(
-                              //   // color: Colors.white,
-                              //   margin: const EdgeInsets.only(
-                              //       left: 10, top: 10, right: 10),
-                              //   padding: const EdgeInsets.only(
-                              //       left: 10, top: 20, right: 10, bottom: 15),
-                              //   decoration: const BoxDecoration(
-                              //     color: Colors.white,
-                              //     boxShadow: [
-                              //       BoxShadow(
-                              //           color: Color(0xFFBDBDBD), blurRadius: 2)
-                              //     ],
-                              //     borderRadius:
-                              //         BorderRadius.all(Radius.circular(5)),
-                              //   ),
-                              //   // height: 125,
-                              //   child: Column(
-                              //     children: [
-                              //       Row(
-                              //         children: [
-                              //           const Icon(
-                              //             Icons.list_alt_outlined,
-                              //             size: 40,
-                              //           ),
-                              //           Expanded(
-                              //             child: Padding(
-                              //               padding:
-                              //                   const EdgeInsets.only(left: 15),
-                              //               child: Column(
-                              //                 // mainAxisAlignment: MainAxisAlignment.start,
-                              //                 children: [
-                              //                   Align(
-                              //                     alignment: Alignment.topLeft,
-                              //                     child: Padding(
-                              //                       padding:
-                              //                           const EdgeInsets.only(
-                              //                               top: 2, bottom: 2),
-                              //                       child: Text(
-                              //                         locationsList[pos]
-                              //                             .locationName,
-                              //                         style: const TextStyle(
-                              //                             fontWeight:
-                              //                                 FontWeight.bold,
-                              //                             fontSize: 19),
-                              //                       ),
-                              //                     ),
-                              //                   ),
-                              //                   Align(
-                              //                     alignment: Alignment.topLeft,
-                              //                     child: Text(
-                              //                       locationsList[pos]
-                              //                           .locationCode,
-                              //                       style: const TextStyle(
-                              //                         fontSize: 12,
-                              //                       ),
-                              //                     ),
-                              //                   )
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           Icon(
-                              //             Icons.arrow_forward_ios,
-                              //             color: Colors.grey[400],
-                              //           )
-                              //         ],
-                              //       ),
-                              //       Container(
-                              //         height: 1,
-                              //         margin:
-                              //             const EdgeInsets.only(top: 10, bottom: 10),
-                              //         width: double.infinity,
-                              //         color: Colors.grey[300],
-                              //       ),
-                              //       Row(
-                              //         mainAxisAlignment:
-                              //             MainAxisAlignment.spaceAround,
-                              //         children: [
-                              //           Column(
-                              //             children:  [
-                              //               const Padding(
-                              //                 padding: EdgeInsets.only(
-                              //                     bottom: 2, top: 2),
-                              //                 child: Text(
-                              //                   'Current',
-                              //                   style: TextStyle(
-                              //                       color: Color(0xFF757575)),
-                              //                 ),
-                              //               ),
-                              //               Text(
-                              //                 '${locationsList[pos].currentCount}',
-                              //                 style: const TextStyle(
-                              //                     fontWeight: FontWeight.bold,
-                              //                     fontSize: 15),
-                              //               ),
-                              //             ],
-                              //           ),
-                              //           Container(
-                              //             height: 25,
-                              //             width: 1,
-                              //             color: Colors.grey[300],
-                              //           ),
-                              //           Column(
-                              //             children: [
-                              //               const Padding(
-                              //                 padding: EdgeInsets.only(
-                              //                     bottom: 2, top: 2),
-                              //                 child: Text(
-                              //                   'Pending',
-                              //                   style: TextStyle(
-                              //                       color: Color(0xFF757575)),
-                              //                 ),
-                              //               ),
-                              //               Text(
-                              //                 '${locationsList[pos].pendingCount}',
-                              //                 style: const TextStyle(
-                              //                     fontWeight: FontWeight.bold,
-                              //                     fontSize: 15),
-                              //               ),
-                              //             ],
-                              //           ),
-                              //         ],
-                              //       )
-                              //     ],
-                              //   ),
-                              // ),
+                              child: TaskCard(
+                                  title: locationsList[pos].locationName,
+                                  description: locationsList[pos].locationCode,
+                                  currentCount: locationsList[pos].pendingCount??0,
+                                  pendingCount: locationsList[pos].pendingCount??0),
                             );
                           }),
                 ),
@@ -504,7 +266,8 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
       var locationCode = prefs.getString('locationCode') ?? '106';
       var userID = prefs.getString('userCode') ?? '105060';
       // String url ="${Constants.apiHttpsUrl}/Login/GetLocationApplicable/70001/${widget.checkList.auditId}";
-      String url =  "${Constants.apiHttpsUrl}/Login/GetLocationApplicable/$userID/${widget.checkList.auditId}";
+      String url =
+          "${Constants.apiHttpsUrl}/Login/GetLocationApplicable/$userID/${widget.checkList.auditId}";
 
       print(url);
       final response =
@@ -542,13 +305,14 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-            content: Text('Network issue\nPlease retry'),
+          content: Text('Network issue\nPlease retry'),
 // Please retry?'),
           actions: <Widget>[
             Container(
               padding: const EdgeInsets.all(15),
-              decoration:
-              BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(5)),
+              decoration: BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(5)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -557,11 +321,11 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                   child: const Text('Cancel',
                       style: TextStyle(color: Colors.white))),
             ),
-
             Container(
               padding: const EdgeInsets.all(15),
-              decoration:
-                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(5)),
+              decoration: BoxDecoration(
+                  color: CupertinoColors.activeBlue,
+                  borderRadius: BorderRadius.circular(5)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();

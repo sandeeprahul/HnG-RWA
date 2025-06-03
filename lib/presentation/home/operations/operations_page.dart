@@ -120,12 +120,12 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                           );
                         } else if (audit.auditId == 107) {
 
-                          askPeremission();
+                          askPermission();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                                 // fullscreenDialog: true,
-                                builder: (context) =>  WebViewExample()),
+                                builder: (context) =>  const WebViewExample()),
                           );
                         } else if (audit.auditId == 108) {
                           Navigator.push(
@@ -311,19 +311,21 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
     );
   }
 
-  Future<void> askPeremission() async {
-    var status = await Permission.photos.status;
+  Future<void> askPermission() async {
+    var status = await Permission.photos.request();
 
     if (!status.isGranted) {
-      status = await Permission.photos.request();
-      if (!status.isGranted) {
-        Get.defaultDialog(
-          middleText: 'Please grant Storage permission',
-          onConfirm: () async {
-            await openAppSettings();
-          }
-        );
-        return;
-      }
+      Get.defaultDialog(
+        title: 'Permission Required',
+        middleText: 'Please grant photo access permission in settings.',
+        textConfirm: 'Open Settings',
+        onConfirm: () async {
+          await openAppSettings();
+          Get.back(); // Dismiss the dialog
+        },
+
+      );
+    }
   }
-}}
+
+}

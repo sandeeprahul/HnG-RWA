@@ -35,7 +35,7 @@ android {
         release {
             storeFile file("/Users/sandeeprahul/Desktop/backup/hng/android/loghg")
             storePassword "He@lth@9"
-            keyAlias "he@lth@9"
+            keyAlias "He@lth@9"
             keyPassword "He@lth@9"
         }
     }

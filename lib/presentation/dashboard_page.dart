@@ -35,13 +35,16 @@ class _WebViewExampleState extends State<WebViewExample> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Retrieve the saved URL, or use the default if not set
-    String userId = prefs.getString('userId') ?? "";
+    String userId = prefs.getString('userCode') ?? "";
     String savedUrl =
         "https://rwaweb.healthandglowonline.co.in/hgrwabrowser/hngposWebbrowser.aspx?userid=$userId";
+    print(savedUrl);
     setState(() {
       _isLoading = false;
       _url = savedUrl;
     });
+    print(_url);
+
   }
 
   // Future<void> _initializeWebView() async {
