@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:intl/intl.dart';
@@ -271,208 +272,181 @@ class _checkListScreenState extends State<checkListScreen>
                                                     "P"
                                                 ? true
                                                 : false,
-                                        child: InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              index_ = index;
-                                            });
-                                            if (checkList.checklistEditStatus ==
-                                                "A") {
-                                              // checkList[0].checklistAssignId;
-                                              Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        AmAcceptSelectionScreen(
-                                                            checkList
-                                                                .checklistAssignId,
-                                                            checkList,
-                                                            widget
-                                                                .mGetActvityTypes,
-                                                            widget
-                                                                .locationsList)),
-                                                // builder: (context) => checkListItemScreen()),
-                                                // builder: (context) => HomeTemp()),
-                                              ).then((value) => () {
-                                                    print("returnData");
-                                                    print(value);
-                                                    onReturnFromScreen();
-                                                    getActiveCheckListData();
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.08),
+                                                blurRadius: 12,
+                                                spreadRadius: 2,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(12),
+                                                onTap: () {
+                                                  setState(() {
+                                                    index_ = index;
                                                   });
-                                            } else if (checkList
-                                                    .checklistEditStatus ==
-                                                "R") {
-                                              // checklist_edit_status=="R" = edit
-                                              Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        AmAcceptSelectionScreen(
-                                                            checkList
-                                                                .checklistAssignId,
-                                                            checkList,
-                                                            widget
-                                                                .mGetActvityTypes,
-                                                            widget
-                                                                .locationsList)),
-                                              ).then((value) => () {
-                                                    onReturnFromScreen();
-
-                                                    getActiveCheckListData();
-                                                  });
-                                            } else {
-                                              if (checkList.check_In_Flag ==
-                                                  "1") {
-                                                // checkDistance_(
-                                                //     latt, lngg, lat_, lng_,v);
-                                                setState(() {
-                                                  popupVisible = true;
-                                                });
-                                              } else {
-                                                if (type == 1) {
-                                                  Navigator.pushReplacement(
+                                                  if (checkList.checklistEditStatus ==
+                                                      "A") {
+                                                    // checkList[0].checklistAssignId;
+                                                    Navigator.pushReplacement(
                                                       context,
                                                       MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            checkListItemScreen(
-                                                                checkList,
-                                                                widget
-                                                                    .mGetActvityTypes,
-                                                                widget
-                                                                    .locationsList),
-                                                      )).then((value) => () {
-                                                        onReturnFromScreen();
+                                                          builder: (context) =>
+                                                              AmAcceptSelectionScreen(
+                                                                  checkList
+                                                                      .checklistAssignId,
+                                                                  checkList,
+                                                                  widget
+                                                                      .mGetActvityTypes,
+                                                                  widget
+                                                                      .locationsList)),
+                                                      // builder: (context) => checkListItemScreen()),
+                                                      // builder: (context) => HomeTemp()),
+                                                    ).then((value) => () {
+                                                      print("returnData");
+                                                      print(value);
+                                                      onReturnFromScreen();
+                                                      getActiveCheckListData();
+                                                    });
+                                                  } else if (checkList
+                                                      .checklistEditStatus ==
+                                                      "R") {
+                                                    // checklist_edit_status=="R" = edit
+                                                    Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              AmAcceptSelectionScreen(
+                                                                  checkList
+                                                                      .checklistAssignId,
+                                                                  checkList,
+                                                                  widget
+                                                                      .mGetActvityTypes,
+                                                                  widget
+                                                                      .locationsList)),
+                                                    ).then((value) => () {
+                                                      onReturnFromScreen();
 
-                                                        getActiveCheckListData();
+                                                      getActiveCheckListData();
+                                                    });
+                                                  } else {
+                                                    if (checkList.check_In_Flag ==
+                                                        "1") {
+                                                      // checkDistance_(
+                                                      //     latt, lngg, lat_, lng_,v);
+                                                      setState(() {
+                                                        popupVisible = true;
                                                       });
-                                                } else if (type == 2) {
-                                                  /* Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      checkListItemScreen_Lpd(
-                                          activeCheckListLpd[0]),
-                                ));*/
-                                                } else if (type == 2) {}
-                                              }
-                                            }
-                                          },
-                                          child: Container(
-                                            // color: Colors.white,
-                                            margin: const EdgeInsets.only(
-                                                left: 10, top: 10, right: 10),
-                                            padding: const EdgeInsets.only(
-                                                left: 10,
-                                                top: 20,
-                                                right: 20,
-                                                bottom: 20),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                    color: Color(0xFFBDBDBD),
-                                                    blurRadius: 2)
-                                              ],
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5)),
-                                            ),
-                                            // height: 85,
-                                            child: Column(
-                                              children: [
-                                                Row(
+                                                    } else {
+                                                      if (type == 1) {
+                                                        Navigator.pushReplacement(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  checkListItemScreen(
+                                                                      checkList,
+                                                                      widget
+                                                                          .mGetActvityTypes,
+                                                                      widget
+                                                                          .locationsList),
+                                                            )).then((value) => () {
+                                                          onReturnFromScreen();
+
+                                                          getActiveCheckListData();
+                                                        });
+                                                      } else if (type == 2) {
+                                                        /* Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              checkListItemScreen_Lpd(
+                                        activeCheckListLpd[0]),
+                                                                        ));*/
+                                                      } else if (type == 2) {}
+                                                    }
+                                                  }
+                                                }, // Add your onTap function
+                                              splashColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(20),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                left: 15,
-                                                                right: 25),
-                                                        child: Column(
-                                                          // mainAxisAlignment: MainAxisAlignment.start,
-                                                          children: [
-                                                            Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child: Text(
-                                                                '${checkList.checklistName} for $outputDate',
-                                                                // 'DILO MORNING STORE for Jan 20 2023',
-                                                                style: const TextStyle(
-                                                                    fontSize:
-                                                                        17,
-                                                                    color: Colors
-                                                                        .black),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child: Text(
-                                                                'Outlet name : ${checkList.locationName} ',
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize: 13,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 7,
-                                                            ),
-                                                            Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child: Text(
-                                                                'Checklist No: ${checkList.checklistAssignId}',
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize: 13,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 7,
-                                                            ),
-                                                            Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child: Text(
-                                                                'Time : $outputTime - $enddTime',
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
+                                                    // Header Row
+                                                    Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        // Status Indicator
+                                                        Container(
+                                                          width: 6,
+                                                          height: 60,
+                                                          decoration: BoxDecoration(
+                                                            color: Theme.of(context).primaryColor,
+                                                            borderRadius: BorderRadius.circular(3),
+                                                          ),
                                                         ),
-                                                      ),
+                                                        const SizedBox(width: 16),
+
+                                                        // Content
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              // Title with Date
+                                                              Text(
+                                                                '${checkList.checklistName} • $outputDate',
+                                                                style: const TextStyle(
+                                                                  fontSize: 18,
+                                                                  fontWeight: FontWeight.w600,
+                                                                  color: Colors.black87,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(height: 8),
+
+                                                              // Outlet Info
+                                                              _buildInfoRow(
+                                                                icon: Icons.store_outlined,
+                                                                text: checkList.locationName,
+                                                              ),
+
+                                                              // Checklist No
+                                                              _buildInfoRow(
+                                                                icon: Icons.list_alt_outlined,
+                                                                text: 'Checklist #${checkList.checklistAssignId}',
+                                                              ),
+
+                                                              // Time Range
+                                                              _buildInfoRow(
+                                                                icon: Icons.access_time_outlined,
+                                                                text: '$outputTime - $enddTime',
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+
+                                                        // Arrow Icon
+                                                        Icon(
+                                                          Icons.arrow_forward_ios_rounded,
+                                                          size: 18,
+                                                          color: Colors.grey[400],
+                                                        ),
+                                                      ],
                                                     ),
-                                                    Container(
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              right: 15),
-                                                      height: 40,
-                                                      width: 1,
-                                                      color: CupertinoColors
-                                                          .systemGrey3,
-                                                    ),
-                                                    Icon(
-                                                      Icons.arrow_forward_ios,
-                                                      color: Colors.grey[400],
-                                                    )
                                                   ],
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
+                                        )
                                       );
                                     },
                                   );
@@ -621,6 +595,30 @@ class _checkListScreenState extends State<checkListScreen>
     } catch (e) {
       // Handle error as needed
     }
+  }
+
+  // Reusable Info Row Widget
+  Widget _buildInfoRow({required IconData icon, required String text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   final GlobalKey<RefreshIndicatorState> _refreshKey =
