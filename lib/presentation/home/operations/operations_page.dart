@@ -120,7 +120,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                           );
                         } else if (audit.auditId == 107) {
 
-                          askPermission();
+                          // askPermission();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
