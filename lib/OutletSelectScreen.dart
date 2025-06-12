@@ -162,7 +162,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                               child: TaskCard(
                                   title: locationsList_Filter[pos].locationName,
                                   description: locationsList_Filter[pos].locationCode,
-                                  currentCount: locationsList_Filter[pos].pendingCount??0,
+                                  currentCount: locationsList_Filter[pos].currentCount??0,
                                   pendingCount: locationsList_Filter[pos].pendingCount??0),
                             );
                           })
@@ -219,7 +219,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                               child: TaskCard(
                                   title: locationsList[pos].locationName,
                                   description: locationsList[pos].locationCode,
-                                  currentCount: locationsList[pos].pendingCount??0,
+                                  currentCount: locationsList[pos].currentCount??0,
                                   pendingCount: locationsList[pos].pendingCount??0),
                             );
                           }),

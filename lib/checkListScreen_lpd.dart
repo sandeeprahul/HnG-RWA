@@ -481,7 +481,18 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
             child: Column(
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
                   children: [
+                    Container(
+                      width: 6,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Padding(
                         padding:
@@ -500,53 +511,29 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                               ),
                             ),
                             const SizedBox(
-                              height: 10,
+                              height: 8,
                             ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Outlet name : ${checkListLpd[index]
-                                    .locationName} ',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
-                              ),
+                            _buildInfoRow(
+                              icon: Icons.store_outlined,
+                              text: checkListLpd[index]
+                                  .locationName,
                             ),
-                            const SizedBox(
-                              height: 7,
+
+                            _buildInfoRow(
+                              icon: Icons.list_alt_outlined,
+                              text: 'Checklist #${checkListLpd[index]
+                                  .lpdChecklistAssignId}',
                             ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Checklist No: ${checkListLpd[index]
-                                    .lpdChecklistAssignId}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 7,
-                            ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Time : $outputTime - $enddTime',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
+
+                            _buildInfoRow(
+                              icon: Icons.access_time_outlined,
+                              text: '$outputTime - $enddTime',
                             ),
                           ],
                         ),
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(right: 15),
-                      height: 40,
-                      width: 1,
-                      color: CupertinoColors.systemGrey3,
-                    ),
+
                     Icon(
                       Icons.arrow_forward_ios,
                       color: Colors.grey[400],
@@ -594,149 +581,170 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
 
         var enddTime = startTimeFormat.format(endTime__);
 
-        return InkWell(
-          onTap: () {
-            setState(() {
-              index_ = index;
-            });
+        return Material(
+          color: Colors.transparent,
 
-            //A
-            if (checkListEmployee[index].checklistEditStatus == "A") {
-              // checkList[0].checklistAssignId;
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AmAcceptSelectionScreen_Employee(
-                          checkListEmployee[index],
-                          widget.mGetActivityTypes,
-                          widget.locationsList,
-                          widget.type,
-                        ),
-                  )).then((value) =>
-                  () {
-                getActiveCheckListData();
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                index_ = index;
               });
-            }
-           //R
-            else if (checkListEmployee[index].checklistEditStatus ==
-                "R") {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AmAcceptSelectionScreen_Employee(
+
+              //A
+              if (checkListEmployee[index].checklistEditStatus == "A") {
+                // checkList[0].checklistAssignId;
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AmAcceptSelectionScreen_Employee(
                             checkListEmployee[index],
                             widget.mGetActivityTypes,
                             widget.locationsList,
-                            widget.type),
-                  )).then((value) =>
-                  () {
-                getActiveCheckListData();
-              });
-            } else
-            {
-              if (checkListEmployee[index].checkinFlag == "1") {
-                setState(() {
-                  popupVisible = true;
+                            widget.type,
+                          ),
+                    )).then((value) =>
+                    () {
+                  getActiveCheckListData();
                 });
               }
-            }
-          },
-          child: Container(
-            // color: Colors.white,
-            margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
-            padding: const EdgeInsets.only(
-                left: 10, top: 20, right: 20, bottom: 20),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(color: Color(0xFFBDBDBD), blurRadius: 2)
-              ],
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),
-            // height: 85,
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding:
-                        const EdgeInsets.only(left: 15, right: 25),
+             //R
+              else if (checkListEmployee[index].checklistEditStatus ==
+                  "R") {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AmAcceptSelectionScreen_Employee(
+                              checkListEmployee[index],
+                              widget.mGetActivityTypes,
+                              widget.locationsList,
+                              widget.type),
+                    )).then((value) =>
+                    () {
+                  getActiveCheckListData();
+                });
+              } else
+              {
+                if (checkListEmployee[index].checkinFlag == "1") {
+                  setState(() {
+                    popupVisible = true;
+                  });
+                }
+              }
+            },
+            splashColor: Theme.of(context).primaryColor.withOpacity(0.1),
+
+            child: Container(
+              // color: Colors.white,
+              margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
+              padding: const EdgeInsets.all(20),
+
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(color: Color(0xFFBDBDBD), blurRadius: 2)
+                ],
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+              ),
+              // height: 85,
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+
+                      Expanded(
                         child: Column(
                           // mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Align(
                               alignment: Alignment.topLeft,
                               child: Text(
-                                '${checkListEmployee[index]
-                                    .checklistName} for $outputDate',
-                                // 'DILO MORNING STORE for Jan 20 2023',
+
+                                '${checkListEmployee[index].checklistName} • $outputDate',
+
                                 style: const TextStyle(
-                                    fontSize: 17, color: Colors.black),
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                    fontSize: 17, ),
                               ),
                             ),
                             const SizedBox(
-                              height: 10,
+                              height: 8,
                             ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Outlet name : ${checkListEmployee[index]
-                                    .locationName} ',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
-                              ),
+                            _buildInfoRow(
+                              icon: Icons.store_outlined,
+                              text: checkListEmployee[index]
+                                  .locationName,
                             ),
-                            const SizedBox(
-                              height: 7,
+
+                            _buildInfoRow(
+                              icon: Icons.list_alt_outlined,
+                              text: 'Checklist #${checkListEmployee[index]
+                                  .empChecklistAssignId}',
                             ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Checklist No: ${checkListEmployee[index]
-                                    .empChecklistAssignId}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
-                              ),
+
+                            _buildInfoRow(
+                              icon: Icons.access_time_outlined,
+                              text: '$outputTime - $enddTime',
                             ),
-                            const SizedBox(
-                              height: 7,
-                            ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Time : $outputTime - $enddTime',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
+
                           ],
                         ),
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(right: 15),
-                      height: 40,
-                      width: 1,
-                      color: CupertinoColors.systemGrey3,
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.grey[400],
-                    )
-                  ],
-                ),
-              ],
+                      // Container(
+                      //   margin: const EdgeInsets.only(right: 15),
+                      //   height: 40,
+                      //   width: 1,
+                      //   color: CupertinoColors.systemGrey3,
+                      // ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.grey[400],
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
       itemCount: checkListEmployee.length,
+    );
+  }
+
+  Widget _buildInfoRow({required IconData icon, required String text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -846,7 +854,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                               alignment: Alignment.topLeft,
                               child: Text(
                                 '${checkListStoreAudit[index]
-                                    .checklistName} for $outputDate',
+                                    .checklistName}  $outputDate',
                                 // 'DILO MORNING STORE for Jan 20 2023',
                                 style: const TextStyle(
                                     fontSize: 17, color: Colors.black),
@@ -894,12 +902,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                         ),
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(right: 15),
-                      height: 40,
-                      width: 1,
-                      color: CupertinoColors.systemGrey3,
-                    ),
+
                     Icon(
                       Icons.arrow_forward_ios,
                       color: Colors.grey[400],
@@ -1008,6 +1011,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
               children: [
                 Row(
                   children: [
+
                     Expanded(
                       child: Padding(
                         padding:
@@ -1026,42 +1030,23 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                               ),
                             ),
                             const SizedBox(
-                              height: 10,
+                              height: 8,
                             ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Outlet name : ${checkListAm[index]
-                                    .locationName} ',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
-                              ),
+                            _buildInfoRow(
+                              icon: Icons.store_outlined,
+                              text: checkListAm[index]
+                                  .locationName,
                             ),
-                            const SizedBox(
-                              height: 7,
+
+                            _buildInfoRow(
+                              icon: Icons.list_alt_outlined,
+                              text: 'Checklist #${checkListAm[index]
+                                  .amChecklistAssignId}',
                             ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Checklist No: ${checkListAm[index]
-                                    .amChecklistAssignId}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 7,
-                            ),
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                'Time : $outputTime - $enddTime',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
+
+                            _buildInfoRow(
+                              icon: Icons.access_time_outlined,
+                              text: '$outputTime - $enddTime',
                             ),
                           ],
                         ),

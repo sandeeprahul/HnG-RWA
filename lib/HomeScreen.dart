@@ -595,28 +595,31 @@ class _HomeScreenState extends State<HomeScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.network(image, loadingBuilder: (BuildContext context,
-                  Widget child, ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) {
-                  return child;
-                } else {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                      Text(
-                        'Please wait while image loading',
-                        style: lightTheme.textTheme.labelSmall!
-                            .copyWith(fontSize: 12),
-                      )
-                    ],
-                  ); // Show loading indicator
-                }
-              }),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: Image.network(image, loadingBuilder: (BuildContext context,
+                    Widget child, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                        Text(
+                          'Please wait while image loading',
+                          style: lightTheme.textTheme.labelSmall!
+                              .copyWith(fontSize: 12),
+                        )
+                      ],
+                    ); // Show loading indicator
+                  }
+                }),
+              ),
               const SizedBox(height: 16),
               CustomElevatedButton(
                   text: 'Close',

@@ -13,7 +13,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 ///
 
 class WebViewExample extends StatefulWidget {
-  const WebViewExample({super.key});
+  final int from;
+  const WebViewExample({super.key,  required this.from});
 
   @override
   State<WebViewExample> createState() => _WebViewExampleState();
@@ -38,12 +39,22 @@ class _WebViewExampleState extends State<WebViewExample> {
     String userId = prefs.getString('userCode') ?? "";
     String savedUrl =
         "https://rwaweb.healthandglowonline.co.in/hgrwabrowser1/hngposWebbrowser.aspx?userid=$userId";
-    //https://rwaweb.healthandglowonline.co.in/hgrwabrowser1/hngposWebbrowser.aspx?userid=
+    String savedUrlForReports =
+        "https://rwaweb.healthandglowonline.co.in/hgrwabrowser/hngposWebbrowser.aspx?userid=$userId";
+
     print(savedUrl);
-    setState(() {
-      _isLoading = false;
-      _url = savedUrl;
-    });
+    if(widget.from==0){
+      setState(() {
+        _isLoading = false;
+        _url = savedUrl;
+      });
+    }else{
+      setState(() {
+        _isLoading = false;
+        _url = savedUrlForReports;
+      });
+    }
+
     print(_url);
 
   }

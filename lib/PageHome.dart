@@ -1375,7 +1375,7 @@ class _PageHomeState extends State<PageHome> {
       // String url = "${Constants.apiHttpsUrl}/Login/checkinstatus/$userID";
       String url =
           "https://rwaweb.healthandglowonline.co.in/RWAAPIDEVELOPMENT/api/Login/checkinstatus/$userID";
-
+      print(url);
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
