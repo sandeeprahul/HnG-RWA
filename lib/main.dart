@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -48,6 +49,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(GetMaterialApp(
       theme: lightTheme,
       getPages: AppPages.pages,
@@ -84,7 +86,8 @@ class _GifScreenState extends State<GifScreen> {
   }
 
   getDeviceId() async {
-    String id = await getOrGenerateDeviceId();
+    // String id = await getOrGenerateDeviceId();
+    String id = "1750066789983150949983";
     print("Generated Device ID: $id");
 
     final prefs = await SharedPreferences.getInstance();

@@ -5,16 +5,13 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-///for ios <key>NSAppTransportSecurity</key>
-/// 	<dict>
-/// 		<key>NSAllowsArbitraryLoads</key>
-/// 		<true/>
-/// 	</dict>
-///
+
+
 
 class WebViewExample extends StatefulWidget {
   final int from;
-  const WebViewExample({super.key,  required this.from});
+
+  const WebViewExample({super.key, required this.from});
 
   @override
   State<WebViewExample> createState() => _WebViewExampleState();
@@ -43,12 +40,12 @@ class _WebViewExampleState extends State<WebViewExample> {
         "https://rwaweb.healthandglowonline.co.in/hgrwabrowser/hngposWebbrowser.aspx?userid=$userId";
 
     print(savedUrl);
-    if(widget.from==0){
+    if (widget.from == 0) {
       setState(() {
         _isLoading = false;
         _url = savedUrl;
       });
-    }else{
+    } else {
       setState(() {
         _isLoading = false;
         _url = savedUrlForReports;
@@ -56,7 +53,6 @@ class _WebViewExampleState extends State<WebViewExample> {
     }
 
     print(_url);
-
   }
 
   // Future<void> _initializeWebView() async {
@@ -162,20 +158,30 @@ class _WebViewExampleState extends State<WebViewExample> {
                   child: CircularProgressIndicator(),
                 )
               : InAppWebView(
-            onWebViewCreated: (controller) {
-              _controller = controller;
-            },
-                  initialUrlRequest: URLRequest(url: WebUri(_url)),
-                  initialSettings: InAppWebViewSettings(
-                    allowFileAccess: true,
-                    mediaPlaybackRequiresUserGesture: false,
-                    allowsInlineMediaPlayback: true,
-                    useOnDownloadStart: true,
-                    javaScriptEnabled: true,
-                    allowFileAccessFromFileURLs: true,
-                    allowUniversalAccessFromFileURLs: true,
-                  ),
 
+
+                  onWebViewCreated: (controller) {
+                    _controller = controller;
+                  },
+                  onPermissionRequest: (controller, request) async {
+                    return PermissionResponse(
+                      resources: request.resources,
+                      action: PermissionResponseAction.GRANT,
+                    );
+                  },
+                  initialUrlRequest: URLRequest(url: WebUri(_url)),
+            initialSettings: InAppWebViewSettings(
+                allowFileAccess: true,
+                mediaPlaybackRequiresUserGesture: false,
+                allowsInlineMediaPlayback: true,
+                useOnDownloadStart: true,
+                javaScriptEnabled: true,
+                useShouldOverrideUrlLoading: true,
+                useShouldInterceptRequest: true, // Example of a setting
+
+                allowFileAccessFromFileURLs: true,
+                allowUniversalAccessFromFileURLs: true,
+                useHybridComposition: true),
                 ),
         ],
       ),

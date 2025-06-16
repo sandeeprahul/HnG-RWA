@@ -13,6 +13,7 @@ import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../WebViewScreen.dart';
 import '../../../data/opeartions/audit.dart';
 import '../../../helper/StringUtils.dart';
 import '../../../provider/store_transfer_provider.dart';
@@ -75,7 +76,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                         // colors:  [Colors.red.shade200, Colors.red.shade400],
                         // colors:  [Colors.green.shade200, Colors.green.shade400],
                         // colors:  [Colors.deepOrange.shade200, Colors.deepOrange.shade400],
-                        colors:  [Colors.blue.shade200, Colors.blue.shade400],
+                        colors: [Colors.blue.shade200, Colors.blue.shade400],
                         // colors:   [Colors.purple.shade200, Colors.purple.shade400],
                       ),
                       boxShadow: [
@@ -119,28 +120,26 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                                     1)), //true permanent//false temporary
                           );
                         } else if (audit.auditId == 107) {
-
-                          // askPermission();
-                          Navigator.push(
+                          askPermission(from:0);
+                    /*  Navigator.push(
                             context,
                             MaterialPageRoute(
                                 // fullscreenDialog: true,
-                                builder: (context) =>  const WebViewExample(from :0)),///dashboard = 0 , forms adn reports = 1
-                          );
+                                builder: (context) =>
+                                    const WebViewExample(from: 0)),
+
+                            ///dashboard = 0 , forms and reports = 1
+                          );*/
                         } else if (audit.auditId == 108) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
                                       const OrderManagementScreen()));
-                        }else if (audit.auditId == 109) {
-                          askPermission();
+                        } else if (audit.auditId == 109) {
+                          askPermission(from:1);
 
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const WebViewExample(from :1)));
+
                         }
                       },
                       child: Column(
@@ -196,20 +195,20 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                               color: Colors.white,
                               size: 60,
                             ))
-                                    else if (audit.auditId == 108)
+                          else if (audit.auditId == 108)
                             const Center(
                                 child: Icon(
                               Icons.playlist_add_check,
                               color: Colors.white,
                               size: 60,
                             ))
-                                      else if (audit.auditId == 109)
-                                          const Center(
-                                              child: Icon(
-                                                Icons.receipt,
-                                                color: Colors.white,
-                                                size: 60,
-                                              )),
+                          else if (audit.auditId == 109)
+                            const Center(
+                                child: Icon(
+                              Icons.receipt,
+                              color: Colors.white,
+                              size: 60,
+                            )),
                           const SizedBox(
                             height: 5,
                           ),
@@ -217,8 +216,9 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                               child: Text(
                             formattedAuditName,
                             textAlign: TextAlign.center,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                           )),
                         ],
                       ),
@@ -326,21 +326,41 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
     );
   }
 
-  Future<void> askPermission() async {
-    var status = await Permission.photos.request();
+  Future<void> askPermission( {required int from}) async {
+    // var status = await Permission.photos.request();
+    await Permission.storage.request();
+    await Permission.photos.request();
+    await Permission.camera.request();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    if (!status.isGranted) {
-      Get.defaultDialog(
-        title: 'Permission Required',
-        middleText: 'Please grant file access permission in settings.',
-        textConfirm: 'Open Settings',
-        onConfirm: () async {
-          await openAppSettings();
-          Get.back(); // Dismiss the dialog
-        },
+    String userId = prefs.getString('userCode') ?? "";
 
-      );
-    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        // fullscreenDialog: true,
+          builder: (context) =>
+           WebViewScreen(from:from,userId:userId)),
+
+      ///dashboard = 0 , forms and reports = 1
+    );
+
+
+  /*  Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+             WebViewExample(from: 1,userId: userId)));*/
+    // if (!status.isGranted) {
+    //   Get.defaultDialog(
+    //     title: 'Permission Required',
+    //     middleText: 'Please grant file access permission in settings.',
+    //     textConfirm: 'Open Settings',
+    //     onConfirm: () async {
+    //       await openAppSettings();
+    //       Get.back(); // Dismiss the dialog
+    //     },
+    //   );
+    // }
   }
-
 }

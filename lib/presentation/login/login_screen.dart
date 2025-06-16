@@ -25,7 +25,7 @@ import '../../common/my_custom_clip_painter.dart';
 import '../../widgets/custom_elevated_button.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
