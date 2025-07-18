@@ -28,7 +28,7 @@ lightTheme = ThemeData(
     ),
     modalBackgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     elevation: 4.0,
     color: Colors.white,
     surfaceTintColor: Colors.white,
@@ -37,7 +37,7 @@ lightTheme = ThemeData(
     ),
   ),
   canvasColor: Colors.white,
-  dialogTheme: DialogTheme(
+  dialogTheme: DialogThemeData(
     backgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
     surfaceTintColor: const Color.fromRGBO(237, 237, 237, 1.0),
     titleTextStyle: GoogleFonts.montserrat(

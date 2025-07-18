@@ -84,10 +84,10 @@ class CustomButton extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, color: Colors.white),
-      label: Text(label, style: TextStyle(color: Colors.white)),
+      label: Text(label, style: const TextStyle(color: Colors.white)),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.orange,
-        minimumSize: Size(double.infinity, 50),
+        minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

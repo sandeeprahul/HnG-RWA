@@ -139,7 +139,6 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                         } else if (audit.auditId == 109) {
                           askPermission(from:1);
 
-
                         }
                       },
                       child: Column(

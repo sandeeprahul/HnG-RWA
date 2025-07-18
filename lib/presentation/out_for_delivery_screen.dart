@@ -208,9 +208,8 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
       status = await Permission.location.request();
       if (!status.isGranted) {
         Get.defaultDialog(
-          middleText: 'Please grant camera permission',
+          middleText: 'Please grant location permission',
         );
-        print('Camera permission denied');
         return;
       }
     }

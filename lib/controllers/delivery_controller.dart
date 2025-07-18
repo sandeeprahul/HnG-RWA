@@ -149,7 +149,6 @@ class DeliveryController extends GetxController {
     print("submitDelivered: $apiUrl");
 
     Map<String, dynamic> requestBody = {
-      // "order_id": "OID101",
       "order_id": orderId,
       "Delivered_To_Person_Name": name,
       "Delivered_To_Mobile_No": mobile

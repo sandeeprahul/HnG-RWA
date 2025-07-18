@@ -86,8 +86,8 @@ class _GifScreenState extends State<GifScreen> {
   }
 
   getDeviceId() async {
-    // String id = await getOrGenerateDeviceId();
-    String id = "1750066789983150949983";
+    String id = await getOrGenerateDeviceId();
+    // String id = "1750066789983150949983";
     print("Generated Device ID: $id");
 
     final prefs = await SharedPreferences.getInstance();
