@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/AmAcceptSelectionScreen.dart';
@@ -897,6 +898,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
   var base64img_ = '';
 
   Future<void> _cropImage(var photo) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
@@ -907,6 +910,8 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
         maxHeight: 1080,
         uiSettings: [
           AndroidUiSettings(
+              hideBottomControls:false,
+
               toolbarTitle: 'Cropper',
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,

@@ -792,6 +792,8 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
   var imageType;
 
   Future<void> _cropImage(var photo, int firstTime) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: photo!.path,
@@ -802,6 +804,8 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
         maxHeight: 1080,
         uiSettings: [
           AndroidUiSettings(
+              hideBottomControls:false,
+
               toolbarTitle: 'Cropper',
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,

@@ -14,31 +14,27 @@ import 'data/ActiveCheckListModel.dart';
 import 'data/Locations.dart';
 import 'applicableScreen.dart';
 
+
+///1= DILO,
+///2= STORE AUDIT,
+///3= LPD Audit,
+///4= DILO EMPLOYEE
+///5 = AM STORE AUDIT
+///6= Virtual merchPage
 class OutletSelectionScreen extends StatefulWidget {
   final GetActvityTypes checkList;
 
-  OutletSelectionScreen(this.checkList, {super.key});
-
-  // const OutletSelectionScreen(GetActvityTypes checkList, {Key? key}) : super(key: key);
-
-  // int checkassignId;
-  // ActiveCheckList activeCheckList;
-
-  // AmOutletSelectionScreen();
+  const OutletSelectionScreen(this.checkList, {super.key});
 
   @override
   State<OutletSelectionScreen> createState() =>
-      _OutletSelectionScreenState(this.checkList);
+      _OutletSelectionScreenState();
 }
 
 bool am = true;
 
 class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
-  // int checkassignId;
-  // ActiveCheckList activeCheckList;
-  GetActvityTypes checkList;
 
-  _OutletSelectionScreenState(this.checkList);
 
   @override
   void initState() {

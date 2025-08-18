@@ -9,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:hng_flutter/widgets/image_preview.dart';
+import 'package:hng_flutter/widgets/showForceTaskCompletionAlert.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,7 @@ var locationCode = '';
 var latGlobal = '';
 var lngGlobal = '';
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   var isSelected = 0;
   final PageController _pageController = PageController();
 
@@ -60,12 +61,62 @@ class _HomeScreenState extends State<HomeScreen> {
     // getVersion();
     // getLocation();
     // _showLocationPermissionDialog(context);
-    getHomeData();
-    firebase();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _init(); // safe to access context inside _init
+    });
+  }
+
+  Future<void> _init() async {
+    await getHomeData();
+    await firebase();
+    await getPendingTasks();
   }
 
   firebase() async {
     await Firebase.initializeApp();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      getPendingTasks(); //do your stuff
+    }
+  }
+
+  Future<void> getPendingTasks() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var locationCode = prefs.getString('locationCode') ?? '106';
+      var userID = prefs.getString('userCode') ?? '105060';
+
+      String url =
+          "${Constants.apiHttpsUrl}/forcetaskcompletion/Data/$locationCode/$userID";
+      final response =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        var respo = jsonDecode(response.body);
+
+        if (respo['status'] == true) {
+          // _showTextAlert(context, respo['desctext']);
+          showForceTaskCompletionAlert(respo['data'], onReturn: () {
+            getPendingTasks(); // ✅ refresh
+          });
+        }
+      } else {
+        Get.snackbar('Alert!', 'Something went wrong\n${response.statusCode}',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            borderRadius: 2);
+      }
+    } catch (e) {
+      Get.snackbar('Alert!', 'Something went wrong\n${e.toString()}',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          borderRadius: 2);
+
+      // _showRetryAlert(Constants.networkIssue);
+    }
   }
 
 /*  Future<void> getLoginDetails() async {
@@ -310,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget bottomNavigationWidget(){
+  Widget bottomNavigationWidget() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
@@ -394,6 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   Widget _buildNavItem({
     required BuildContext context,
     required IconData icon,
@@ -411,12 +463,12 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: isSelected
               ? [
-            BoxShadow(
-              color: const Color(0xfff76613).withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ]
+                  BoxShadow(
+                    color: const Color(0xfff76613).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
               : null,
         ),
         child: Column(
@@ -427,11 +479,11 @@ class _HomeScreenState extends State<HomeScreen> {
               color: isSelected ? Colors.white : Colors.grey[600],
               size: 24,
             ).animate().scale(
-              duration: 300.ms,
-              curve: Curves.easeInOut,
-              begin: const Offset(1, 1),
-              end: isSelected ? const Offset(1.2, 1.2) : const Offset(1, 1),
-            ),
+                  duration: 300.ms,
+                  curve: Curves.easeInOut,
+                  begin: const Offset(1, 1),
+                  end: isSelected ? const Offset(1.2, 1.2) : const Offset(1, 1),
+                ),
             const SizedBox(height: 4),
             Text(
               label,
@@ -441,14 +493,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: isSelected ? Colors.white : Colors.grey[600],
               ),
             ).animate().fade(
-              duration: 300.ms,
-              curve: Curves.easeInOut,
-            ),
+                  duration: 300.ms,
+                  curve: Curves.easeInOut,
+                ),
           ],
         ),
       ),
     );
   }
+
   void showAuditSummaryDialog(BuildContext context) async {
     AuditSummary? summary = await fetchAuditSummary();
 
@@ -494,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Text(
                                     "${section.sectionName} ",
                                     style: const TextStyle(
-                                      // fontWeight: FontWeight.bold,
+                                        // fontWeight: FontWeight.bold,
                                         fontSize: 12),
                                   ),
                                 ),
@@ -520,8 +573,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Text(
                       "Percentage: ${summary.percentage}%",
-                      style: const TextStyle(
-                          fontSize: 13),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ],
                 ),
@@ -543,7 +595,7 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
                 color: Colors.green, borderRadius: BorderRadius.circular(16)),
             child:
-            const Text('Continue', style: TextStyle(color: Colors.white)),
+                const Text('Continue', style: TextStyle(color: Colors.white)),
           ),
         ),
         cancel: InkWell(
@@ -562,7 +614,6 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         onCancel: () {
           Get.back(); // Close dialog
-
         },
       );
     } else {
@@ -576,7 +627,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<AuditSummary?> fetchAuditSummary() async {
     final response = await http.get(
-      Uri.parse('https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/AreaManager/GetAreamanagerSummary/777052324900043'),
+      Uri.parse(
+          'https://rwaweb.healthandglowonline.co.in/RWASTAFFMOVEMENT_TEST/api/AreaManager/GetAreamanagerSummary/777052324900043'),
     );
 
     if (response.statusCode == 200) {
@@ -587,6 +639,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return null;
     }
   }
+
   void _showImageAlert(BuildContext context, String image) {
     showDialog(
       context: context,
@@ -597,8 +650,9 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(16.0),
-                child: Image.network(image, loadingBuilder: (BuildContext context,
-                    Widget child, ImageChunkEvent? loadingProgress) {
+                child: Image.network(image, loadingBuilder:
+                    (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
                   if (loadingProgress == null) {
                     return child;
                   } else {
@@ -654,8 +708,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
-
 
   BottomNavigationBarItem buildBottomNavigationBarItem(
       IconData icon, String label) {

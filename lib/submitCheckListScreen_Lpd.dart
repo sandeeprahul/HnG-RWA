@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:hng_flutter/data/ActiveCheckListLpd.dart';
 import 'package:hng_flutter/data/HeaderQuesLpd.dart';
@@ -580,6 +581,8 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
   var base64img_ = '';
 
   Future<void> _cropImage(var photo) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
@@ -589,6 +592,8 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
         maxHeight: 1080,
         uiSettings: [
           AndroidUiSettings(
+              hideBottomControls:false,
+
               toolbarTitle: 'Cropper',
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,

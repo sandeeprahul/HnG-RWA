@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -41,6 +42,8 @@ class CameraPageController extends GetxController {
 
   // Function to crop the image
   Future<void> _cropImage(XFile? photo) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo == null || !(await File(photo.path).exists())) return;
 
     try{
@@ -53,6 +56,8 @@ class CameraPageController extends GetxController {
           compressQuality: 50,
           uiSettings: [
             AndroidUiSettings(
+              hideBottomControls:false,
+
               toolbarTitle: 'Cropper',
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,

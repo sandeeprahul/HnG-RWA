@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/data/ActiveCheckListEmployee.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
@@ -836,6 +837,8 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
   }
 
   Future<void> _cropImage(var photo, int firstTime) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,

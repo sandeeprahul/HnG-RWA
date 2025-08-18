@@ -747,6 +747,8 @@ class _ViewProfileState extends State<ViewProfile> {
   var imageEncoded;
 
   Future<void> _cropImage(var photo) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
@@ -757,6 +759,7 @@ class _ViewProfileState extends State<ViewProfile> {
         maxHeight: 720,
         uiSettings: [
           AndroidUiSettings(
+              hideBottomControls:false,
               toolbarTitle: 'Cropper',
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,

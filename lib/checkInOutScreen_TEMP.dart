@@ -46,6 +46,7 @@ class checkInOutScreen_TEMP extends StatefulWidget {
 }
 
 class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
+
   int checkInoutType;
 
   String statusText = "Loading..";
@@ -97,9 +98,13 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+      SystemUiOverlay.top, // This shows the status bar
+    ]);
     _picker = ImagePicker();
     // _determinePosition();
     // findUserGeoLoc();
+
 
     if (Platform.isAndroid) {
       getPhoto(0);
@@ -454,6 +459,8 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
   }
 
   Future<void> _cropImage(var photo, int firstTime) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: photo,
@@ -461,12 +468,16 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
         compressFormat: ImageCompressFormat.jpg,
         maxWidth: 1920,
         maxHeight: 1080,
+
         uiSettings: [
           AndroidUiSettings(
+
               toolbarTitle: 'Crop Image',
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,
               initAspectRatio: CropAspectRatioPreset.original,
+              hideBottomControls: false,          // Show bottom controls (including save)
+
               lockAspectRatio: false),
         ],
       );

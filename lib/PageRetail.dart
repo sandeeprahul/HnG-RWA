@@ -522,7 +522,7 @@ class _PageRetailState extends State<PageRetail> {
 
         final prefs = await SharedPreferences.getInstance();
         locationCode = prefs.getString('locationCode') ?? '106';
-        var userID = prefs.getString('userCode') ?? '70001';
+        var userID = prefs.getString('userCode') ?? '105060';
 
         // String url = "${Constants.apiHttpsUrl}/Login/GetActvityTypes/70001";
         String url = "${Constants.apiHttpsUrl}/Login/GetActvityTypes/$userID";
@@ -549,7 +549,7 @@ class _PageRetailState extends State<PageRetail> {
         _showRetryAlert(isUpdated);
       }
     } catch (e) {
-      if (loading == true) {
+      if (mounted && loading == true) {
         setState(() {
           loading = false;
         });

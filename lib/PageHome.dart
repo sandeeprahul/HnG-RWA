@@ -9,12 +9,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hng_flutter/HomeScreen.dart';
 import 'package:hng_flutter/presentation/order_list_screen.dart';
 import 'package:hng_flutter/presentation/order_management_screen.dart';
 import 'package:hng_flutter/presentation/product_quick_enquiry_page.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:hng_flutter/widgets/product_quick_enquiry_widget.dart';
 import 'package:hng_flutter/widgets/scan_qr_widget.dart';
+import 'package:hng_flutter/widgets/showForceTaskCompletionAlert.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -49,7 +51,7 @@ var status_ = 0.obs;
 var deviceID = "Not known";
 var lat, lng;
 var startendTimeText = 'Your shift time starts at ';
-bool checkOutbnt = false;
+bool checkOutButton = false;
 String time = "09:30 AM";
 Future<dynamic>? _future;
 
@@ -69,12 +71,21 @@ class _PageHomeState extends State<PageHome> {
     super.initState();
 
     // checkPermissions();
-    _future = getActiveCheckListData();
-    getUserCheckInStatus();
-    getTime();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _init(); // safe to access context inside _init
+    });
 
-    getuserType();
   }
+
+  Future<void> _init() async {
+    _future = getActiveCheckListData();
+   await getUserCheckInStatus();
+     getTime();
+
+    await getuserType();
+    // await getPendingTasks();
+  }
+
 
   checkPermissions(int checkInOutType) async {
     PermissionStatus locationPermission = await Permission.location.status;
@@ -164,23 +175,7 @@ class _PageHomeState extends State<PageHome> {
             );
           });
 
-      // showDialog(
-      //   context: context,
-      //   builder: (context) => PermissionPopup(
-      //     onPermissionGranted: (status) {
-      //       // Handle permission granted
-      //       // gotoCheckInOutScreen(checkInOutType);
-      //       Navigator.pop(context);
-      //     },
-      //     onPermissionDenied: (status) {
-      //       Navigator.pop(context);
-      //
-      //       showPermissionAlert();
-      //
-      //       // Handle permission denied
-      //     },
-      //   ),
-      // );
+
     } else {
       gotoCheckInOutScreen(checkInOutType);
     }
@@ -447,7 +442,7 @@ class _PageHomeState extends State<PageHome> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  checkOutbnt
+                                  checkOutButton
                                       ? chekinTime
                                       : checkInBool
                                           ? '09:30 AM'
@@ -467,7 +462,7 @@ class _PageHomeState extends State<PageHome> {
                         // Action Button
                         Align(
                           alignment: Alignment.bottomRight,
-                          child: checkOutbnt
+                          child: checkOutButton
                               ? checkoutBtnWidget()
                               : checkInBool
                                   ? checkInBtn()
@@ -676,7 +671,7 @@ class _PageHomeState extends State<PageHome> {
                                       style: const TextStyle(fontSize: 12),
                                     ),
                                     Text(
-                                      checkOutbnt
+                                      checkOutButton
                                           ? '$chekinTime'
                                           : checkInBool
                                               ? '09:30 AM'
@@ -691,7 +686,7 @@ class _PageHomeState extends State<PageHome> {
                                 ),
                                 Align(
                                     alignment: Alignment.bottomRight,
-                                    child: checkOutbnt
+                                    child: checkOutButton
                                         ? checkoutBtnWidget()
                                         : checkInBool
                                             ? checkInBtn()
@@ -1231,6 +1226,8 @@ class _PageHomeState extends State<PageHome> {
   var _croppedFile;
 
   Future<void> _cropImage(var photo) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: photo!.path,
@@ -1238,6 +1235,8 @@ class _PageHomeState extends State<PageHome> {
         compressQuality: 100,
         uiSettings: [
           AndroidUiSettings(
+              hideBottomControls: false,          // Show bottom controls (including save)
+
               toolbarTitle: 'Cropper',
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,
@@ -1325,7 +1324,7 @@ class _PageHomeState extends State<PageHome> {
 
         setState(() {
           startendTimeText = "You check in at ";
-          checkOutbnt = true;
+          checkOutButton = true;
           time = timeMin;
         });
       } else if (result == 1) {
@@ -1333,7 +1332,7 @@ class _PageHomeState extends State<PageHome> {
         // await prefs.setString('ckdInTime', '$timeMin');
 
         setState(() {
-          checkOutbnt = false;
+          checkOutButton = false;
 
           startendTimeText = 'Your Shift time start at ';
           // time = timeMin;
@@ -1344,6 +1343,9 @@ class _PageHomeState extends State<PageHome> {
       getUserCheckInStatus();
     }
   }
+
+
+
 
   List<GetProgressStatus> checkList = [];
 
@@ -1406,7 +1408,7 @@ class _PageHomeState extends State<PageHome> {
             setState(() {
               // chekinTime = outputFormat.format(inputDate);
               // chekinTime = responseData['chekin_time'];
-              checkOutbnt = false;
+              checkOutButton = false;
               startendTimeText = "You checked out ";
               checkInBool = false;
               chekinTime = outputFormat.format(inputDate);
@@ -1424,7 +1426,7 @@ class _PageHomeState extends State<PageHome> {
 
             setState(() {
               chekinTime = outputFormat.format(inputDate);
-              checkOutbnt = true;
+              checkOutButton = true;
               startendTimeText = "You check in at ";
             });
             taskCheckController.checkTaskStatus();
@@ -1439,7 +1441,7 @@ class _PageHomeState extends State<PageHome> {
 
             setState(() {
               chekoutTime = outputFormat.format(inputDate);
-              checkOutbnt = false;
+              checkOutButton = false;
 
               startendTimeText = "Your Shift time start at ";
             });
@@ -1455,7 +1457,7 @@ class _PageHomeState extends State<PageHome> {
 
               setState(() {
                 chekoutTime = outputFormat.format(inputDate);
-                checkOutbnt = false;
+                checkOutButton = false;
                 startendTimeText = "Your Shift time start at ";
               });
             }
@@ -1477,7 +1479,7 @@ class _PageHomeState extends State<PageHome> {
     } catch (e) {
       setState(() {
         noInterNet = false;
-        checkOutbnt = false;
+        checkOutButton = false;
       });
       print("CheckInSTatus ERROR$e");
     }

@@ -31,7 +31,7 @@ class checkListScreen_lpd extends StatefulWidget {
 
   // LPDSection mLpdChecklist;
 
-  //0=DILO,1=LPD,2=STORE AUDIT
+  ///0=DILO,1=LPD,2=STORE AUDIT
   // ActiveCheckList activeCheckList;
 
   const checkListScreen_lpd(this.type, this.mGetActivityTypes, this.locationsList, {super.key});

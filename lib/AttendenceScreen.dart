@@ -90,8 +90,9 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
                             ],
                           ),
                         ),
+
                         Padding(
-                          padding: const EdgeInsets.only(left: 10, right: 10),
+                          padding: const EdgeInsets.only(left: 16, right: 16),
                           child: Align(
                               alignment: Alignment.topLeft,
                               child: Row(
@@ -129,7 +130,7 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
                         ),
                         const Padding(
                           padding: EdgeInsets.only(
-                              left: 10, right: 10, top: 20, bottom: 10),
+                              left: 16, right: 16, top: 20, bottom: 10),
                           child: Align(
                               alignment: Alignment.topLeft,
                               child: Text(
@@ -140,7 +141,7 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
                               )),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: SizedBox(
                             height: 75,
                             child: ListView(
@@ -269,7 +270,7 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 10),
                           child: SizedBox(
                             height: 40,
                             child: TextField(
@@ -281,7 +282,7 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
                                   isDense: true,
                                   prefixIcon: const Icon(Icons.search),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   filled: true,
                                   hintStyle: TextStyle(
@@ -337,26 +338,26 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
   Widget item(
     int pos,
     BuildContext context,
-    Employeedetail employeedetail,
+    Employeedetail employeeDetail,
   ) {
     return SizedBox(
       child: Container(
         // color: Colors.white,
-        margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
+        margin: const EdgeInsets.only(left: 16, top: 10, right: 16),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
         decoration: const BoxDecoration(
           color: Colors.white,
           boxShadow: [BoxShadow(color: Color(0xFFBDBDBD), blurRadius: 2)],
-          borderRadius: BorderRadius.all(Radius.circular(5)),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         child: Row(
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: employeedetail.check_in_selfie_url == ""
+              child: employeeDetail.check_in_selfie_url == ""
                   ? const CircleAvatar()
                   : FutureBuilder<String>(
-                      future: getImageDataFromFirebase(pos, employeedetail),
+                      future: getImageDataFromFirebase(pos, employeeDetail),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -374,7 +375,7 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
                                   MaterialPageRoute(
                                       builder: (context) => ImagePreview(
                                           snapshot.data!,
-                                          employeedetail.employeeCode),
+                                          employeeDetail.employeeCode),
                                       fullscreenDialog: true));
                             },
                             child: CircleAvatar(
@@ -394,7 +395,7 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 5, bottom: 5),
                       child: Text(
-                        employeedetail.employeeName,
+                        employeeDetail.employeeName,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 17),
                       ),
@@ -403,7 +404,7 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                      employeedetail.employeeCode,
+                      employeeDetail.employeeCode,
                       style: const TextStyle(fontSize: 14),
                     ),
                   ),
@@ -411,10 +412,10 @@ class _AttendenceScreenState extends State<AttendenceScreen> {
               ),
             ),
             Text(
-              employeedetail.attendanceStatus,
+              employeeDetail.attendanceStatus,
               style: TextStyle(
                   fontSize: 12,
-                  color: employeedetail.attendanceStatus == "Not Checked In"
+                  color: employeeDetail.attendanceStatus == "Not Checked In"
                       ? Colors.redAccent
                       : Colors.lightBlueAccent),
             ),

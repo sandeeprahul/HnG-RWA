@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:hng_flutter/checkListItemScreen.dart';
@@ -930,6 +931,8 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
   }
 
   Future<void> _cropImage(var photo, int firstTime) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: Platform.isAndroid ? photo : photo!.path,
@@ -940,6 +943,8 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
         maxHeight: 1080,
         uiSettings: [
           AndroidUiSettings(
+              hideBottomControls: false,          // Show bottom controls (including save)
+
               toolbarTitle: 'Cropper',
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,

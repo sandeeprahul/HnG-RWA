@@ -26,6 +26,7 @@ import 'package:hng_flutter/presentation/order_list_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'controllers/app_resume_controller.dart';
 import 'core/DeviceIdentifier.dart';
 import 'helper/DatabaseHelper.dart';
 import 'presentation/login/login_screen.dart';
@@ -63,6 +64,7 @@ Future<void> main() async {
 }
 
 class GifScreen extends StatefulWidget {
+
   const GifScreen({super.key});
 
   @override
@@ -70,6 +72,8 @@ class GifScreen extends StatefulWidget {
 }
 
 class _GifScreenState extends State<GifScreen> {
+  final AppResumeController _appResumeController = Get.put(AppResumeController());
+
   @override
   void initState() {
     // TODO: implement initState
@@ -87,7 +91,7 @@ class _GifScreenState extends State<GifScreen> {
 
   getDeviceId() async {
     String id = await getOrGenerateDeviceId();
-    // String id = "1750066789983150949983";
+    // String id = "1754551800138130000138";
     print("Generated Device ID: $id");
 
     final prefs = await SharedPreferences.getInstance();

@@ -726,7 +726,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         body: jsonEncode({
           'username': uname.text.toString(),
           'password': password.text.toString(),
-          // 'deviceid': '55ec53ccf5a40648',
+          // 'deviceid': '1754551800138130000138',
           'deviceid': deviceId,
           'osVersion': '$release',
           'osType': Platform.isAndroid ? 'Android' : 'Ios',
