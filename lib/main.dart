@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -26,6 +27,7 @@ import 'package:hng_flutter/presentation/order_list_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'controllers/ScreenTracker.dart';
 import 'controllers/app_resume_controller.dart';
 import 'core/DeviceIdentifier.dart';
 import 'helper/DatabaseHelper.dart';
@@ -72,7 +74,8 @@ class GifScreen extends StatefulWidget {
 }
 
 class _GifScreenState extends State<GifScreen> {
-  final AppResumeController _appResumeController = Get.put(AppResumeController());
+  // final AppResumeController _appResumeController = Get.put(AppResumeController());
+
 
   @override
   void initState() {

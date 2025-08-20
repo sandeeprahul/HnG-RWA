@@ -584,7 +584,6 @@ class _submitCheckListScreenEmployeeState
   var base64img_ = '';
 
   Future<void> _cropImage(var photo) async {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(

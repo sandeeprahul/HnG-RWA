@@ -40,9 +40,11 @@ class _ViewProfileState extends State<ViewProfile> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     getuserType();
     getProfileImage();
     _getId();
+
   }
 
   var deviceId = "";
@@ -87,544 +89,545 @@ class _ViewProfileState extends State<ViewProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[200],
-        resizeToAvoidBottomInset: true,
+        // resizeToAvoidBottomInset: true,
         body: SafeArea(
-            child: Stack(
-          children: [
-            Column(
-              // mainAxisSize:   MainAxisSize.min           ,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  child: Row(
+          child: Stack(
                     children: [
-                      InkWell(
-                          onTap: () {
-                            Navigator.pop(context, true);
-                          },
-                          child: const Icon(Icons.arrow_back)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 15),
-                        child: Text(
-                          "Profile",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Center(
-                  child: Column(
-                    children: [
-                      InkWell(
+          Column(
+            // mainAxisSize:   MainAxisSize.min           ,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(15),
+                child: Row(
+                  children: [
+                    InkWell(
                         onTap: () {
-                          // getPhoto();
-                          if (profile_image_url.isNotEmpty) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      ImagePreview(profile_image_url, '-1'),
-                                  fullscreenDialog: true),
-                            );
-                          }
+                          Navigator.pop(context, true);
                         },
-                        child: profile_image_url.isEmpty
-                            ?  CircleAvatar(
-                                backgroundColor: Colors.blue,
-                                radius: 40,
-                                child: Stack(
-                                  children: [
-                                    const Center(child: Icon(Icons.person)),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: CircleAvatar(
-                                        radius: 16,
-                                        backgroundColor: Colors.white,
-                                        child: IconButton(
-                                          icon: const Icon(
-                                            size: 14,
-                                            Icons.edit,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () {
-                                            getPhoto();
-                                          },
+                        child: const Icon(Icons.arrow_back)),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 15),
+                      child: Text(
+                        "Profile",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Center(
+                child: Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        // getPhoto();
+                        if (profile_image_url.isNotEmpty) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ImagePreview(profile_image_url, '-1'),
+                                fullscreenDialog: true),
+                          );
+                        }
+                      },
+                      child: profile_image_url.isEmpty
+                          ?  CircleAvatar(
+                              backgroundColor: Colors.blue,
+                              radius: 40,
+                              child: Stack(
+                                children: [
+                                  const Center(child: Icon(Icons.person)),
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: Colors.white,
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          size: 14,
+                                          Icons.edit,
+                                          color: Colors.red,
                                         ),
+                                        onPressed: () {
+                                          getPhoto();
+                                        },
                                       ),
                                     ),
-                                  ],
-                                ),
-                              )
-                            : Hero(
-                                tag: 'userImage',
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.orange,
-                                  radius: 58,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Stack(
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 56,
-                                          backgroundImage:
-                                              NetworkImage(profile_image_url),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: CircleAvatar(
-                                            radius: 16,
-                                            backgroundColor: Colors.white,
-                                            child: IconButton(
-                                              icon: const Icon(
-                                                size: 14,
-                                                Icons.edit,
-                                                color: Colors.red,
-                                              ),
-                                              onPressed: () {
-                                                getPhoto();
-                                              },
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Hero(
+                              tag: 'userImage',
+                              child: CircleAvatar(
+                                backgroundColor: Colors.orange,
+                                radius: 58,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Stack(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 56,
+                                        backgroundImage:
+                                            NetworkImage(profile_image_url),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: CircleAvatar(
+                                          radius: 16,
+                                          backgroundColor: Colors.white,
+                                          child: IconButton(
+                                            icon: const Icon(
+                                              size: 14,
+                                              Icons.edit,
+                                              color: Colors.red,
                                             ),
+                                            onPressed: () {
+                                              getPhoto();
+                                            },
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
+                            ),
+                    ),
+                    Visibility(
+                      visible: false,
+                      child: TextButton(
+                        onPressed: () {},
+                        child: const Text('Take photo'),
                       ),
-                      Visibility(
-                        visible: false,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text('Take photo'),
-                        ),
-                      )
-                    ],
-                  ),
+                    )
+                  ],
                 ),
-                // const Divider(),
-                Container(
-                  padding: const EdgeInsets.all(25),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 10, left: 25, right: 15),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  userName,
-                                  style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+              ),
+              // const Divider(),
+              Container(
+                padding: const EdgeInsets.all(25),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            bottom: 10, left: 25, right: 15),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                userName,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const Divider(
+                              color: Colors.transparent,
+                              height: 3,
+                            ),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                designation,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
                                 ),
                               ),
-                              const Divider(
-                                color: Colors.transparent,
+                            ),
+                            const Divider(
+                              color: Colors.transparent,
+                              height: 3,
+                            ),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'EMP ID: $userCode',
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                            const Divider(
+                              color: Colors.transparent,
+                              height: 3,
+                            ),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Location: $location_name',
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // const Divider(),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 28,vertical: 18),
+                  margin: const EdgeInsets.all(8),
+                  decoration:  BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withOpacity(0.5),)],
+                      borderRadius: BorderRadius.circular(18)),
+                  child: Stack(
+                    children: [
+                      Column(
+                        children: [
+                          Column(
+                            children: [
+                              const Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  'Branch Name',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                // color: Colors.white,
                                 height: 3,
                               ),
                               Align(
-                                alignment: Alignment.center,
+                                alignment: Alignment.topLeft,
                                 child: Text(
-                                  designation,
-                                  style: const TextStyle(
-                                    color: Colors.black,
+                                  location_name,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
                                     fontSize: 14,
                                   ),
                                 ),
                               ),
-                              const Divider(
-                                color: Colors.transparent,
-                                height: 3,
-                              ),
-                              Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'EMP ID: $userCode',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ),
-                              const Divider(
-                                color: Colors.transparent,
-                                height: 3,
-                              ),
-                              Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'Location: $location_name',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              )
                             ],
+                          ),
+                          const Divider(),
+
+                          Column(
+                            children: [
+                              const Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  'Reporting Manager',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                // color: Colors.white,
+                                height: 3,
+                              ),
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  reporting_manager_name,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          InkWell(
+                            onTap: () {
+                              // alertMobileNumber();
+                              setState(() {
+                                changePasswordPopup = true;
+                              });
+                            },
+                            child: const Row(
+                              children: [
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    child: Text(
+                                      'Change Your Password',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  size: 15,
+                                )
+                              ],
+                            ),
+                          ),
+                          const Divider(),
+
+                        ],
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Version ${Constants.appVersion}\nId:$deviceId',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 10,),
+                            ),
+                            const SizedBox(height: 12,),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          18.0), // Set the border radius here
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Fluttertoast.showToast(
+                                        msg:
+                                            "Please wait while logging out user");
+
+                                    logoutUser(context);
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Logout',
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.white),
+                                    ),
+                                  )),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Visibility(
+              visible: Camcontroller == null ? false : camVisible,
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                // aspectRatio: controller!.value.aspectRatio,
+                child: Stack(
+                  children: [
+                    SizedBox(
+                        height: double.infinity,
+                        // height: MediaQuery.of(context).size.height,
+                        // width: MediaQuery.of(context).size.width,
+                        width: double.infinity,
+                        child: Camcontroller == null
+                            ? const CircularProgressIndicator()
+                            : CameraPreview(Camcontroller!)),
+                    Align(
+                        alignment: Alignment.bottomCenter,
+                        child: InkWell(
+                          onTap: () async {
+                            // final image = await Camcontroller!.takePicture();
+
+                            try {
+                              final image =
+                                  await Camcontroller!.takePicture();
+                              setState(() {
+                                imagePath = image.path;
+                                camVisible = false;
+                              });
+                              _cropImage(image.path);
+                            } catch (e) {
+                              print(e);
+                            }
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 35,
+                              child: Icon(
+                                Icons.camera,
+                                size: 35,
+                              ),
+                            ),
+                            /*ElevatedButton(
+                                    style: ButtonStyle(
+                                    ),
+                                      onPressed: () {},
+                                      child: Text(
+                                          'Take Photo'))*/
+                            /* CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 35,
+                                ),*/
+                          ),
+                        ))
+                  ],
+                ),
+              )),
+          Visibility(
+            visible: changePasswordPopup,
+            child: Container(
+              color: Colors.black.withOpacity(0.5),
+              child: Center(
+                child: Container(
+                  margin: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.red,
+                          child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  changePasswordPopup = false;
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                              )),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: TextField(
+                          // textAlign: TextAlign.center,
+                          controller: _passwordController,
+                          obscureText: showpass ? true : false,
+                          decoration: InputDecoration(
+                            labelText: 'New Password',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                if (showpass) {
+                                  setState(() {
+                                    showpass = false;
+                                  });
+                                } else {
+                                  setState(() {
+                                    showpass = true;
+                                  });
+                                }
+                              },
+                              icon: showpass
+                                  ? const Icon(Icons.visibility)
+                                  : const Icon(Icons.visibility_off),
+                            ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                // const Divider(),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 28,vertical: 18),
-                    margin: const EdgeInsets.all(8),
-                    decoration:  BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withOpacity(0.5),)],
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Stack(
-                      children: [
-                        Column(
-                          children: [
-                            Column(
-                              children: [
-                                const Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    'Branch Name',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  // color: Colors.white,
-                                  height: 3,
-                                ),
-                                Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    location_name,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Divider(),
-
-                            Column(
-                              children: [
-                                const Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    'Reporting Manager',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  // color: Colors.white,
-                                  height: 3,
-                                ),
-                                Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    reporting_manager_name,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Divider(),
-                            InkWell(
-                              onTap: () {
-                                // alertMobileNumber();
-                                setState(() {
-                                  changePasswordPopup = true;
-                                });
-                              },
-                              child: const Row(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 10, bottom: 10),
-                                      child: Text(
-                                        'Change Your Password',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Icon(
-                                    Icons.arrow_forward_ios_outlined,
-                                    size: 15,
-                                  )
-                                ],
-                              ),
-                            ),
-                            const Divider(),
-
-                          ],
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Version ${Constants.appVersion}\nId:$deviceId',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 10,),
-                              ),
-                              const SizedBox(height: 12,),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            18.0), // Set the border radius here
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Fluttertoast.showToast(
-                                          msg:
-                                              "Please wait while logging out user");
-
-                                      logoutUser(context);
-                                    },
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Logout',
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      ),
-                                    )),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Visibility(
-                visible: Camcontroller == null ? false : camVisible,
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  // aspectRatio: controller!.value.aspectRatio,
-                  child: Stack(
-                    children: [
-                      SizedBox(
-                          height: double.infinity,
-                          // height: MediaQuery.of(context).size.height,
-                          // width: MediaQuery.of(context).size.width,
-                          width: double.infinity,
-                          child: Camcontroller == null
-                              ? const CircularProgressIndicator()
-                              : CameraPreview(Camcontroller!)),
-                      Align(
-                          alignment: Alignment.bottomCenter,
-                          child: InkWell(
-                            onTap: () async {
-                              // final image = await Camcontroller!.takePicture();
-
-                              try {
-                                final image =
-                                    await Camcontroller!.takePicture();
-                                setState(() {
-                                  imagePath = image.path;
-                                  camVisible = false;
-                                });
-                                _cropImage(image.path);
-                              } catch (e) {
-                                print(e);
-                              }
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(15.0),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 35,
-                                child: Icon(
-                                  Icons.camera,
-                                  size: 35,
-                                ),
-                              ),
-                              /*ElevatedButton(
-                                      style: ButtonStyle(
-                                      ),
-                                        onPressed: () {},
-                                        child: Text(
-                                            'Take Photo'))*/
-                              /* CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    radius: 35,
-                                  ),*/
-                            ),
-                          ))
-                    ],
-                  ),
-                )),
-            Visibility(
-              visible: changePasswordPopup,
-              child: Container(
-                color: Colors.black.withOpacity(0.5),
-                child: Center(
-                  child: Container(
-                    margin: const EdgeInsets.all(20),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: CircleAvatar(
-                            backgroundColor: Colors.red,
-                            child: IconButton(
-                                onPressed: () {
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: TextField(
+                          controller: _confirmController,
+                          obscureText: showpass_confim ? true : false,
+                          decoration: InputDecoration(
+                            labelText: 'Confirm Password',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                if (showpass_confim) {
                                   setState(() {
-                                    changePasswordPopup = false;
+                                    showpass_confim = false;
                                   });
-                                },
-                                icon: const Icon(
-                                  Icons.close,
-                                  color: Colors.white,
-                                )),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: TextField(
-                            // textAlign: TextAlign.center,
-                            controller: _passwordController,
-                            obscureText: showpass ? true : false,
-                            decoration: InputDecoration(
-                              labelText: 'New Password',
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  if (showpass) {
-                                    setState(() {
-                                      showpass = false;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      showpass = true;
-                                    });
-                                  }
-                                },
-                                icon: showpass
-                                    ? const Icon(Icons.visibility)
-                                    : const Icon(Icons.visibility_off),
-                              ),
+                                } else {
+                                  setState(() {
+                                    showpass_confim = true;
+                                  });
+                                }
+                              },
+                              icon: showpass_confim
+                                  ? const Icon(Icons.visibility)
+                                  : const Icon(Icons.visibility_off),
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: TextField(
-                            controller: _confirmController,
-                            obscureText: showpass_confim ? true : false,
-                            decoration: InputDecoration(
-                              labelText: 'Confirm Password',
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  if (showpass_confim) {
-                                    setState(() {
-                                      showpass_confim = false;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      showpass_confim = true;
-                                    });
-                                  }
-                                },
-                                icon: showpass_confim
-                                    ? const Icon(Icons.visibility)
-                                    : const Icon(Icons.visibility_off),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(22)
+                            )
+                              // backgroundColor: Colors.b,
                               ),
+                          onPressed: () {
+                            checkOtp();
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Reset Password',
+                              style: TextStyle(
+                                  fontSize: 20, color: Colors.white),
                             ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(22)
-                              )
-                                // backgroundColor: Colors.b,
-                                ),
-                            onPressed: () {
-                              checkOtp();
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Reset Password',
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
-                              ),
-                            )),
-                      ],
-                    ),
+                          )),
+                    ],
                   ),
                 ),
               ),
             ),
-            Visibility(
-                visible: loading,
-                child: Container(
-                  color: const Color(0x80000000),
-                  child: Center(
-                      child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5)),
-                          padding: const EdgeInsets.all(20),
-                          height: 115,
-                          width: 150,
-                          child: const Column(
-                            children: [
-                              CircularProgressIndicator(),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text('Please wait..'),
-                              )
-                            ],
-                          ))),
-                )),
-          ],
-        )));
+          ),
+          Visibility(
+              visible: loading,
+              child: Container(
+                color: const Color(0x80000000),
+                child: Center(
+                    child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5)),
+                        padding: const EdgeInsets.all(20),
+                        height: 115,
+                        width: 150,
+                        child: const Column(
+                          children: [
+                            CircularProgressIndicator(),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Please wait..'),
+                            )
+                          ],
+                        ))),
+              )),
+                    ],
+                  ),
+        ));
   }
 
   var userCode = "";
@@ -747,7 +750,6 @@ class _ViewProfileState extends State<ViewProfile> {
   var imageEncoded;
 
   Future<void> _cropImage(var photo) async {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
@@ -762,6 +764,7 @@ class _ViewProfileState extends State<ViewProfile> {
               hideBottomControls:false,
               toolbarTitle: 'Cropper',
               toolbarColor: Colors.deepOrange,
+              statusBarColor: Colors.transparent,
               toolbarWidgetColor: Colors.white,
               initAspectRatio: CropAspectRatioPreset.original,
               lockAspectRatio: false),

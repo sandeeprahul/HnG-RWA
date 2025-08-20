@@ -8,64 +8,64 @@ import '../presentation/employee_qna.dart';
 import '../presentation/home/operations/employees_leave_apply_page.dart';
 import '../presentation/storeAudit/store_audit_qna.dart';
 
+
 void showForceTaskCompletionAlert(tasks, {VoidCallback? onReturn}) {
-/*  final tasks = [
-    {"title": "Store Audit", "targetScreen": "storeAudit", "priority": 5},
-    {"title": "Employees", "targetScreen": "employee", "priority": 4},
-    {"title": "Attendance", "targetScreen": "attendance", "priority": 3},
-    {"title": "Leave Request", "targetScreen": "leaveForm", "priority": 2},
-  ];*/
 
   Get.dialog(
-    AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      title: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.blue[800],
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+    PopScope(
+      canPop: true, // Prevents system pop gestures or back button
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        // Optional: handle attempted pop if needed
+      },      child: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.blue[800],
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: const Text(
+            textAlign: TextAlign.center,
+            'Pending Tasks',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        child: const Text(
-          textAlign: TextAlign.center,
-          'Pending Tasks',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Please complete these pending tasks:',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            ...tasks.map((task) => _buildTaskItem(task,onReturn)).toList(),
+          ],
         ),
+        // actions: [
+        //   TextButton(
+        //     style: ButtonStyle(
+        //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        //             RoundedRectangleBorder(
+        //                 borderRadius: BorderRadius.circular(12.0),
+        //                 side: const BorderSide(color: Colors.blue)))),
+        //     onPressed: () => Get.back(),
+        //     child: const Text(
+        //       'Dismiss',
+        //       style: TextStyle(color: Colors.white),
+        //     ),
+        //   ),
+        // ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Please complete these pending tasks:',
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 16),
-          ...tasks.map((task) => _buildTaskItem(task,onReturn)).toList(),
-        ],
-      ),
-      // actions: [
-      //   TextButton(
-      //     style: ButtonStyle(
-      //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-      //             RoundedRectangleBorder(
-      //                 borderRadius: BorderRadius.circular(12.0),
-      //                 side: const BorderSide(color: Colors.blue)))),
-      //     onPressed: () => Get.back(),
-      //     child: const Text(
-      //       'Dismiss',
-      //       style: TextStyle(color: Colors.white),
-      //     ),
-      //   ),
-      // ],
     ),
     barrierDismissible: false,
   );
@@ -197,25 +197,40 @@ Widget _buildTaskItem(Map<String, dynamic> task,VoidCallback? onReturn) {
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       onTap: () {
-        Get.back();
         // Navigate to respective screen
         if (task['targetScreen'] != null) {
           if (task['targetScreen'] == 'storeAudit') {
+            Get.back();
 
             Get.to(() => OutletSelectionScreen( storeAuditList[0]))?.then((_) {
               print("Back from Store Audit to MainScreen");
               onReturn?.call(); // ✅ trigger MainScreen method
-
             });
 
             //
           } else if (task['targetScreen'] == 'employee') {
-            Get.to( OutletSelectionScreen(diloEmployeeList[0]));
+            Get.back();
+
+            Get.to( OutletSelectionScreen(diloEmployeeList[0]))?.then((_) {
+              print("Back from Store Audit to MainScreen");
+              onReturn?.call(); // ✅ trigger MainScreen method
+            });
 
           } else if (task['targetScreen'] == 'attendance') {
-            Get.to(const AttendenceScreen());
+            Get.back();
+
+            Get.to(const AttendenceScreen())?.then((_) {
+              print("Back from Store Audit to MainScreen");
+              onReturn?.call(); // ✅ trigger MainScreen method
+            });
           } else if (task['targetScreen'] == 'leaveForm') {
-            Get.to(const EmployeeListScreen(formattedAuditName: 'Record Attendance',));
+            Get.back();
+
+            Get.to(const EmployeeListScreen(formattedAuditName: 'Record Attendance',))?.then((_) {
+              print("Back from Store Audit to MainScreen");
+              onReturn?.call(); // ✅ trigger MainScreen method
+
+            });
             //EmployeeListScreen
           }
         }

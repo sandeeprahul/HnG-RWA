@@ -556,7 +556,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
   var base64img_ = '';
 
   Future<void> _cropImage(var photo) async {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    ///no
 
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(

@@ -64,6 +64,7 @@
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
+            android:exported="false"
 
             android:theme="@style/Ucrop.CropTheme" />
         <provider

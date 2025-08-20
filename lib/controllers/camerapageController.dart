@@ -42,7 +42,7 @@ class CameraPageController extends GetxController {
 
   // Function to crop the image
   Future<void> _cropImage(XFile? photo) async {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    ///no
 
     if (photo == null || !(await File(photo.path).exists())) return;
 

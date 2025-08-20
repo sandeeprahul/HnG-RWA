@@ -22,6 +22,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../common/constants.dart';
 import '../../common/my_cusotm_clipper.dart';
 import '../../common/my_custom_clip_painter.dart';
+import '../../controllers/ScreenTracker.dart';
 import '../../widgets/custom_elevated_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -67,6 +68,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       }
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -548,12 +551,15 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       ),
     );
   }
+  final screenTracker = Get.put(ScreenTracker());
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    screenTracker.activeScreen.value = "LoginScreen"; // mark active
+
     showpass = false;
     loading = false;
     getappVersion();

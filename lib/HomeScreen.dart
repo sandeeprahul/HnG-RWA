@@ -20,6 +20,8 @@ import 'PageHome.dart';
 import 'PageProfile.dart';
 import 'PageRetail.dart';
 import 'common/constants.dart';
+import 'controllers/ScreenTracker.dart';
+import 'controllers/app_resume_controller.dart';
 import 'core/light_theme.dart';
 import 'data/AuditSummary.dart';
 import 'presentation/home/operations/operations_page.dart';
@@ -40,6 +42,7 @@ var latGlobal = '';
 var lngGlobal = '';
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+
   var isSelected = 0;
   final PageController _pageController = PageController();
 
@@ -51,6 +54,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   var status_ = 0;
   bool isUpdated = false;
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      // When app resumes, navigate to home and clear stack
+      // Get.offAllNamed('/home'); // Replace with your home route
+      await getPendingTasks();
+
+
+    }
+  }
 
   @override
   void initState() {
@@ -61,12 +74,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // getVersion();
     // getLocation();
     // _showLocationPermissionDialog(context);
+    // screenTracker.activeScreen.value = "HomeScreen"; // mark active
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _init(); // safe to access context inside _init
     });
   }
 
   Future<void> _init() async {
+
     await getHomeData();
     await firebase();
     await getPendingTasks();
@@ -76,12 +92,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     await Firebase.initializeApp();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      getPendingTasks(); //do your stuff
-    }
-  }
+
 
   Future<void> getPendingTasks() async {
     try {
@@ -382,7 +393,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             icon: Icons.home_filled,
             label: 'Home',
             isSelected: isSelected == 0,
-            onTap: () {
+            onTap: () async {
+
               setState(() {
                 isSelected = 0;
                 _pageController.animateToPage(
@@ -391,6 +403,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   curve: Curves.easeInOut,
                 );
               });
+              await getPendingTasks();
             },
           ),
           _buildNavItem(
@@ -398,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             icon: Icons.check_box_outlined,
             label: 'Operations',
             isSelected: isSelected == 1,
-            onTap: () {
+            onTap: () async {
               setState(() {
                 isSelected = 1;
                 _pageController.animateToPage(
@@ -407,6 +420,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   curve: Curves.easeInOut,
                 );
               });
+              await getPendingTasks();
+
             },
           ),
           _buildNavItem(
@@ -414,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             icon: Icons.shop_outlined,
             label: 'Retail',
             isSelected: isSelected == 2,
-            onTap: () {
+            onTap: () async {
               setState(() {
                 isSelected = 2;
                 _pageController.animateToPage(
@@ -423,6 +438,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   curve: Curves.easeInOut,
                 );
               });
+              await getPendingTasks();
+
             },
           ),
           _buildNavItem(
@@ -430,7 +447,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             icon: Icons.perm_identity_sharp,
             label: 'Profile',
             isSelected: isSelected == 3,
-            onTap: () {
+            onTap: () async {
               setState(() {
                 isSelected = 3;
                 _pageController.animateToPage(
@@ -439,6 +456,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   curve: Curves.easeInOut,
                 );
               });
+              await getPendingTasks();
+
             },
           ),
         ],

@@ -7,8 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/constants.dart';
 import '../widgets/showForceTaskCompletionAlert.dart';
+import 'ScreenTracker.dart';
 
 class AppResumeController extends GetxController with WidgetsBindingObserver {
+  final screenTracker = Get.put(ScreenTracker());
+
   @override
   void onInit() {
     super.onInit();
@@ -26,7 +29,11 @@ class AppResumeController extends GetxController with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       // When app resumes, navigate to home and clear stack
       // Get.offAllNamed('/home'); // Replace with your home route
-     await getPendingTasks();
+      if (screenTracker.activeScreen.value == "HomeScreen") {///,LoginScreen
+        await getPendingTasks();
+      }else {
+        return;
+      }
 
     }
   }
@@ -38,6 +45,7 @@ class AppResumeController extends GetxController with WidgetsBindingObserver {
       var userID = prefs.getString('userCode') ?? '105060';
 
       String url = "${Constants.apiHttpsUrl}/forcetaskcompletion/Data/$locationCode/$userID";
+      print(url);
       final response =
       await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
 
@@ -50,6 +58,8 @@ class AppResumeController extends GetxController with WidgetsBindingObserver {
           showForceTaskCompletionAlert(respo['data'], onReturn: () {
             getPendingTasks(); // ✅ refresh
           });
+
+
         }
       }else{
         Get.snackbar('Alert!', 'Something went wrong\n${response.statusCode}',backgroundColor: Colors.red,colorText: Colors.white,borderRadius: 2);

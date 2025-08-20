@@ -792,7 +792,6 @@ class _checkInOutScreenIOSState extends State<checkInOutScreenIOS> {
   var imageType;
 
   Future<void> _cropImage(var photo, int firstTime) async {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(

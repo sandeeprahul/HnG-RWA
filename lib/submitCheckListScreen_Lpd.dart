@@ -581,7 +581,7 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
   var base64img_ = '';
 
   Future<void> _cropImage(var photo) async {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    ///no
 
     if (photo != null) {
       final croppedFile = await ImageCropper().cropImage(
