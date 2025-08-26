@@ -78,7 +78,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
                   child: SizedBox(
                     height: 40,
                     child: TextField(
@@ -134,7 +134,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                                 .locationCode)),
                                   );
                                 } else if (widget.checkList.auditId == "4") {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => checkListScreen(
@@ -144,7 +144,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                                 .locationCode)),
                                   );
                                 } else {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => checkListScreen(
@@ -191,7 +191,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                             locationsList[pos].locationCode)),
                                   );
                                 } else if (widget.checkList.auditId == "4") {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
@@ -202,7 +202,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                                     .locationCode)),
                                   );
                                 } else {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => checkListScreen(

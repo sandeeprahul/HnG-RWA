@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TaskCard extends StatelessWidget {
@@ -42,10 +43,10 @@ class TaskCard extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.all(8),
                     child: imageUrl.isEmpty
-                        ? Icon(
+                        ?  Icon(
                             Icons.task,
                             size: 22,
-                            color: Theme.of(context).primaryColor,
+                            color:Theme.of(context).primaryColor,
                           )
                         : ClipRRect(
                             borderRadius: BorderRadius.circular(8),

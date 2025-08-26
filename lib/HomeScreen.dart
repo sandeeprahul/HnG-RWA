@@ -61,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // Get.offAllNamed('/home'); // Replace with your home route
       await getPendingTasks();
 
-
     }
   }
 

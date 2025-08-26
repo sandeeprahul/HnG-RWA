@@ -69,6 +69,7 @@ class _applicableScreenState extends State<applicableScreen>
   late int index_;
   bool loading = false;
 
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       print("resumedCheckListScreen");
@@ -117,7 +118,7 @@ class _applicableScreenState extends State<applicableScreen>
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: Text(
-                        '${widget.mGetActvityTypes.auditName}',
+                        widget.mGetActvityTypes.auditName,
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
@@ -237,7 +238,7 @@ class _applicableScreenState extends State<applicableScreen>
                   child: Row(
                     children: [
                       Text(
-                        '${checkList[index].checklistName}',
+                        checkList[index].checklistName,
                         style: const TextStyle(fontSize: 18),
                       ),
                       const Spacer(),

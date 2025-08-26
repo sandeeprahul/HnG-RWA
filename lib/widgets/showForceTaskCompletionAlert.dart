@@ -13,7 +13,7 @@ void showForceTaskCompletionAlert(tasks, {VoidCallback? onReturn}) {
 
   Get.dialog(
     PopScope(
-      canPop: true, // Prevents system pop gestures or back button
+      canPop: false, // Prevents system pop gestures or back button
       onPopInvokedWithResult: (bool didPop, dynamic result) {
         // Optional: handle attempted pop if needed
       },      child: AlertDialog(
@@ -208,7 +208,15 @@ Widget _buildTaskItem(Map<String, dynamic> task,VoidCallback? onReturn) {
             });
 
             //
-          } else if (task['targetScreen'] == 'employee') {
+          } else if (task['targetScreen'] == 'employee') {///employeeDilo
+            Get.back();
+
+            Get.to( OutletSelectionScreen(diloList[0]))?.then((_) {
+              print("Back from Store Audit to MainScreen");
+              onReturn?.call(); // ✅ trigger MainScreen method
+            });
+
+          }else if (task['targetScreen'] == 'employeeDILO') {///employeeDilo
             Get.back();
 
             Get.to( OutletSelectionScreen(diloEmployeeList[0]))?.then((_) {
@@ -231,6 +239,10 @@ Widget _buildTaskItem(Map<String, dynamic> task,VoidCallback? onReturn) {
               onReturn?.call(); // ✅ trigger MainScreen method
 
             });
+            //EmployeeListScreen
+          }
+          else if (task['targetScreen'] == 'checkIn') {
+            Get.back();
             //EmployeeListScreen
           }
         }
