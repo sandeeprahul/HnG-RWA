@@ -851,6 +851,8 @@ class _CheckListPageState extends State<CheckListPage> {
 
   Future<void> cloudstorageRef(var img, var empcode, var sendJson,
       CheckListItem checkListItem, int questionIndex) async {
+
+    print("Coming to cloudstorageRef");
     final prefs = await SharedPreferences.getInstance();
 
     String empCode = empcode;

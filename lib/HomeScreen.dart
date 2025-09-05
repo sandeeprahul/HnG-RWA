@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hng_flutter/presentation/home/operations/employees_leave_apply_page.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:hng_flutter/widgets/image_preview.dart';
 import 'package:hng_flutter/widgets/showForceTaskCompletionAlert.dart';
@@ -15,7 +17,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/wecareScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'AttendenceScreen.dart';
 import 'NewProfilePage.dart';
+import 'OutletSelectScreen.dart';
 import 'PageHome.dart';
 import 'PageProfile.dart';
 import 'PageRetail.dart';
@@ -24,6 +28,7 @@ import 'controllers/ScreenTracker.dart';
 import 'controllers/app_resume_controller.dart';
 import 'core/light_theme.dart';
 import 'data/AuditSummary.dart';
+import 'data/GetActvityTypes.dart';
 import 'presentation/home/operations/operations_page.dart';
 
 void main() {
@@ -63,6 +68,201 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     }
   }
+  // Suppose this is your full list
+  final List<GetActvityTypes> allAudits = [
+    GetActvityTypes(
+      userId: "",
+      auditId: "1",
+      auditName: "DILO",
+      description: "View and perform the tasks assigned to you",
+      currentCount: 0,
+      pendingCount: 0,
+      apiUrl: "",
+    ),
+    GetActvityTypes(
+      userId: "",
+      auditId: "2",
+      auditName: "Store Audit",
+      description: "Audit for store operations and compliance",
+      currentCount: 0,
+      pendingCount: 0,
+      apiUrl: "",
+    ),
+    GetActvityTypes(
+      userId: "",
+      auditId: "3",
+      auditName: "LPD Audit",
+      description: "Loss prevention and detection audit",
+      currentCount: 0,
+      pendingCount: 0,
+      apiUrl: "",
+    ),
+    GetActvityTypes(
+      userId: "",
+      auditId: "4",
+      auditName: "DILO Employee",
+      description: "View and perform the tasks assigned to you",
+      currentCount: 0,
+      pendingCount: 0,
+      apiUrl: "",
+    ),
+    GetActvityTypes(
+      userId: "",
+      auditId: "5",
+      auditName: "AM Store Audit",
+      description: "Area manager store-level audit",
+      currentCount: 0,
+      pendingCount: 0,
+      apiUrl: "",
+    ),
+    GetActvityTypes(
+      userId: "",
+      auditId: "6",
+      auditName: "Virtual Merch Page",
+      description: "Virtual merchandising and display page audit",
+      currentCount: 0,
+      pendingCount: 0,
+      apiUrl: "",
+    ),
+  ];
+
+
+
+   List<GetActvityTypes> get diloList =>
+  allAudits.where((e) => e.auditId == "1").toList();
+
+   List<GetActvityTypes>get  storeAuditList =>
+  allAudits.where((e) => e.auditId == "2").toList();
+
+   List<GetActvityTypes> get lpdAuditList =>
+  allAudits.where((e) => e.auditId == "3").toList();
+
+   List<GetActvityTypes> get diloEmployeeList =>
+  allAudits.where((e) => e.auditId == "4").toList();
+
+   List<GetActvityTypes> get amStoreAuditList =>
+  allAudits.where((e) => e.auditId == "5").toList();
+
+   List<GetActvityTypes> get virtualMerchPageList =>
+  allAudits.where((e) => e.auditId == "6").toList();
+
+
+  Widget _buildTaskItem(Map<String, dynamic> task) {
+    // Determine color based on priority
+    Color priorityColor;
+    switch (task['priority']) {
+      case 5:
+        priorityColor = Colors.red[400]!;
+        break;
+      case 4:
+        priorityColor = Colors.orange[400]!;
+        break;
+      case 3:
+        priorityColor = Colors.yellow[700]!;
+        break;
+      default:
+        priorityColor = Colors.blue[400]!;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 1)),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          height: 6,
+          width: 6,
+          decoration: BoxDecoration(
+            color: priorityColor,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        title: Text(
+          task['title'],
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+        onTap: () {
+          // Navigate to respective screen
+          setState(() {
+
+            showPendingTask = false;
+
+          });
+          if (task['targetScreen'] != null) {
+            if (task['targetScreen'] == 'storeAudit') {
+              Get.back();
+
+              Get.to(() => OutletSelectionScreen( storeAuditList[0]))?.then((_) {
+                print("Back from Store Audit to MainScreen");
+                getPendingTasks();
+
+              });
+
+              //
+            } else if (task['targetScreen'] == 'employee') {///employeeDilo
+              Get.back();
+
+              Get.to( OutletSelectionScreen(diloList[0]))?.then((_) {
+                print("Back from Store Audit to MainScreen");
+                getPendingTasks();
+
+              });
+
+            }else if (task['targetScreen'] == 'employeeDILO') {///employeeDilo
+              Get.back();
+
+              Get.to( OutletSelectionScreen(diloEmployeeList[0]))?.then((_) {
+                print("Back from Store Audit to MainScreen");
+                getPendingTasks();
+              });
+
+            } else if (task['targetScreen'] == 'attendance') {
+              Get.back();
+
+              Get.to(const AttendenceScreen())?.then((_) {
+                print("Back from Store Audit to MainScreen");
+                getPendingTasks();
+
+              });
+            } else if (task['targetScreen'] == 'leaveForm') {
+              Get.back();
+
+              Get.to(const EmployeeListScreen(formattedAuditName: 'Record Attendance',))?.then((_) {
+                print("Back from Store Audit to MainScreen");
+                getPendingTasks();
+
+              });
+              //EmployeeListScreen
+            }
+            else if (task['targetScreen'] == 'checkIn') {
+              // Get.back();
+
+              setState(() {
+                // showPendingTask = false;
+                _pageController.animateToPage(0, duration: const Duration(milliseconds: 100), curve: Curves.ease);
+              });
+              //EmployeeListScreen
+            }
+          }
+          // Get.toNamed('/${task['targetScreen']}');
+        },
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -91,7 +291,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     await Firebase.initializeApp();
   }
 
+  bool showPendingTask = false;
 
+  List<dynamic> tasks = [];
 
   Future<void> getPendingTasks() async {
     try {
@@ -109,9 +311,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
         if (respo['status'] == true) {
           // _showTextAlert(context, respo['desctext']);
-          showForceTaskCompletionAlert(respo['data'], onReturn: () {
-            getPendingTasks(); // ✅ refresh
+          setState(() {
+            tasks = respo['data'];
+            showPendingTask = true;
           });
+       /*   showForceTaskCompletionAlert(respo['data'], onReturn: (result) {
+            if (result == 'checkIn') {
+              // do something special
+              setState(() {
+                _pageController.animateToPage(0, duration: const Duration(milliseconds: 100), curve: Curves.ease);
+              });
+            } else {
+              getPendingTasks(); // default refresh
+            }
+          });*/
         }
       } else {
         Get.snackbar('Alert!', 'Something went wrong\n${response.statusCode}',
@@ -318,6 +531,87 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             )
                           ],
                         )))),
+            Visibility(
+              visible: showPendingTask,
+                child: Container(
+                  padding: const EdgeInsets.all(30),
+                  height: double.infinity,
+                  width: double.infinity,
+                  color: Colors.black.withOpacity(0.2),
+                  child: Stack(
+
+                    children: [
+                      BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.white,
+
+                          ),                        ),
+                      ),
+                      Container(
+                        height: double.infinity,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: Colors.white,
+
+                        ),
+                        child: InkWell(
+                          onTap: (){},
+                          child: Stack(
+                            children: [
+
+                              Container(
+                                // color: Colors.white,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: Colors.white,
+
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 26),
+                                child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[800],
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Pending Tasks',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Please complete these pending tasks:',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 16),
+                                ...tasks.map((task) => _buildTaskItem(task)).toList(),
+                                              ],
+                                            ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ))
           ],
         )),
       ),
@@ -519,6 +813,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ),
     );
   }
+
+
+
+
+
 
   void showAuditSummaryDialog(BuildContext context) async {
     AuditSummary? summary = await fetchAuditSummary();
@@ -777,3 +1076,4 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 }
+

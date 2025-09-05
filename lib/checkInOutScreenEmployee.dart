@@ -104,6 +104,8 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
     photo = null;
   }
 
+
+
   Future<void> handlePermission() async {
     final status = await PermissionHelper.requestLocationPermission();
 
@@ -1248,4 +1250,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       return const SizedBox.shrink();
     }
   }
+
+  ///for testing without location and image checkIn please remove after testing
+
 }

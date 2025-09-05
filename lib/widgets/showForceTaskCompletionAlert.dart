@@ -9,7 +9,8 @@ import '../presentation/home/operations/employees_leave_apply_page.dart';
 import '../presentation/storeAudit/store_audit_qna.dart';
 
 
-void showForceTaskCompletionAlert(tasks, {VoidCallback? onReturn}) {
+void showForceTaskCompletionAlert(tasks, {Function(dynamic)? onReturn})
+ {
 
   Get.dialog(
     PopScope(
@@ -51,20 +52,7 @@ void showForceTaskCompletionAlert(tasks, {VoidCallback? onReturn}) {
             ...tasks.map((task) => _buildTaskItem(task,onReturn)).toList(),
           ],
         ),
-        // actions: [
-        //   TextButton(
-        //     style: ButtonStyle(
-        //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-        //             RoundedRectangleBorder(
-        //                 borderRadius: BorderRadius.circular(12.0),
-        //                 side: const BorderSide(color: Colors.blue)))),
-        //     onPressed: () => Get.back(),
-        //     child: const Text(
-        //       'Dismiss',
-        //       style: TextStyle(color: Colors.white),
-        //     ),
-        //   ),
-        // ],
+
       ),
     ),
     barrierDismissible: false,
@@ -148,7 +136,7 @@ final List<GetActvityTypes> virtualMerchPageList =
 allAudits.where((e) => e.auditId == "6").toList();
 
 
-Widget _buildTaskItem(Map<String, dynamic> task,VoidCallback? onReturn) {
+Widget _buildTaskItem(Map<String, dynamic> task,Function? onReturn) {
   // Determine color based on priority
   Color priorityColor;
   switch (task['priority']) {
@@ -242,7 +230,7 @@ Widget _buildTaskItem(Map<String, dynamic> task,VoidCallback? onReturn) {
             //EmployeeListScreen
           }
           else if (task['targetScreen'] == 'checkIn') {
-            Get.back();
+            Get.back(result: 'checkIn');
             //EmployeeListScreen
           }
         }

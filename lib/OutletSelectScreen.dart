@@ -71,7 +71,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                         padding: const EdgeInsets.only(left: 20),
                         child: Text(
                           widget.checkList.auditName,
-                          style: const TextStyle(color: Colors.black),
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],

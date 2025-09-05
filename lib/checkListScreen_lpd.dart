@@ -426,6 +426,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
               index_ = index;
             });
 
+
             if (checkListLpd[index].checklistEditStatus == "A") {
               // checkList[0].checklistAssignId;
               Navigator.pushReplacement(
@@ -590,48 +591,60 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                 index_ = index;
               });
 
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckListPage(
+                      activeCheckList: checkListEmployee[index],
+                      isEdit: 0,
+                      locationsList: widget.locationsList,
+                      mGetActivityTypes: mGetActvityTypes,
+                      sendingToEditAmHeaderQuestion: 0,
+                      checkListItemMstId: "${checkListEmployee[0].checklisTId}",
+                    ),
+                  ));
+
               //A
-              if (checkListEmployee[index].checklistEditStatus == "A") {
-                // checkList[0].checklistAssignId;
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          AmAcceptSelectionScreen_Employee(
-                            checkListEmployee[index],
-                            widget.mGetActivityTypes,
-                            widget.locationsList,
-                            widget.type,
-                          ),
-                    )).then((value) =>
-                    () {
-                  getActiveCheckListData();
-                });
-              }
-             //R
-              else if (checkListEmployee[index].checklistEditStatus ==
-                  "R") {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          AmAcceptSelectionScreen_Employee(
-                              checkListEmployee[index],
-                              widget.mGetActivityTypes,
-                              widget.locationsList,
-                              widget.type),
-                    )).then((value) =>
-                    () {
-                  getActiveCheckListData();
-                });
-              } else
-              {
-                if (checkListEmployee[index].checkinFlag == "1") {
-                  setState(() {
-                    popupVisible = true;
-                  });
-                }
-              }
+             //  if (checkListEmployee[index].checklistEditStatus == "A") {
+             //    // checkList[0].checklistAssignId;
+             //    Navigator.pushReplacement(
+             //        context,
+             //        MaterialPageRoute(
+             //          builder: (context) =>
+             //              AmAcceptSelectionScreen_Employee(
+             //                checkListEmployee[index],
+             //                widget.mGetActivityTypes,
+             //                widget.locationsList,
+             //                widget.type,
+             //              ),
+             //        )).then((value) =>
+             //        () {
+             //      getActiveCheckListData();
+             //    });
+             //  }
+             // //R
+             //  else if (checkListEmployee[index].checklistEditStatus ==
+             //      "R") {
+             //    Navigator.pushReplacement(
+             //        context,
+             //        MaterialPageRoute(
+             //          builder: (context) =>
+             //              AmAcceptSelectionScreen_Employee(
+             //                  checkListEmployee[index],
+             //                  widget.mGetActivityTypes,
+             //                  widget.locationsList,
+             //                  widget.type),
+             //        )).then((value) =>
+             //        () {
+             //      getActiveCheckListData();
+             //    });
+             //  } else {
+             //    if (checkListEmployee[index].checkinFlag == "1") {
+             //      setState(() {
+             //        popupVisible = true;
+             //      });
+             //    }
+             //  }
             },
             splashColor: Theme.of(context).primaryColor.withOpacity(0.1),
 

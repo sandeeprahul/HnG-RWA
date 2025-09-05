@@ -112,10 +112,7 @@ class _submitCheckListScreen_StoreAuditState
     option_mandatory_Flag = "0";
     rating_ = 0.0;
     rating2_ = 0.0;
-    Camcontroller?.dispose();
-    super.dispose();
-
-
+     super.dispose();
   }
 
   bool goBack = false;
