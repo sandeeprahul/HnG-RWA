@@ -182,7 +182,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
   void dispose() {
     timer?.cancel();
     // geofenceStatusStream?.cancel();
-
+    Camcontroller?.dispose();
     super.dispose();
   }
 
@@ -283,7 +283,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
             content: Text(msg),
             actions: <Widget>[
               TextButton(
-                child: const Text('Got it'),
+                child: const Text('Got it',style: TextStyle(color: Colors.white),),
                 onPressed: () {
                   Navigator.of(context_).pop();
                   // Navigator.of(context).pop();
@@ -300,7 +300,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                 },
               ),
               TextButton(
-                child: const Text('ReCheck'),
+                child: const Text('ReCheck',style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   Navigator.of(context_).pop();
                   // Navigator.of(context).pop();
@@ -334,11 +334,13 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           width: 100,
           height: 100,
           child: AlertDialog(
+            backgroundColor: Colors.white,
             title: const Text('Alert!'),
             content: Text(msg),
             actions: <Widget>[
               TextButton(
-                child: const Text('Proceed'),
+                style: TextButton.styleFrom(backgroundColor: Colors.blue),
+                child: const Text('Proceed',style: TextStyle(color: Colors.white),),
                 onPressed: () {
                   Navigator.of(context_).pop();
                   getPhoto(f);

@@ -96,11 +96,13 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     imageList.clear();
     dropdownText = '';
     _croppedFile = null;
     rating_ = 0.0;
+    Camcontroller?.dispose();
+    super.dispose();
+
   }
 
   bool goBack = false;

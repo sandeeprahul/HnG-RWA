@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_service.dart';
+import 'bindings/camera_bindings.dart';
 import 'checkListScreen_lpd.dart';
 import 'controllers/camerapageController.dart';
 import 'controllers/progressController.dart';
@@ -48,8 +49,9 @@ class _CheckListPageState extends State<CheckListPage> {
   // final PageController _pageController = PageController();
   List<CheckListItem> checkListItems = [];
   bool isLoading = false;
-  final CameraPageController cameraPageController =
-      Get.put(CameraPageController());
+
+  final CameraPageController cameraPageController = Get.find<CameraPageController>();
+
 
   final ProgressController progressController = Get.put(ProgressController());
   Question? _question;
@@ -232,7 +234,7 @@ class _CheckListPageState extends State<CheckListPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Questions List')),
+        appBar: AppBar(title: const Text('Questions List'),iconTheme: const IconThemeData(color: Colors.black),),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child:
@@ -484,7 +486,7 @@ class _CheckListPageState extends State<CheckListPage> {
                       child: _body(),
                     ),
                     onTap: () {
-                      Get.to(() => const CameraPage());
+                      Get.to(() => const CameraPage(), binding: CameraBinding());
 
                       /*   setState(() {
                         cameraOpen = 0;
@@ -502,7 +504,7 @@ class _CheckListPageState extends State<CheckListPage> {
   }
 
 
-  Widget buildAttachMultipleProofWidget(Question question) {
+/*  Widget buildAttachMultipleProofWidget(Question question) {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -572,7 +574,7 @@ class _CheckListPageState extends State<CheckListPage> {
         ],
       ),
     );
-  }
+  }*/
 
 
   Widget buildImageWidget(Question question) {

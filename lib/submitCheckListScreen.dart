@@ -98,16 +98,19 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
     checklist_id = "Loading....";
   }
 
+
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     imageList.clear();
     dropdownText = '';
     showpopup = false;
     _croppedFile = null;
+    Camcontroller?.dispose();
 
     option_mandatory_Flag = "0";
+    super.dispose();
+
   }
 
   bool goBack = false;

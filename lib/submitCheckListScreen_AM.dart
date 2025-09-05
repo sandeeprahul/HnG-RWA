@@ -120,13 +120,16 @@ class _submitCheckListScreen_AMState extends State<submitCheckListScreen_AM> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     imageList.clear();
     dropdownText = '';
     _croppedFile = null;
     optionMandatoryFlag = "-1";
     rating_ = 0.0;
     rating2_ = 0.0;
+    Camcontroller?.dispose();
+
+    super.dispose();
+
   }
 
   bool goBack = false;

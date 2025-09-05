@@ -106,13 +106,16 @@ class _submitCheckListScreen_StoreAuditState
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     imageList.clear();
     dropdownText = '';
     _croppedFile = null;
     option_mandatory_Flag = "0";
     rating_ = 0.0;
     rating2_ = 0.0;
+    Camcontroller?.dispose();
+    super.dispose();
+
+
   }
 
   bool goBack = false;

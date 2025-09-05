@@ -8,7 +8,7 @@ lightTheme = ThemeData(
   primaryColor: Colors.orange,
 
   // colorScheme: lightColorScheme,
-  textTheme: GoogleFonts.aBeeZeeTextTheme().apply(
+  textTheme: GoogleFonts.montserratTextTheme().apply(
     bodyColor: Colors.black,
     displayColor: Colors.black,
   ),
@@ -33,7 +33,7 @@ lightTheme = ThemeData(
     color: Colors.white,
     surfaceTintColor: Colors.white,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(6.0),
+      borderRadius: BorderRadius.circular(12.0),
     ),
   ),
   canvasColor: Colors.white,
@@ -59,7 +59,7 @@ lightTheme = ThemeData(
       ),
       // foregroundColor: Colors.blue,
       backgroundColor: Colors.blue,// Button text color
-      textStyle: const TextStyle(fontSize: 16,color: Colors.white), // Button text style
+      textStyle:  GoogleFonts.montserrat(fontSize: 16,color: Colors.white), // Button text style
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(

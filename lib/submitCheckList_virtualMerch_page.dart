@@ -101,16 +101,20 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
     checklist_id = "Loading....";
   }
 
+
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
+    Camcontroller?.dispose();
+
     imageList.clear();
     dropdownText = '';
     showpopup = false;
     _croppedFile = null;
 
     option_mandatory_Flag = "0";
+    super.dispose();
+
   }
 
   bool goBack = false;

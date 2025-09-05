@@ -256,9 +256,11 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton(
+
                             onPressed: () {
                               alertMobileNumber();
                             },
+                            style: TextButton.styleFrom(backgroundColor: Colors.transparent),
                             child: const Text(
                               'Forgot password?',
                               style: TextStyle(color: Colors.grey),

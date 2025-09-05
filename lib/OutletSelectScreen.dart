@@ -134,7 +134,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                                 .locationCode)),
                                   );
                                 } else if (widget.checkList.auditId == "4") {
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => checkListScreen(
@@ -144,7 +144,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
                                                 .locationCode)),
                                   );
                                 } else {
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => checkListScreen(

@@ -155,9 +155,12 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
   }
 
   @override
-  void dispose() {
+  void dispose()  {
     timer?.cancel();
+     Camcontroller?.dispose();
+
     super.dispose();
+
   }
 
   var lat_ = 0.0, lng_ = 0.0;
@@ -417,18 +420,12 @@ class _checkInOutScreenDiloState extends State<checkInOutScreenDilo> {
                             ),
                           ),
                         ),
-                        Align(
+                        const Align(
                           alignment: Alignment.center,
                           child: Padding(
-                              padding: const EdgeInsets.only(left: 20),
-                              child: RichText(
-                                text: const TextSpan(children: <TextSpan>[
-                                  TextSpan(
-                                      text: 'Activity Check In',
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.black)),
-                                ]),
-                              )),
+                              padding: EdgeInsets.only(left: 20),
+                              child: Text('Activity Check In',  style: TextStyle(
+                                  fontSize: 18, color: Colors.black))),
                         ),
                       ],
                     ),

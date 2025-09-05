@@ -173,10 +173,9 @@ class _checkInOutScreenAmState extends State<checkInOutScreenAm> {
   void dispose() {
     timer?.cancel();
     // geofenceStatusStream?.cancel();
-
+    Camcontroller?.dispose();
     super.dispose();
   }
-
   var lat_ = 0.0, lng_ = 0.0;
 
   Future<void> getLocation(var firstime) async {

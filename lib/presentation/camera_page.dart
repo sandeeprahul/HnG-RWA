@@ -16,7 +16,7 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
-  final CameraPageController controller = Get.put(CameraPageController());
+  final CameraPageController controller = Get.find<CameraPageController>();
 
   @override
   void initState() {

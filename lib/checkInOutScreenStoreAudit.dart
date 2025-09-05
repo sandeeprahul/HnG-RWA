@@ -175,7 +175,7 @@ class _checkInOutScreenStoreAuditState
   void dispose() {
     timer?.cancel();
     // geofenceStatusStream?.cancel();
-
+    Camcontroller?.dispose();
     super.dispose();
   }
 

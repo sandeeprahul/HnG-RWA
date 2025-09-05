@@ -29,6 +29,7 @@ import 'package:sqflite/sqflite.dart';
 
 import 'controllers/ScreenTracker.dart';
 import 'controllers/app_resume_controller.dart';
+import 'controllers/camerapageController.dart';
 import 'core/DeviceIdentifier.dart';
 import 'helper/DatabaseHelper.dart';
 import 'presentation/login/login_screen.dart';
@@ -52,6 +53,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  Get.put(CameraPageController()); // Register the controller once
 
   runApp(GetMaterialApp(
       theme: lightTheme,
@@ -66,7 +68,6 @@ Future<void> main() async {
 }
 
 class GifScreen extends StatefulWidget {
-
   const GifScreen({super.key});
 
   @override
@@ -75,7 +76,6 @@ class GifScreen extends StatefulWidget {
 
 class _GifScreenState extends State<GifScreen> {
   // final AppResumeController _appResumeController = Get.put(AppResumeController());
-
 
   @override
   void initState() {
@@ -248,10 +248,13 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return ProviderScope(
       child: MaterialApp(
-          theme: ThemeData(
+          theme: lightTheme,
+
+          /*theme: ThemeData(
+
             primarySwatch: Colors.blue,
             fontFamily: 'Montserrat',
-          ),
+          ),*/
           debugShowCheckedModeBanner: false,
           home: Scaffold(
               resizeToAvoidBottomInset: true,

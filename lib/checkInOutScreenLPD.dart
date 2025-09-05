@@ -169,9 +169,10 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
   @override
   void dispose() {
     timer?.cancel();
+    // geofenceStatusStream?.cancel();
+    Camcontroller?.dispose();
     super.dispose();
   }
-
   var lat_ = 0.0, lng_ = 0.0;
 
   Future<void> getlocation(var firstime) async {
