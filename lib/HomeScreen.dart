@@ -204,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           });
           if (task['targetScreen'] != null) {
             if (task['targetScreen'] == 'storeAudit') {
-              Get.back();
+              // Get.back();
 
               Get.to(() => OutletSelectionScreen( storeAuditList[0]))?.then((_) {
                 print("Back from Store Audit to MainScreen");
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
               //
             } else if (task['targetScreen'] == 'employee') {///employeeDilo
-              Get.back();
+              // Get.back();
 
               Get.to( OutletSelectionScreen(diloList[0]))?.then((_) {
                 print("Back from Store Audit to MainScreen");
@@ -223,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               });
 
             }else if (task['targetScreen'] == 'employeeDILO') {///employeeDilo
-              Get.back();
+              // Get.back();
 
               Get.to( OutletSelectionScreen(diloEmployeeList[0]))?.then((_) {
                 print("Back from Store Audit to MainScreen");
@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               });
 
             } else if (task['targetScreen'] == 'attendance') {
-              Get.back();
+              // Get.back();
 
               Get.to(const AttendenceScreen())?.then((_) {
                 print("Back from Store Audit to MainScreen");
@@ -239,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
               });
             } else if (task['targetScreen'] == 'leaveForm') {
-              Get.back();
+              // Get.back();
 
               Get.to(const EmployeeListScreen(formattedAuditName: 'Record Attendance',))?.then((_) {
                 print("Back from Store Audit to MainScreen");
@@ -309,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         var respo = jsonDecode(response.body);
 
-        if (respo['status'] == true) {
+        if (respo['status'] == true) {///true
           // _showTextAlert(context, respo['desctext']);
           setState(() {
             tasks = respo['data'];
