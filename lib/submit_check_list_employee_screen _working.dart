@@ -157,7 +157,12 @@ class _CheckListPageState extends State<CheckListPage> {
     setState(() {
       isLoading = false;
     });
-    Navigator.pushReplacement(
+    Get.off(()=>checkListScreen_lpd(
+      1,
+      widget.mGetActivityTypes,
+      widget.locationsList,
+    ));
+/*    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => checkListScreen_lpd(
@@ -165,7 +170,7 @@ class _CheckListPageState extends State<CheckListPage> {
             widget.mGetActivityTypes,
             widget.locationsList,
           ),
-        ));
+        ));*/
   }
 
   void onBackPressed() async {
@@ -178,8 +183,8 @@ class _CheckListPageState extends State<CheckListPage> {
         msg: 'Are you sure to want go back?');
   }
 
-  Future<void> submitAllDilo() async {
-    progressController.show();
+  Future<int> submitAllDilo() async {
+    // progressController.show();
     final sharedPreferences = await SharedPreferences.getInstance();
 
     ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
@@ -202,10 +207,15 @@ class _CheckListPageState extends State<CheckListPage> {
       loading = false;
     });
 */
-    progressController.hide();
+    // progressController.hide();
 
     // showConfirmDialog(onConfirmed: (){}, title: 'Success', msg: '')
-    Navigator.pushReplacement(
+    Get.off(()=>checkListScreen_lpd(
+      1,
+      widget.mGetActivityTypes,
+      widget.locationsList,
+    ));
+ /*   Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => checkListScreen_lpd(
@@ -213,7 +223,8 @@ class _CheckListPageState extends State<CheckListPage> {
             widget.mGetActivityTypes,
             widget.locationsList,
           ),
-        ));
+        ));*/
+    return 1;
   }
 
   final ScrollController _scrollController = ScrollController();
@@ -350,8 +361,12 @@ class _CheckListPageState extends State<CheckListPage> {
                   onPressed: isAllSubmitted
                       ? () {
                     showConfirmDialog(
-                      onConfirmed: () {
-                        submitAllDilo();
+                      onConfirmed: ()  {
+                submitAllDilo();
+                Navigator.pop(context);
+                    // if(goBack==1){
+                    //   Get.back();
+                    // }
                       },
                       title: "Submit all?",
                       msg: "Are you sure?",
@@ -376,6 +391,7 @@ class _CheckListPageState extends State<CheckListPage> {
                     TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
+                const SizedBox(height: 48),
               ],
             )
           ,
@@ -673,10 +689,10 @@ class _CheckListPageState extends State<CheckListPage> {
     // Submit the checklist item data
     print('Submitting checklist item: ${checkListItem.itemName}');
     // Here you can add logic to send the answers back to the server or handle locally
-    for (var question in checkListItem.questions!) {
-      print('Question: ${question.questionText}');
-      print('Answer: ${question.answer ?? question.selectedOption}');
-    }
+    // for (var question in checkListItem.questions!) {
+    //   print('Question: ${question.questionText}');
+    //   print('Answer: ${question.answer ?? question.selectedOption}');
+    // }
     handleChecklistSubmission(checkListItem, questionIndex);
 
 /*    showConfirmDialog(
@@ -796,9 +812,8 @@ class _CheckListPageState extends State<CheckListPage> {
           final apiResponse = await checklistRepo.postChecklistData(sendJson);
 
           if (apiResponse.statusCode == "200") {
-            Get.snackbar("Success", "Checklist posted successfully!",duration: const Duration(seconds: 1));
-          /*  showSimpleDialog(
-                title: 'Alert!', msg: 'Checklist posted successfully!');*/
+            // Get.snackbar("Success", "Checklist posted successfully!",duration: const Duration(seconds: 1));
+
 
             // Add to submittedItems if successful
             if (!submittedItems.contains(checkListItem.checkListItemId)) {
@@ -814,14 +829,7 @@ class _CheckListPageState extends State<CheckListPage> {
           }
         }
 
-        /* Get.snackbar(
-          'Alert!', 'Checklist posted successfully!',
-          backgroundColor: Colors.black,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM, // Set gravity to bottom
-        );*/
 
-        // Move to the next page
 
         print('Checklist posted successfully!');
       }

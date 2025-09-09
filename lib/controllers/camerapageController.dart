@@ -18,7 +18,7 @@ class CameraPageController extends GetxController {
   var cameraOpen = false.obs; // Flag to track camera open status
 
   // Use ImagePicker to pick an image from the camera
-  Future<void> captureAndCropImage() async {
+  Future<int> captureAndCropImage() async {
     try {
       // Show camera preview and allow capturing image
       final photo = await picker.pickImage(
@@ -33,10 +33,17 @@ class CameraPageController extends GetxController {
         camVisible.value = false; // Hide camera preview after capture
 
         await _cropImage(photo); // Crop the image after capture
-        Get.back(); // Go back after capturing the image
+        return 1;
+        // Get.back(); // Go back after capturing the image
+        // Get.back(); // Go back after capturing the image
+      }
+      else {
+        return 0; // ❌ cancelled
       }
     } catch (e) {
       print("Error capturing image: $e");
+      return 0; // ❌ error
+
     }
   }
 

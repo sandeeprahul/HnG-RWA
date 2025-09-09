@@ -217,16 +217,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               // Get.back();
 
               Get.to( OutletSelectionScreen(diloList[0]))?.then((_) {
-                print("Back from Store Audit to MainScreen");
+                print("Back from employee to MainScreen");
                 getPendingTasks();
-
               });
 
             }else if (task['targetScreen'] == 'employeeDILO') {///employeeDilo
               // Get.back();
 
               Get.to( OutletSelectionScreen(diloEmployeeList[0]))?.then((_) {
-                print("Back from Store Audit to MainScreen");
+                print("Back from EmployeeDILO to MainScreen");
                 getPendingTasks();
               });
 
@@ -234,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               // Get.back();
 
               Get.to(const AttendenceScreen())?.then((_) {
-                print("Back from Store Audit to MainScreen");
+                print("Back from attendance to MainScreen");
                 getPendingTasks();
 
               });
@@ -242,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               // Get.back();
 
               Get.to(const EmployeeListScreen(formattedAuditName: 'Record Attendance',))?.then((_) {
-                print("Back from Store Audit to MainScreen");
+                print("Back from leaveForm to MainScreen");
                 getPendingTasks();
 
               });
@@ -299,8 +298,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     try {
       final prefs = await SharedPreferences.getInstance();
       var locationCode = prefs.getString('locationCode') ?? '106';
+      // var userID =  '71002';
       var userID = prefs.getString('userCode') ?? '105060';
-
+      //
       String url =
           "${Constants.apiHttpsUrl}/forcetaskcompletion/Data/$locationCode/$userID";
       final response =

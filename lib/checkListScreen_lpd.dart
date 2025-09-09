@@ -591,7 +591,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                 index_ = index;
               });
 
-              ///remove in production
+             /* ///remove in production
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -603,49 +603,49 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                       sendingToEditAmHeaderQuestion: 0,
                       checkListItemMstId: "${checkListEmployee[0].checklisTId}",
                     ),
-                  ));
+                  ));*/
 
               //A
-             //  if (checkListEmployee[index].checklistEditStatus == "A") {
-             //    // checkList[0].checklistAssignId;
-             //    Navigator.pushReplacement(
-             //        context,
-             //        MaterialPageRoute(
-             //          builder: (context) =>
-             //              AmAcceptSelectionScreen_Employee(
-             //                checkListEmployee[index],
-             //                widget.mGetActivityTypes,
-             //                widget.locationsList,
-             //                widget.type,
-             //              ),
-             //        )).then((value) =>
-             //        () {
-             //      getActiveCheckListData();
-             //    });
-             //  }
-             // //R
-             //  else if (checkListEmployee[index].checklistEditStatus ==
-             //      "R") {
-             //    Navigator.pushReplacement(
-             //        context,
-             //        MaterialPageRoute(
-             //          builder: (context) =>
-             //              AmAcceptSelectionScreen_Employee(
-             //                  checkListEmployee[index],
-             //                  widget.mGetActivityTypes,
-             //                  widget.locationsList,
-             //                  widget.type),
-             //        )).then((value) =>
-             //        () {
-             //      getActiveCheckListData();
-             //    });
-             //  } else {
-             //    if (checkListEmployee[index].checkinFlag == "1") {
-             //      setState(() {
-             //        popupVisible = true;
-             //      });
-             //    }
-             //  }
+              if (checkListEmployee[index].checklistEditStatus == "A") {
+                // checkList[0].checklistAssignId;
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AmAcceptSelectionScreen_Employee(
+                            checkListEmployee[index],
+                            widget.mGetActivityTypes,
+                            widget.locationsList,
+                            widget.type,
+                          ),
+                    )).then((value) =>
+                    () {
+                  getActiveCheckListData();
+                });
+              }
+             //R
+              else if (checkListEmployee[index].checklistEditStatus ==
+                  "R") {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AmAcceptSelectionScreen_Employee(
+                              checkListEmployee[index],
+                              widget.mGetActivityTypes,
+                              widget.locationsList,
+                              widget.type),
+                    )).then((value) =>
+                    () {
+                  getActiveCheckListData();
+                });
+              } else {
+                if (checkListEmployee[index].checkinFlag == "1") {
+                  setState(() {
+                    popupVisible = true;
+                  });
+                }
+              }
             },
             splashColor: Theme.of(context).primaryColor.withOpacity(0.1),
 
@@ -1135,7 +1135,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
       }
 
       final response =
-      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
+      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 59));
       print(url);
       print(response.body);
 
@@ -1171,7 +1171,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
      /* setState(() {
         loading = false;
       });*/
-      _showRetryAlert();
+      _showRetryAlert(e);
     }
     finally{
       setState(() {
@@ -1180,14 +1180,14 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
     }
   }
 
-  Future<void> _showRetryAlert() async {
+  Future<void> _showRetryAlert(Object e) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content: const Text('Network issue\nPlease retry'),
+          content:  Text('Something went wrong!\n$e\nPlease retry'),
 // Please retry?'),
           actions: <Widget>[
             /*  Container(

@@ -104,8 +104,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
     photo = null;
   }
 
-
-
   Future<void> handlePermission() async {
     final status = await PermissionHelper.requestLocationPermission();
 
@@ -130,7 +128,6 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
   bool camVisible = false;
 
   getPhoto(int firstTime) async {
-
     final ImagePicker _picker = ImagePicker();
     var status = await Permission.camera.status;
     if (!status.isGranted) {
@@ -285,7 +282,10 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
             content: Text(msg),
             actions: <Widget>[
               TextButton(
-                child: const Text('Got it',style: TextStyle(color: Colors.white),),
+                child: const Text(
+                  'Got it',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.of(context_).pop();
                   // Navigator.of(context).pop();
@@ -302,7 +302,8 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                 },
               ),
               TextButton(
-                child: const Text('ReCheck',style: TextStyle(color: Colors.white)),
+                child: const Text('ReCheck',
+                    style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   Navigator.of(context_).pop();
                   // Navigator.of(context).pop();
@@ -342,7 +343,10 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
             actions: <Widget>[
               TextButton(
                 style: TextButton.styleFrom(backgroundColor: Colors.blue),
-                child: const Text('Proceed',style: TextStyle(color: Colors.white),),
+                child: const Text(
+                  'Proceed',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.of(context_).pop();
                   getPhoto(f);
@@ -1040,19 +1044,31 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           // Navigator.pop(context, 1);
 
           if (widget.activeCheckList.list_type == "Y") {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CheckListPage(
-                    activeCheckList: widget.activeCheckList,
-                    isEdit: 0,
-                    locationsList: widget.locationsList,
-                    mGetActivityTypes: widget.mGetActvityTypes,
-                    sendingToEditAmHeaderQuestion: 0,
-                    checkListItemMstId: "${widget.activeCheckList.checklisTId}",
-                  ),
-                ));
+            Get.off(
+              () => CheckListPage(
+                activeCheckList: widget.activeCheckList,
+                isEdit: 0,
+                locationsList: widget.locationsList,
+                mGetActivityTypes: widget.mGetActvityTypes,
+                sendingToEditAmHeaderQuestion: 0,
+                checkListItemMstId: "${widget.activeCheckList.checklisTId}",
+              ),
+            );
+
+            // Navigator.pushReplacement(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => CheckListPage(
+            //         activeCheckList: widget.activeCheckList,
+            //         isEdit: 0,
+            //         locationsList: widget.locationsList,
+            //         mGetActivityTypes: widget.mGetActvityTypes,
+            //         sendingToEditAmHeaderQuestion: 0,
+            //         checkListItemMstId: "${widget.activeCheckList.checklisTId}",
+            //       ),
+            //     ));
           } else if (widget.activeCheckList.list_type == "N") {
+
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -1252,5 +1268,4 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
   }
 
   ///for testing without location and image checkIn please remove after testing
-
 }

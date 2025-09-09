@@ -501,7 +501,7 @@ class _PageRetailState extends State<PageRetail> {
                       .invokeMethod('SystemNavigator.pop');
                 }
               },
-              child: const Text('Logout'),
+              child: const Text('Logout',style: TextStyle(color: Colors.white),),
             ),
           ],
         );

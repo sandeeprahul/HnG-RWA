@@ -290,25 +290,25 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
       setState(() {
         loading = false;
       });
-      _showRetryAlert();
+      _showRetryAlert(e);
     }
   }
 
-  Future<void> _showRetryAlert() async {
+  Future<void> _showRetryAlert(var e) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert!'),
-          content: Text('Network issue\nPlease retry'),
+          content: Text('Something went wrong!\n$e\nPlease retry'),
 // Please retry?'),
           actions: <Widget>[
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                   color: CupertinoColors.activeBlue,
-                  borderRadius: BorderRadius.circular(5)),
+                  borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -321,7 +321,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                   color: CupertinoColors.activeBlue,
-                  borderRadius: BorderRadius.circular(5)),
+                  borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();

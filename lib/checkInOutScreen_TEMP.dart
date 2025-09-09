@@ -45,7 +45,7 @@ class checkInOutScreen_TEMP extends StatefulWidget {
       _checkInOutScreen_TEMPState(this.checkInoutType);
 }
 
-class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
+class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP>  with SingleTickerProviderStateMixin{
 
   int checkInoutType;
 
@@ -93,6 +93,8 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
   ImagePicker? _picker;
 
   final storage = FirebaseStorage.instance;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -112,6 +114,17 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
     getLocation(0);
     fetchLocations(widget.checkInoutType);
     photo = null;
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+    _animationController.forward();
   }
 
   CameraController? camController;
@@ -194,6 +207,8 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
   void dispose() {
     print("overrideDISPOSE");
     timer?.cancel();
+    _animationController.dispose();
+
     camController?.dispose();
     super.dispose();
   }
@@ -227,6 +242,201 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: WillPopScope(
+        onWillPop: () async {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Please complete the process'),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          return false;
+        },
+        child: SafeArea(
+          child: AnimatedBuilder(
+            animation: _fadeAnimation,
+            builder: (context, child) {
+              return FadeTransition(
+                opacity: _fadeAnimation,
+                child: Stack(
+                  children: [
+                    // Background with gradient
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.blue.shade50,
+                            Colors.white,
+                            Colors.blue.shade50,
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Loading overlay
+                    Visibility(
+                      visible: !camVisible,
+                      child: Container(
+                        color: Colors.white.withOpacity(0.9),
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CustomProgressIndicator(),
+                            const SizedBox(height: 20),
+                            Text(
+                              'Setting up your camera...',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.blue.shade800,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Camera preview
+                    Visibility(
+                      visible: camController != null && camVisible,
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
+                        child: Stack(
+                          children: [
+                            // Camera preview
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height,
+                              width: MediaQuery.of(context).size.width,
+                              child: CameraPreview(camController!),
+                            ),
+
+                            // Gradient overlay at bottom
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                height: MediaQuery.of(context).size.height / 2.5,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Colors.black.withOpacity(0.8),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // Status information panel
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                height: MediaQuery.of(context).size.height / 3,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 15,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      statusText,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Shimmer.fromColors(
+                                      baseColor: Colors.white,
+                                      highlightColor: Colors.blue.shade200,
+                                      child: const Text(
+                                        'Please wait while we process',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                        horizontal: 24,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade700,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Text(
+                                        'Position your face to the camera',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Location selection modal
+                    if (showLocationList)
+                      ModalOverlay(
+                        child: LocationSelectionModal(
+                          filteredLocations: filteredLocations,
+                          onLocationSelected: (location) async {
+                            setState(() {
+                              showLocationList = false;
+                              selectedLocation = location;
+                            });
+                            await checkDistance_(
+                              double.parse(location.latitude),
+                              double.parse(location.longitude),
+                              0,
+                            );
+                          },
+                       /*   onCancel: () {
+                            setState(() {
+                              showLocationList = false;
+                            });
+                          },*/
+                          searchController: searchController,
+                          onSearchChanged: filterSearch,
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget buildORIGINAL(BuildContext context) {
     final CheckInOutController controller = Get.put(CheckInOutController());
     return Scaffold(
       body: WillPopScope(
@@ -1230,4 +1440,270 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP> {
     });
   }
 
+}
+// Custom animated progress indicator
+class CustomProgressIndicator extends StatefulWidget {
+  @override
+  _CustomProgressIndicatorState createState() => _CustomProgressIndicatorState();
+}
+
+class _CustomProgressIndicatorState extends State<CustomProgressIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Color?> _colorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _colorAnimation = ColorTween(
+      begin: Colors.blue.shade300,
+      end: Colors.blue.shade700,
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          width: 80,
+          height: 80,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blue.withOpacity(0.2),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(_colorAnimation.value!),
+            strokeWidth: 4,
+          ),
+        );
+      },
+    );
+  }
+}
+
+// Modern location selection modal
+class LocationSelectionModal extends StatelessWidget {
+  final List<UserLocations> filteredLocations;
+  final Function(UserLocations) onLocationSelected;
+  // final Function() onCancel;
+  final TextEditingController searchController;
+  final Function(String) onSearchChanged;
+
+  const LocationSelectionModal({
+    required this.filteredLocations,
+    required this.onLocationSelected,
+    // required this.onCancel,
+    required this.searchController,
+    required this.onSearchChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          constraints: BoxConstraints(
+            maxWidth: 500,
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.location_on, color: Colors.blue.shade700),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Select Location',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blue.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Search bar
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: "Search locations...",
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.grey.shade50,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  onChanged: onSearchChanged,
+                ),
+              ),
+
+              // Locations list
+              Expanded(
+                child: filteredLocations.isEmpty
+                    ? const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.location_off, size: 40, color: Colors.grey),
+                      SizedBox(height: 10),
+                      Text(
+                        'No locations found',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+                    : ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: filteredLocations.length,
+                  itemBuilder: (context, index) {
+                    final location = filteredLocations[index];
+                    return LocationListItem(
+                      location: location,
+                      onTap: () => onLocationSelected(location),
+                    );
+                  },
+                  separatorBuilder: (context, index) => const Divider(height: 1),
+                ),
+              ),
+
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Location list item widget
+class LocationListItem extends StatelessWidget {
+  final UserLocations location;
+  final VoidCallback onTap;
+
+  const LocationListItem({
+    required this.location,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.location_on, color: Colors.blue.shade700, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    location.locationName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Code: ${location.locationCode}',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: Colors.grey.shade400),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Modal overlay widget
+class ModalOverlay extends StatelessWidget {
+  final Widget child;
+
+  const ModalOverlay({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black.withOpacity(0.5),
+      width: double.infinity,
+      height: double.infinity,
+      child: child,
+    );
+  }
 }

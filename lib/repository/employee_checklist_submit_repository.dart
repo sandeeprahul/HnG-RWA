@@ -37,7 +37,7 @@ class EmployeeSubmitChecklistRepository {
       rethrow;
     } finally {
       progressController.hide();
-      Get.back(); // Optionally handle this in the controller instead
+      // Get.back(); // Optionally handle this in the controller instead
     }
   }
 
