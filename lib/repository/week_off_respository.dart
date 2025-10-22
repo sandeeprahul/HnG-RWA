@@ -97,7 +97,7 @@ class WeekOffRepository {
           "${Constants.apiHttpsUrl}/Login/Listweekoff/$employeeCode";
 
       final response =
-      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
       print(url);
 
       var responseData = json.decode(response.body);

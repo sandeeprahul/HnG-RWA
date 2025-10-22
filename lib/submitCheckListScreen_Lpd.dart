@@ -1056,7 +1056,7 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
               "checklist_mst_item_id": widget.checkList.checklisTItemMstId,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       var respo = jsonDecode(response.body);
 
@@ -1258,7 +1258,7 @@ class _submitCheckListScreen_LpdState extends State<submitCheckListScreen_Lpd> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(sendJson),
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 300));
 
       var respo = jsonDecode(response.body);
 

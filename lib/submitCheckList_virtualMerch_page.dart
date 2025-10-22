@@ -676,7 +676,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
           "${Constants.apiHttpsUrl}/VirtualMerchandiser/QuestionAnswers/${widget.checkList.vm_assign_id}/${widget.checkList.checklistItemMstId}/InProcess/$userId"; //
 
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       // var responseData = json.decode(response.body);
       final decodedJson = jsonDecode(response.body); // dynamic
@@ -1231,7 +1231,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
             },
             body: jsonEncode(sendJson),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
       print(response.body);
       print(response.request);
       print(response.statusCode);
@@ -1398,7 +1398,7 @@ class _submitCheckListVirtualMerchPageState extends State<submitCheckListVirtual
               "getImages": image,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       var json = jsonEncode({
         "checkList_Item_Mst_Id": widget.checkList.checklistItemMstId,

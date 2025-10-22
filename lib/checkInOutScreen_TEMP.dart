@@ -292,7 +292,7 @@ class _checkInOutScreen_TEMPState extends State<checkInOutScreen_TEMP>  with Sin
                             CustomProgressIndicator(),
                             const SizedBox(height: 20),
                             Text(
-                              'Setting up your camera...',
+                              'Please wait...',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,

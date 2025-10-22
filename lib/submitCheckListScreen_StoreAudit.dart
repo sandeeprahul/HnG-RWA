@@ -1597,7 +1597,7 @@ class _submitCheckListScreen_StoreAuditState
               "getImages": image,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       var json = jsonEncode({
         "checkList_Item_Mst_Id": widget.checkList.checklisTItemMstId,

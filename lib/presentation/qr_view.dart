@@ -123,7 +123,7 @@ class _QRViewExampleState extends State<QRViewExample> {
         },
         body: jsonEncode(params),
       )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       var respo = jsonDecode(response.body);
 

@@ -12,7 +12,7 @@ class SupportTeamRepository {
       String url =
           "${Constants.apiHttpsUrl}/Login/ITSupport";
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);

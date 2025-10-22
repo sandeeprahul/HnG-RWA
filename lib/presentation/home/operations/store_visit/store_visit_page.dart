@@ -1103,7 +1103,7 @@ class _StoreVisitPageState extends State<StoreVisitPage> {
               "storevistlist": jsonParamsList,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       var respo = jsonDecode(response.body);
       print("Response->>>>$respo");

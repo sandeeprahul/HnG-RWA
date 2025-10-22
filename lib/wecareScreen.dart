@@ -587,7 +587,7 @@ class _WeCareScreenState extends State<WeCareScreen> {
               }
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -624,7 +624,7 @@ class _WeCareScreenState extends State<WeCareScreen> {
           "${Constants.apiHttpsUrl}/Login/getlocationwecare/$userID"; //
       print("URL->$url");
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
       if (response.statusCode == 200) {
         setState(() {
           loading = false;

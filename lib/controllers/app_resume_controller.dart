@@ -47,7 +47,7 @@
 //       String url = "${Constants.apiHttpsUrl}/forcetaskcompletion/Data/$locationCode/$userID";
 //       print(url);
 //       final response =
-//       await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+//       await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 //
 //       if (response.statusCode == 200) {
 //         var respo = jsonDecode(response.body);

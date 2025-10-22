@@ -673,7 +673,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
 
       print(url);
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       // var responseData = json.decode(response.body);
       final decodedJson = jsonDecode(response.body); // dynamic
@@ -1210,7 +1210,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
             },
             body: jsonEncode(sendJson),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
       print(response.body);
       print(response.request);
       print(response.statusCode);
@@ -1380,7 +1380,7 @@ class _submitCheckListScreenState extends State<submitCheckListScreen> {
               "getImages": image,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       var json = jsonEncode({
         "checkList_Item_Mst_Id": widget.checkList.checklistItemMstId,

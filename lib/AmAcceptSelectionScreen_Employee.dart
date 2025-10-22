@@ -1981,7 +1981,7 @@ class _AmAcceptSelectionScreen_EmployeeState
             },
             body: jsonEncode(params),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
       print(response.statusCode);
       print(response.request);
       print(response.body);

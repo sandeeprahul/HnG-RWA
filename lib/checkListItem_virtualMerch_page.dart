@@ -595,7 +595,7 @@ class _checkListItemVirtualMerchPageState extends State<checkListItemVirtualMerc
               "vm_assign_id": widget.activeCheckList.vm_assign_id
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
       if (response.statusCode == 200) {
         setState(() {
           loading = false;

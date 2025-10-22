@@ -109,7 +109,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                           padding: const EdgeInsets.only(left: 20),
                           child: Text(
                             widget.mGetActivityTypes.auditName,
-                            style: const TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18),
                           ),
                         ),
                       ],
@@ -129,6 +129,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                             Text('Current',
                                 style: TextStyle(
                                     fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                     color: isSelected == 0
                                         ? Colors.blue
                                         : Colors.black)),
@@ -159,6 +160,8 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
                               // 'Pending(${widget.mGetActvityTypes.pendingCount})',
                               style: TextStyle(
                                   fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+
                                   color:
                                   isSelected == 1 ? Colors.blue : Colors.black),
                             ),
@@ -690,7 +693,7 @@ class _checkListScreen_lpdState extends State<checkListScreen_lpd>
 
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                    color: Colors.black,
                                     fontSize: 17, ),
                               ),
                             ),

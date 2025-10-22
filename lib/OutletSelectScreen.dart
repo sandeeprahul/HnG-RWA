@@ -33,7 +33,7 @@ class OutletSelectionScreen extends StatefulWidget {
 
 bool am = true;
 
-class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
+class _OutletSelectionScreenState extends State<OutletSelectionScreen>with WidgetsBindingObserver {
 
 
   @override
@@ -41,6 +41,13 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen> {
     // TODO: implement initState
     super.initState();
     getLocationsData();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      getLocationsData();
+    }
   }
 
   bool loading = false;

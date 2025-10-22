@@ -1414,7 +1414,7 @@ class _AmAcceptSelectionScreen_StoreAuditState
       String url =
           "${Constants.apiHttpsUrl}/StoreAudit/$type/${widget.activeCheckList.store_checklist_assign_id}";
 
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       var responseData = json.decode(response.body);
 

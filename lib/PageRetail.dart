@@ -527,7 +527,7 @@ class _PageRetailState extends State<PageRetail> {
         // String url = "${Constants.apiHttpsUrl}/Login/GetActvityTypes/70001";
         String url = "${Constants.apiHttpsUrl}/Login/GetActvityTypes/$userID";
         final response =
-            await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+            await http.get(Uri.parse(url)).timeout(const Duration(seconds: 60));
 
         print(url);
         checkList = [];
@@ -620,7 +620,7 @@ class _PageRetailState extends State<PageRetail> {
       print(url);
 
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
       if (response.statusCode == 200) {
         setState(() {
           loading = false;

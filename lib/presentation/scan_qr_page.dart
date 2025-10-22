@@ -204,7 +204,7 @@ class _ScanQrPageState extends State<ScanQrPage> {
             },
             body: jsonEncode(params),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       var respo = jsonDecode(response.body);
       print("$url , $params , $respo");

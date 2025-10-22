@@ -710,7 +710,7 @@ class _submitCheckListScreenEmployeeState
           "${Constants.apiHttpsUrl}/Employee/QuestionAnswers/${widget.empChecklistAssignId}/$mstId/InProcess/$userId/$userId"; //
 
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       print(url);
       // var responseData = json.decode(response.body);
@@ -1076,7 +1076,7 @@ class _submitCheckListScreenEmployeeState
               "employeeCode": empCode,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 300));
 
       var respo = jsonDecode(response.body);
 

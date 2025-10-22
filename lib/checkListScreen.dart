@@ -115,7 +115,7 @@ class _checkListScreenState extends State<checkListScreen>
                           padding: const EdgeInsets.only(left: 20),
                           child: Text(
                             widget.mGetActvityTypes.auditName,
-                            style: const TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -643,7 +643,7 @@ class _checkListScreenState extends State<checkListScreen>
           "${Constants.apiHttpsUrl}/CheckList/Active_CheckList/$locationCode/${widget.mGetActvityTypes.auditId}/$userID";
       print(url);
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
       var responseData = json.decode(response.body);
 
       if(response.statusCode==200){

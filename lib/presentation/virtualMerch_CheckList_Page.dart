@@ -645,7 +645,7 @@ class _VirtualMerchCheckListPageState extends State<VirtualMerchCheckListPage>
       "${Constants.apiHttpsUrl}/VirtualMerchandiser/Active_CheckList/$locationCode/${widget.mGetActvityTypes.auditId}/$userID";
 
       final response =
-      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
       var responseData = json.decode(response.body);
 
       if(response.statusCode==200){

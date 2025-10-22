@@ -304,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       String url =
           "${Constants.apiHttpsUrl}/forcetaskcompletion/Data/$locationCode/$userID";
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       if (response.statusCode == 200) {
         var respo = jsonDecode(response.body);
@@ -361,7 +361,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return Scaffold(
       body: SafeArea(
         child: Scaffold(
+          // appBar: AppBar(),
             body: Stack(
+
           children: [
             Column(
               children: [
@@ -373,8 +375,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       SizedBox(
                           height: 50,
                           width: 100,
-                          child: SvgPicture.network(
-                              'https://ik.imagekit.io/hng/desktop-assets/svgs/logo.svg')),
+                          child: SvgPicture.network('https://ik.imagekit.io/hng/desktop-assets/svgs/logo.svg')),
                       const Icon(
                         Icons.notifications,
                         size: 20,
@@ -633,7 +634,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
       String url = "${Constants.apiHttpsUrl}/Login/gethomepage/$userID";
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       if (response.statusCode == 200) {
         var respo = jsonDecode(response.body);

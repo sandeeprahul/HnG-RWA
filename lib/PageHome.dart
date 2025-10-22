@@ -480,7 +480,7 @@ class _PageHomeState extends State<PageHome> {
     );
   }
 
-  Widget menuHomeWidgets({required String title, required String tag}) {
+  Widget menuHomeWidgets({required String title, required String tag,required IconData icon}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
@@ -515,7 +515,7 @@ class _PageHomeState extends State<PageHome> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.group_outlined,
+              icon,
               size: 24,
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -713,7 +713,7 @@ class _PageHomeState extends State<PageHome> {
                         },
                         child: menuHomeWidgets(
                             title: "My Team Activities",
-                            tag: "View team activities."),
+                            tag: "View team activities.", icon: Icons.group_outlined),
                       )
                     : const SizedBox();
               }),
@@ -730,7 +730,7 @@ class _PageHomeState extends State<PageHome> {
                         },
                         child: menuHomeWidgets(
                             title: "Product Quick Enquiry",
-                            tag: "Get Product Details."))
+                            tag: "Get Product Details.", icon: Icons.details))
                     : const SizedBox();
               }),
 
@@ -1379,7 +1379,7 @@ class _PageHomeState extends State<PageHome> {
           "https://rwaweb.healthandglowonline.co.in/RWAAPIDEVELOPMENT/api/Login/checkinstatus/$userID";
       print(url);
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       var responseData = json.decode(response.body);
 
