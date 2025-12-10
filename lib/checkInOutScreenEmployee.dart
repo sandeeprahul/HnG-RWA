@@ -23,7 +23,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'checkListItemScreenExmployee.dart';
-import 'checkListScreen_lpd.dart';
+import 'check_list_segregation_screen.dart';
 import 'common/constants.dart';
 import 'helper/permission_helper.dart';
 
@@ -293,7 +293,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => checkListScreen_lpd(
+                        builder: (context) => CheckListSegregationScreen(
                           1,
                           widget.mGetActvityTypes,
                           widget.locationsList,
@@ -310,7 +310,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => checkListScreen_lpd(
+                        builder: (context) => CheckListSegregationScreen(
                           1,
                           widget.mGetActvityTypes,
                           widget.locationsList,
@@ -433,7 +433,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => checkListScreen_lpd(
+                builder: (context) => CheckListSegregationScreen(
                   1,
                   widget.mGetActvityTypes,
                   widget.locationsList,

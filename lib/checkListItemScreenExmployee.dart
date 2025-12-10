@@ -14,7 +14,7 @@ import 'common/constants.dart';
 import 'data/GetActvityTypes.dart';
 import 'data/GetChecklist.dart';
 import 'data/HeaderQuestionEmployee.dart';
-import 'checkListScreen_lpd.dart';
+import 'check_list_segregation_screen.dart';
 
 class checkListItemScreenEmployee extends StatefulWidget
     with WidgetsBindingObserver {
@@ -93,7 +93,7 @@ class _checkListItemScreenEmployeeState
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => checkListScreen_lpd(
+              builder: (context) => CheckListSegregationScreen(
                 1,
                 widget.mGetActvityTypes,
                 widget.locationsList,
@@ -641,7 +641,7 @@ class _checkListItemScreenEmployeeState
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => checkListScreen_lpd(
+                      builder: (context) => CheckListSegregationScreen(
                         1,
                         widget.mGetActvityTypes,
                         widget.locationsList,

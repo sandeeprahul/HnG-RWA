@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hng_flutter/checkListScreen_lpd.dart';
+import 'package:hng_flutter/check_list_segregation_screen.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/checkListScreen.dart';
 import 'package:hng_flutter/widgets/task_card.dart';
@@ -202,7 +202,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen>with Widge
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            checkListScreen_lpd(
+                                            CheckListSegregationScreen(
                                                 1,
                                                 widget.checkList,
                                                 locationsList[pos]

@@ -24,7 +24,7 @@ import 'PageHome.dart';
 import 'checkInOutScreenDilo.dart';
 import 'checkListItemScreen.dart';
 import 'checkListItemScreen_Lpd.dart';
-import 'checkListScreen_lpd.dart';
+import 'check_list_segregation_screen.dart';
 
 // import 'createCheckListScreen_lpd.dart';
 import 'imageUploadScreen.dart';
@@ -194,7 +194,7 @@ class _applicableScreenState extends State<applicableScreen>
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => checkListScreen_lpd(
+                          builder: (context) => CheckListSegregationScreen(
                               1,
                               widget.mGetActvityTypes,
                               widget.locationsList,
@@ -386,7 +386,7 @@ class _applicableScreenState extends State<applicableScreen>
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => checkListScreen_lpd(
+                builder: (context) => CheckListSegregationScreen(
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
@@ -485,7 +485,7 @@ class _applicableScreenState extends State<applicableScreen>
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => checkListScreen_lpd(
+                builder: (context) => CheckListSegregationScreen(
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
@@ -589,7 +589,7 @@ class _applicableScreenState extends State<applicableScreen>
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => checkListScreen_lpd(
+                builder: (context) => CheckListSegregationScreen(
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
@@ -696,7 +696,7 @@ class _applicableScreenState extends State<applicableScreen>
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => checkListScreen_lpd(
+                builder: (context) => CheckListSegregationScreen(
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,

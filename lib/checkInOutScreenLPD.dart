@@ -28,7 +28,7 @@ import 'common/constants.dart';
 import 'data/ActiveCheckListLpd.dart';
 import 'data/ActiveCheckListModel.dart';
 import 'data/LPDSection.dart';
-import 'checkListScreen_lpd.dart';
+import 'check_list_segregation_screen.dart';
 import 'helper/permission_helper.dart';
 import 'main.dart';
 
@@ -276,7 +276,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => checkListScreen_lpd(
+                        builder: (context) => CheckListSegregationScreen(
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
@@ -291,7 +291,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => checkListScreen_lpd(
+                        builder: (context) => CheckListSegregationScreen(
                             1,
                             widget.mGetActvityTypes,
                             widget.locationsList,
@@ -404,7 +404,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => checkListScreen_lpd(
+                builder: (context) => CheckListSegregationScreen(
                     1,
                     widget.mGetActvityTypes,
                     widget.locationsList,
@@ -430,7 +430,7 @@ class _checkInOutScreenLPDState extends State<checkInOutScreenLPD> {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => checkListScreen_lpd(
+                                    builder: (context) => CheckListSegregationScreen(
                                         1,
                                         widget.mGetActvityTypes,
                                         widget.locationsList,

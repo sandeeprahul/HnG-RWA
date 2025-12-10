@@ -303,6 +303,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       //
       String url =
           "${Constants.apiHttpsUrl}/forcetaskcompletion/Data/$locationCode/$userID";
+      print(url);
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/common/constants.dart';
 import 'package:hng_flutter/common/zoomable_image.dart';
+import 'package:hng_flutter/new_camera_handling_for_lower_version/cameraPageNewForLowerVersions.dart';
 import 'package:hng_flutter/presentation/camera_page.dart';
 import 'package:hng_flutter/repository/employee_checklist_submit_repository.dart';
 import 'package:http/http.dart' as http;
@@ -16,13 +17,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_service.dart';
 import 'bindings/camera_bindings.dart';
-import 'checkListScreen_lpd.dart';
+import 'check_list_segregation_screen.dart';
 import 'controllers/camerapageController.dart';
 import 'controllers/progressController.dart';
 import 'data/ActiveCheckListEmployee.dart';
 import 'data/GetActvityTypes.dart';
 import 'helper/confirmDialog.dart';
 import 'helper/simpleDialog.dart';
+import 'new_camera_handling_for_lower_version/cameraPageControllerForLowerVersions.dart';
 
 class CheckListPage extends StatefulWidget {
   final ActiveCheckListEmployee activeCheckList;
@@ -50,7 +52,8 @@ class _CheckListPageState extends State<CheckListPage> {
   List<CheckListItem> checkListItems = [];
   bool isLoading = false;
 
-  final CameraPageController cameraPageController = Get.find<CameraPageController>();
+  final CameraPageControllerForLowerVersions cameraPageController = Get.find<CameraPageControllerForLowerVersions>();
+  // final CameraPageController cameraPageController = Get.find<CameraPageController>();
 
 
   final ProgressController progressController = Get.put(ProgressController());
@@ -157,7 +160,7 @@ class _CheckListPageState extends State<CheckListPage> {
     setState(() {
       isLoading = false;
     });
-    Get.off(()=>checkListScreen_lpd(
+    Get.off(()=>CheckListSegregationScreen(
       1,
       widget.mGetActivityTypes,
       widget.locationsList,
@@ -210,7 +213,7 @@ class _CheckListPageState extends State<CheckListPage> {
     // progressController.hide();
 
     // showConfirmDialog(onConfirmed: (){}, title: 'Success', msg: '')
-    Get.off(()=>checkListScreen_lpd(
+    Get.off(()=>CheckListSegregationScreen(
       1,
       widget.mGetActivityTypes,
       widget.locationsList,
@@ -317,6 +320,7 @@ class _CheckListPageState extends State<CheckListPage> {
                               ),
                               InkWell(
                                 onTap: () {
+                                  // print("CLICKED SUbMIT");
                                   _submitCheckListItem(
                                       checkListItem, questionIndex);
                                 },
@@ -326,20 +330,21 @@ class _CheckListPageState extends State<CheckListPage> {
                                   decoration: BoxDecoration(
                                     borderRadius:
                                     BorderRadius.circular(12),
+                                    // color: Colors.red,
                                     color: !submittedItems.contains(checkListItem.checkListItemId)?Colors.blue:Colors.green,
                                   ),
                                   width: double.infinity,
                                   child:  Center(
                                       child: Obx(
-                                         () {
-                                          return Text(progressController.isLoading.value?'Submitting..': !submittedItems.contains(checkListItem.checkListItemId)?'Submit':'Submitted',
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18));
-                                        }
+                                              () {
+                                            return Text(progressController.isLoading.value?'Submitting..': !submittedItems.contains(checkListItem.checkListItemId)?'Submit':'Submitted',
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 18));
+                                          }
                                       )),
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),
@@ -449,7 +454,9 @@ class _CheckListPageState extends State<CheckListPage> {
                 ))
             .toList(),
         onChanged: (value) {
+
           setState(() {
+
             question.selectedOption = value;
             dropDownOptionAnswer = value!;
 
@@ -460,9 +467,10 @@ class _CheckListPageState extends State<CheckListPage> {
             dropDownOptionAnswerID =
                 "${selectedOption.checkListAnswerOptionId}";
             non_Compliance_Flag = "${selectedOption.nonComplianceFlag}";
-            print(
-                "$dropDownOptionAnswer , $dropDownOptionAnswerID , $non_Compliance_Flag");
+
           });
+          print(
+              "$dropDownOptionAnswer , $dropDownOptionAnswerID , $non_Compliance_Flag");
         },
       ),
     );
@@ -502,7 +510,8 @@ class _CheckListPageState extends State<CheckListPage> {
                       child: _body(),
                     ),
                     onTap: () {
-                      Get.to(() => const CameraPage(), binding: CameraBinding());
+                      // Get.put(CameraPageControllerForLowerVersions()); // Registers and initializes the controller immediately
+                      Get.to(() => const CameraPageForLowerVersions(), binding: CameraBinding());
 
                       /*   setState(() {
                         cameraOpen = 0;
@@ -744,7 +753,8 @@ class _CheckListPageState extends State<CheckListPage> {
       int questionIndex) async {
     final prefs = await SharedPreferences.getInstance();
 
-    final cameraPageController = Get.find<CameraPageController>();
+    final cameraPageController = Get.find<CameraPageControllerForLowerVersions>();
+    // final cameraPageController = Get.find<CameraPageController>();
 
 
     var userId = prefs.getString("userCode");

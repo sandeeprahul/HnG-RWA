@@ -8,7 +8,7 @@ lightTheme = ThemeData(
   primaryColor: Colors.orange,
 
   // colorScheme: lightColorScheme,
-  textTheme: GoogleFonts.montserratTextTheme().apply(
+  textTheme: GoogleFonts.outfitTextTheme().apply(
     bodyColor: Colors.black,
     displayColor: Colors.black,
   ),
@@ -40,12 +40,12 @@ lightTheme = ThemeData(
   dialogTheme: DialogThemeData(
     backgroundColor: const Color.fromRGBO(237, 237, 237, 1.0),
     surfaceTintColor: const Color.fromRGBO(237, 237, 237, 1.0),
-    titleTextStyle: GoogleFonts.montserrat(
+    titleTextStyle: GoogleFonts.outfit(
       color: Colors.black,
       fontSize: 20.0,
       fontWeight: FontWeight.w500,
     ),
-    contentTextStyle: GoogleFonts.montserrat(
+    contentTextStyle: GoogleFonts.outfit(
       color: Colors.black,
       fontSize: 16,
       fontWeight: FontWeight.w400,
@@ -59,7 +59,7 @@ lightTheme = ThemeData(
       ),
       // foregroundColor: Colors.blue,
       backgroundColor: Colors.blue,// Button text color
-      textStyle:  GoogleFonts.montserrat(fontSize: 16,color: Colors.white), // Button text style
+      textStyle:  GoogleFonts.outfit(fontSize: 16,color: Colors.white), // Button text style
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -68,11 +68,11 @@ lightTheme = ThemeData(
       borderRadius: BorderRadius.circular(4.0),
     ),
     backgroundColor: const Color(0xfff76613),
-    textStyle: GoogleFonts.montserrat(fontSize: 16.0, color: Colors.white),
+    textStyle: GoogleFonts.outfit(fontSize: 16.0, color: Colors.white),
   )),
   filledButtonTheme: FilledButtonThemeData(
     style: FilledButton.styleFrom(
-      textStyle: GoogleFonts.montserrat(
+      textStyle: GoogleFonts.outfit(
         color: Colors.white,
         fontSize: 16.0,
       ),
@@ -83,23 +83,23 @@ lightTheme = ThemeData(
     size: 24.0,
   ),
   inputDecorationTheme: InputDecorationTheme(
-    labelStyle: GoogleFonts.montserrat(
+    labelStyle: GoogleFonts.outfit(
       color: Colors.black,
       fontSize: 16.0,
     ),
-    floatingLabelStyle: GoogleFonts.montserrat(
+    floatingLabelStyle: GoogleFonts.outfit(
       color: Colors.black,
       fontSize: 16.0,
     ),
-    errorStyle: GoogleFonts.montserrat(
+    errorStyle: GoogleFonts.outfit(
       color: Colors.red,
       fontSize: 14.0,
     ),
-    hintStyle: GoogleFonts.montserrat(
+    hintStyle: GoogleFonts.outfit(
       color: const Color.fromARGB(153, 61, 61, 66),
       fontSize: 16.0,
     ),
-    helperStyle: GoogleFonts.montserrat(
+    helperStyle: GoogleFonts.outfit(
       color: const Color.fromARGB(153, 61, 61, 66),
       fontSize: 16.0,
     ),
@@ -141,7 +141,7 @@ lightTheme = ThemeData(
       );
     }),
     labelTextStyle: MaterialStateTextStyle.resolveWith((states) {
-      return GoogleFonts.montserrat(
+      return GoogleFonts.outfit(
         color: Colors.black,
         fontSize: 14.0,
       );

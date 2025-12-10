@@ -16,6 +16,7 @@ class CameraPageController extends GetxController {
 
 
   var cameraOpen = false.obs; // Flag to track camera open status
+  bool _isDisposed = false;
 
   // Use ImagePicker to pick an image from the camera
   Future<int> captureAndCropImage() async {
@@ -26,21 +27,30 @@ class CameraPageController extends GetxController {
         preferredCameraDevice: CameraDevice.front,
       );
 
-      if (photo != null&& await File(photo.path).exists()) {
+      if (photo != null && await File(photo.path).exists()) {
         await Future.delayed(const Duration(milliseconds: 300));
 
         imagePath.value = photo.path;
         camVisible.value = false; // Hide camera preview after capture
 
-        await _cropImage(photo); // Crop the image after capture
+        // 🚫 No cropping — directly read and encode image
+        final imageBytes = await File(photo.path).readAsBytes();
+        croppedImageFile.value = XFile(photo.path);
+        croppedImageFiles.add(XFile(photo.path));
+        base64img.value = base64.encode(imageBytes);
+
+        debugPrint("✅ Captured image path: ${photo.path}");
+        debugPrint("✅ Base64 length: ${base64img.value.length}");
+
         return 1;
-        // Get.back(); // Go back after capturing the image
-        // Get.back(); // Go back after capturing the image
       }
       else {
         return 0; // ❌ cancelled
       }
     } catch (e) {
+      if (!_isDisposed) {
+        debugPrint("Error capturing image: $e");
+      }
       print("Error capturing image: $e");
       return 0; // ❌ error
 
@@ -51,8 +61,9 @@ class CameraPageController extends GetxController {
   Future<void> _cropImage(XFile? photo) async {
     ///no
 
-    if (photo == null || !(await File(photo.path).exists())) return;
-
+    if (_isDisposed || photo == null || !(await File(photo.path).exists())) {
+      return;
+    }
     try{
         final croppedFile = await ImageCropper().cropImage(
           sourcePath: Platform.isAndroid ? photo.path : photo.path,
@@ -74,7 +85,7 @@ class CameraPageController extends GetxController {
           ],
         );
 
-        if (croppedFile != null) {
+        if (croppedFile != null&& !_isDisposed) {
           final imageBytes = await File(croppedFile.path).readAsBytes();
           croppedImageFile.value = XFile(croppedFile.path);
           croppedImageFiles.add(XFile(croppedFile.path)); // Add to the list
@@ -82,8 +93,15 @@ class CameraPageController extends GetxController {
           print("Base64 Image: ${base64img.value}");
         }
       }catch(e){
-        Get.snackbar('Alert!', "Error:$e",overlayBlur: 2.0,backgroundColor: Colors.red,colorText: Colors.white);
-      }
+      if (!_isDisposed) {
+        Get.snackbar(
+          'Alert!',
+          "Error: $e",
+          overlayBlur: 2.0,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }      }
 
 
   }
@@ -95,6 +113,7 @@ class CameraPageController extends GetxController {
   }
   @override
   void onClose() {
+    _isDisposed = true;
     super.onClose();
   }
 }

@@ -14,7 +14,7 @@ import 'data/ActiveCheckListAm.dart';
 import 'data/AuditSummary.dart';
 import 'data/LPDSection.dart';
 import 'OutletSelectScreen.dart';
-import 'checkListScreen_lpd.dart';
+import 'check_list_segregation_screen.dart';
 
 
 class amCheckListScreen extends StatefulWidget {
@@ -84,7 +84,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => checkListScreen_lpd(
+                  builder: (context) => CheckListSegregationScreen(
                       1,
                       widget.mGetActvityTypes,
                       widget.locationsList,
@@ -108,7 +108,7 @@ class _amCheckListScreenState extends State<amCheckListScreen>
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => checkListScreen_lpd(
+                                builder: (context) => CheckListSegregationScreen(
                                     1,
                                     widget.mGetActvityTypes,
                                     widget.locationsList,

@@ -27,7 +27,7 @@ import 'checkInOutScreenDilo.dart';
 import 'checkListItemScreen.dart';
 import 'checkListItemScreen_Lpd.dart';
 import 'checkListScreen.dart';
-import 'checkListScreen_lpd.dart';
+import 'check_list_segregation_screen.dart';
 import 'imageUploadScreen.dart';
 import 'mainCntrl.dart';
 

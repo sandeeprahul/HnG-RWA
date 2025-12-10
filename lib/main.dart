@@ -21,6 +21,7 @@ import 'package:hng_flutter/PageRetail.dart';
 import 'package:hng_flutter/ThemeData_.dart';
 import 'package:hng_flutter/core/light_theme.dart';
 import 'package:hng_flutter/loginBinding.dart';
+import 'package:hng_flutter/new_camera_handling_for_lower_version/cameraPageControllerForLowerVersions.dart';
 
 // import 'package:hng_flutter/presentation/ai_home_page.dart';
 import 'package:hng_flutter/presentation/order_list_screen.dart';
@@ -53,7 +54,10 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  Get.put(CameraPageController()); // Register the controller once
+  Get.put(CameraPageControllerForLowerVersions()); // Register the controller once
+  // Get.put(CameraPageController()); // Register the controller once
+
+
 
   runApp(GetMaterialApp(
       theme: lightTheme,
@@ -62,6 +66,9 @@ Future<void> main() async {
       debugShowCheckedModeBanner: false,
       // home: const OrderListScreen())
       home: const GifScreen()));
+
+
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   // WidgetsBinding.instance;
@@ -250,11 +257,6 @@ class _SplashScreenState extends State<SplashScreen> {
       child: MaterialApp(
           theme: lightTheme,
 
-          /*theme: ThemeData(
-
-            primarySwatch: Colors.blue,
-            fontFamily: 'Montserrat',
-          ),*/
           debugShowCheckedModeBanner: false,
           home: Scaffold(
               resizeToAvoidBottomInset: true,

@@ -31,7 +31,7 @@ import 'data/AmHeaderQuestionEmployee.dart';
 import 'data/AmHeaderQuestionStoreAudit.dart';
 import 'data/GetChecklist.dart';
 import 'data/LPDSection.dart';
-import 'checkListScreen_lpd.dart';
+import 'check_list_segregation_screen.dart';
 
 class AmAcceptSelectionScreen_Employee extends StatefulWidget {
   // const AmAcceptSelectionScreen({Key? key}) : super(key: key);
@@ -192,7 +192,7 @@ class _AmAcceptSelectionScreen_EmployeeState
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => checkListScreen_lpd(
+                    builder: (context) => CheckListSegregationScreen(
                       1,
                       widget.mGetActvityTypes,
                       widget.locationsList,
@@ -216,7 +216,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => checkListScreen_lpd(
+                                    builder: (context) => CheckListSegregationScreen(
                                       1,
                                       widget.mGetActvityTypes,
                                       widget.locationsList,
@@ -368,12 +368,10 @@ class _AmAcceptSelectionScreen_EmployeeState
                               if (showSelectAll == false) {
                                 setState(() {
                                   showSelectAll = true;
-                                  // signleSelection = false;
                                 });
                               } else {
                                 setState(() {
                                   showSelectAll = false;
-                                  // signleSelection = false;
                                 });
                               }
                             },
@@ -1580,6 +1578,8 @@ class _AmAcceptSelectionScreen_EmployeeState
 
       print('URL->$url');
       var responseData = json.decode(response.body);
+      debugPrint(const JsonEncoder.withIndent('  ').convert(responseData));
+
       print('responseData->$responseData');
 
       // final amHeaderQuestionStoreAudit = amHeaderQuestionStoreAuditFromJson(jsonString);
@@ -1644,7 +1644,7 @@ class _AmAcceptSelectionScreen_EmployeeState
 
       var userID = prefs.getString('userCode') ?? '105060';
       String url =
-          "${Constants.apiHttpsUrl}/Employee/HeaderQuestion/${widget.activeCheckList.empChecklistAssignId}/$employeeCode";
+          "${Constants.apiHttpsUrl}/Employee/HeaderQuestion/${widget.activeCheckList.empChecklistAssignId}/$userID";///,employeeCode
 
       final response =
           await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
@@ -2131,7 +2131,7 @@ class _AmAcceptSelectionScreen_EmployeeState
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => checkListScreen_lpd(
+                      builder: (context) => CheckListSegregationScreen(
                         1,
                         widget.mGetActvityTypes,
                         widget.locationsList,
