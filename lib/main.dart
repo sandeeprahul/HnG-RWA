@@ -22,6 +22,7 @@ import 'package:hng_flutter/ThemeData_.dart';
 import 'package:hng_flutter/core/light_theme.dart';
 import 'package:hng_flutter/loginBinding.dart';
 import 'package:hng_flutter/new_camera_handling_for_lower_version/cameraPageControllerForLowerVersions.dart';
+import 'package:hng_flutter/presentation/dashboard_v2_page.dart';
 
 // import 'package:hng_flutter/presentation/ai_home_page.dart';
 import 'package:hng_flutter/presentation/order_list_screen.dart';
@@ -65,7 +66,8 @@ Future<void> main() async {
       // initialBinding: loginBinding(),
       debugShowCheckedModeBanner: false,
       // home: const OrderListScreen())
-      home: const GifScreen()));
+      home: const DashboardV2Page()));
+      // home: const GifScreen()));
 
 
 
