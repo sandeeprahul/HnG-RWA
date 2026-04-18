@@ -7,30 +7,27 @@ import '../core/light_theme.dart';
 import '../presentation/scan_qr_page.dart';
 
 class ProductQuickEnquiryWidget extends StatelessWidget {
-   const ProductQuickEnquiryWidget({super.key});
+  const ProductQuickEnquiryWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => const ProductQuickEnquiryPage()));
       },
       child: Container(
-        margin: const EdgeInsets.only(
-            left: 15, right: 15, bottom: 5),
-        padding: const EdgeInsets.only(
-            left: 15, right: 15, top: 15, bottom: 10),
+        margin: const EdgeInsets.only(left: 15, right: 15, bottom: 5),
+        padding:
+            const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 10),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: const BorderRadius.all(Radius.circular(15)),
             boxShadow: [
               BoxShadow(
-                  spreadRadius: 1,
-                  blurRadius: 4,
-                  color: (Colors.grey[200]!))
+                  spreadRadius: 1, blurRadius: 4, color: (Colors.grey[200]!))
             ]),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -48,8 +45,8 @@ class ProductQuickEnquiryWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Product Quick Enquiry ',
-                style: lightTheme.textTheme.labelSmall!.copyWith(
-                    fontSize: 14, fontWeight: FontWeight.bold),
+                style: lightTheme.textTheme.labelSmall!
+                    .copyWith(fontSize: 14, fontWeight: FontWeight.bold),
 
                 /* style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.bold),*/

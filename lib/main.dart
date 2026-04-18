@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/AppPages.dart';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -52,24 +53,22 @@ Future<void> main() async {
 
   final dbPath = await getDatabasesPath();
   print('Database path: $dbPath');
+  GoogleFonts.config.allowRuntimeFetching = true;
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  Get.put(CameraPageControllerForLowerVersions()); // Register the controller once
+  Get.put(
+      CameraPageControllerForLowerVersions()); // Register the controller once
   // Get.put(CameraPageController()); // Register the controller once
-
-
-
   runApp(GetMaterialApp(
       theme: lightTheme,
       getPages: AppPages.pages,
       // initialBinding: loginBinding(),
       debugShowCheckedModeBanner: false,
       // home: const OrderListScreen())
-      home: const DashboardV2Page()));
-      // home: const GifScreen()));
-
-
+      // home: const DashboardV2Page()));
+      home: const GifScreen()));
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -256,21 +255,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
-      child: MaterialApp(
-          theme: lightTheme,
-
-          debugShowCheckedModeBanner: false,
-          home: Scaffold(
-              resizeToAvoidBottomInset: true,
-              body: SafeArea(
-                  child: loading
-                      ? const CircularProgressIndicator()
-                      : loggedIIn
-                          // ? const HomePage()
-                          ? const HomeScreen()
-                          // : PageRetail()
-                          : const LoginScreen()))),
-    );
+        child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            body: SafeArea(
+                child: loading
+                    ? const CircularProgressIndicator()
+                    : loggedIIn
+                        // ? const HomePage()
+                        ? const HomeScreen()
+                        // : PageRetail()
+                        : const LoginScreen())));
   }
 
   @override

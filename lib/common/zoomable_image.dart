@@ -20,7 +20,11 @@ class _ZoomableImageState extends State<ZoomableImage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.deepOrangeAccent,
+        // leading: const BackButton(color: Colors.black,),
+        // title: const Text('Zoomable Image'),
+      ),
       body: GestureDetector(
         onScaleStart: (details) {
           _previousScale = _scale;

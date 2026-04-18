@@ -6,12 +6,19 @@ lightTheme = ThemeData(
   useMaterial3: true,
   // primaryColor:  const Color(0xFF81D4FA),
   primaryColor: Colors.orange,
+  fontFamily: GoogleFonts.outfit().fontFamily,
 
+  // colorScheme: ColorScheme.fromSeed(
+  //   seedColor: Colors.deepOrangeAccent,
+  //   // onSurface: Colors.black, // This controls the default text color in M3
+  // ),
   // colorScheme: lightColorScheme,
-  textTheme: GoogleFonts.outfitTextTheme().apply(
+  // textTheme: GoogleFonts.outfitTextTheme().apply(
+  textTheme: GoogleFonts.outfitTextTheme(
+  )/*.apply(
     bodyColor: Colors.black,
     displayColor: Colors.black,
-  ),
+  ),*/,
   appBarTheme: const AppBarTheme(
     scrolledUnderElevation: 4.0,
     backgroundColor: Color(0xffF5F5F5),
@@ -59,7 +66,8 @@ lightTheme = ThemeData(
       ),
       // foregroundColor: Colors.blue,
       backgroundColor: Colors.blue,// Button text color
-      textStyle:  GoogleFonts.outfit(fontSize: 16,color: Colors.white), // Button text style
+      foregroundColor: Colors.white, // Add this to ensure text is white
+      textStyle:  GoogleFonts.outfit(fontSize: 16), // Button text style
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -68,7 +76,9 @@ lightTheme = ThemeData(
       borderRadius: BorderRadius.circular(4.0),
     ),
     backgroundColor: const Color(0xfff76613),
-    textStyle: GoogleFonts.outfit(fontSize: 16.0, color: Colors.white),
+        foregroundColor: Colors.white, // Add this to ensure text is white
+
+        textStyle: GoogleFonts.outfit(fontSize: 16.0),
   )),
   filledButtonTheme: FilledButtonThemeData(
     style: FilledButton.styleFrom(

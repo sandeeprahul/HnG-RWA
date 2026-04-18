@@ -55,9 +55,16 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
-                itemCount: auditData.length,
+                itemCount: auditData.length ,
                 padding: const EdgeInsets.all(16),
                 itemBuilder: (BuildContext context, int index) {
+                  // 2. Check if we are at the last index
+                  // bool isStaticItem = index == auditData.length;
+
+                  // if (isStaticItem) {
+                  //   return _buildStaticOmsTile(context);
+                  // }
+
                   final audit = auditData[index];
                   final formattedAuditName =
                       StringUtils.formatWithSpaces(audit.auditName);
@@ -120,8 +127,8 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                                     1)), //true permanent//false temporary
                           );
                         } else if (audit.auditId == 107) {
-                          askPermission(from:0);
-                    /*  Navigator.push(
+                          askPermission(from: 0);
+                          /*  Navigator.push(
                             context,
                             MaterialPageRoute(
                                 // fullscreenDialog: true,
@@ -137,8 +144,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                                   builder: (context) =>
                                       const OrderManagementScreen()));
                         } else if (audit.auditId == 109) {
-                          askPermission(from:1);
-
+                          askPermission(from: 1);
                         }
                       },
                       child: Column(
@@ -240,6 +246,56 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
               ));
   }
 
+  Widget _buildStaticOmsTile(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          // Using a slightly different blue or your preferred color
+          colors: [Colors.blue.shade300, Colors.blue.shade500],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          // Define navigation for H&G OMS here
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => YourOMSScreen()));
+        },
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: Icon(
+                Icons.business_center, // Choose an appropriate icon
+                color: Colors.white,
+                size: 60,
+              ),
+            ),
+            SizedBox(height: 5),
+            Center(
+              child: Text(
+                "H&G OMS",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> sendTOStoreTransferPage(bool isPermanant) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -325,7 +381,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
     );
   }
 
-  Future<void> askPermission( {required int from}) async {
+  Future<void> askPermission({required int from}) async {
     // var status = await Permission.photos.request();
     await Permission.storage.request();
     await Permission.photos.request();
@@ -337,15 +393,13 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        // fullscreenDialog: true,
-          builder: (context) =>
-           WebViewScreen(from:from,userId:userId)),
+          // fullscreenDialog: true,
+          builder: (context) => WebViewScreen(from: from, userId: userId)),
 
       ///dashboard = 0 , forms and reports = 1
     );
 
-
-  /*  Navigator.push(
+    /*  Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>

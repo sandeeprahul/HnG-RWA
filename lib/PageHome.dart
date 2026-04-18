@@ -479,93 +479,194 @@ class _PageHomeState extends State<PageHome> {
       ),
     );
   }
-
-  Widget menuHomeWidgets({required String title, required String tag,required IconData icon}) {
+  Widget menuHomeWidgets({
+    required BuildContext context, // Added context
+    required String title,
+    required String tag,
+    required IconData icon,
+    VoidCallback? onTap, // Added onTap callback
+  })
+  {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 8,
+            color: Colors.grey.withOpacity(0.2), // Slightly softer shadow
+            spreadRadius: 1,
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Avatar with gradient background
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                  Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              size: 24,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
+      child: Material( // Required for InkWell ripple to show correctly
 
-          const SizedBox(width: 12),
-
-          // Title with better typography
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
+                // Icon with gradient background
+                Container(
+                  width: 44, // Slightly larger for better tap target look
+                  height: 44,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                        Theme.of(context).colorScheme.secondary.withOpacity(0.15),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 24,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  tag,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
+
+                const SizedBox(width: 15),
+
+                // Title and Tag
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min, // Keep height tight
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        tag,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Trailing Arrow
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: Colors.grey[400],
                   ),
                 ),
               ],
             ),
           ),
-
-          // Arrow with animation
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
+        ),
       ),
-    ).animate().fadeIn(duration: 500.ms).slideX();
+    ).animate().fadeIn(duration: 500.ms).slideX(begin: 0.1, end: 0);
   }
+  // Widget menuHomeWidgets({required String title, required String tag,required IconData icon}) {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+  //     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(16),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.grey.withOpacity(0.3),
+  //           spreadRadius: 2,
+  //           blurRadius: 8,
+  //           offset: const Offset(0, 4),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.center,
+  //       children: [
+  //         // Avatar with gradient background
+  //         Container(
+  //           width: 40,
+  //           height: 40,
+  //           decoration: BoxDecoration(
+  //             gradient: LinearGradient(
+  //               colors: [
+  //                 Theme.of(context).colorScheme.primary.withOpacity(0.2),
+  //                 Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+  //               ],
+  //               begin: Alignment.topLeft,
+  //               end: Alignment.bottomRight,
+  //             ),
+  //             shape: BoxShape.circle,
+  //           ),
+  //           child: Icon(
+  //             icon,
+  //             size: 24,
+  //             color: Theme.of(context).colorScheme.primary,
+  //           ),
+  //         ),
+  //
+  //         const SizedBox(width: 12),
+  //
+  //         // Title with better typography
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 title,
+  //                 style: const TextStyle(
+  //                   fontSize: 16,
+  //                   fontWeight: FontWeight.w700,
+  //                   color: Colors.black87,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 4),
+  //               Text(
+  //                 tag,
+  //                 style: TextStyle(
+  //                   fontSize: 12,
+  //                   color: Colors.grey[600],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //
+  //         // Arrow with animation
+  //         Container(
+  //           width: 36,
+  //           height: 36,
+  //           decoration: BoxDecoration(
+  //             color: Colors.grey[100],
+  //             shape: BoxShape.circle,
+  //           ),
+  //           child: Icon(
+  //             Icons.arrow_forward_ios,
+  //             size: 16,
+  //             color: Colors.grey[600],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   ).animate().fadeIn(duration: 500.ms).slideX();
+  // }
 // decoration: const BoxDecoration(
 //         gradient: LinearGradient(
 //           begin: Alignment.topCenter,
@@ -713,7 +814,7 @@ class _PageHomeState extends State<PageHome> {
                         },
                         child: menuHomeWidgets(
                             title: "My Team Activities",
-                            tag: "View team activities.", icon: Icons.group_outlined),
+                            tag: "View team activities.", icon: Icons.group_outlined, context: context),
                       )
                     : const SizedBox();
               }),
@@ -730,7 +831,7 @@ class _PageHomeState extends State<PageHome> {
                         },
                         child: menuHomeWidgets(
                             title: "Product Quick Enquiry",
-                            tag: "Get Product Details.", icon: Icons.details))
+                            tag: "Get Product Details.", icon: Icons.details, context: context))
                     : const SizedBox();
               }),
 

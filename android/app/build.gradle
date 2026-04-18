@@ -33,7 +33,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("/Users/sandeeprahul/Desktop/backup/hng/android/loghg")
+            storeFile file("/Users/sandeeprahul/StudioProjects/hng/android/loghg")
             storePassword "He@lth@9"
             keyAlias "He@lth@9"
             keyPassword "He@lth@9"

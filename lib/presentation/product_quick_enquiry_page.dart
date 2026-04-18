@@ -31,7 +31,6 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
   Map<String, dynamic>? productData;
 
   Future<void> fetchProductDetails(String code) async {
-
     SharedPreferences pref = await SharedPreferences.getInstance();
     var userCode = pref.getString('userCode');
     // var locationCode = "106";
@@ -45,8 +44,10 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
     });
 
     try {
-      final response = await http.get(url).timeout(const Duration(seconds: 100), onTimeout: () {
-        throw TimeoutException('The connection has timed out. Please try again.');
+      final response = await http.get(url).timeout(const Duration(seconds: 100),
+          onTimeout: () {
+        throw TimeoutException(
+            'The connection has timed out. Please try again.');
       });
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -62,7 +63,8 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
       }
     } catch (e) {
       if (e is TimeoutException) {
-        _showError('Request timed out. Please check your connection and try again.');
+        _showError(
+            'Request timed out. Please check your connection and try again.');
       } else {
         _showError('An error occurred: $e');
       }
@@ -90,8 +92,6 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
       fetchProductDetails(scannedCode);
     }
   }
-
-
 
   Widget _buildDetailRow(String title, String value) {
     return Padding(
@@ -136,10 +136,9 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
           // Product Image
           Center(
             child: InkWell(
-              onTap: (){
-                Get.to(ZoomableImage(
-                    imageUrl:
-                    productData!['productImageUrl']));
+              onTap: () {
+                Get.to(
+                    ZoomableImage(imageUrl: productData!['productImageUrl']),fullscreenDialog: true);
               },
               child: Image.network(
                 productData['productImageUrl'] ?? '', // Image URL
@@ -154,15 +153,16 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
               ),
             ),
           ),
-          const SizedBox(height: 16), // Add some spacing after the image
+          const SizedBox(height: 16),
+          // Add some spacing after the image
           Text(
             textAlign: TextAlign.center,
             '${productData['skU_NAME']}\n',
-            style: const TextStyle(fontSize: 16,color: Colors.black),
+            style: const TextStyle(fontSize: 16, color: Colors.black),
             // overflow: TextOverflow.ellipsis,
           ),
           Container(
-            color:Colors.white   , // Alternate background
+            color: Colors.white, // Alternate background
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -173,8 +173,13 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                 ),
                 Flexible(
                   child: Text(
-                      '${productData['availability']}',
-                    style:  TextStyle(fontSize: 14,fontWeight: FontWeight.bold,color: productData['availability']=="Available"?Colors.green:Colors.red),
+                    '${productData['availability']}',
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: productData['availability'] == "Available"
+                            ? Colors.green
+                            : Colors.red),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -182,26 +187,50 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
             ),
           ),
           Container(
-            color: Colors.grey[200] , // Alternate background
+            color: Colors.grey[200], // Alternate background
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Average Daily Sales',
+                  'Days of Stock',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 Flexible(
                   child: Text(
-                      '${productData['avarageDailySales']}',
-                    style:  const TextStyle(fontSize: 14,fontWeight: FontWeight.bold,),
+                    "${productData['daysOfSale'] ?? ''} days",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-          ),  Container(
-            color: Colors.grey[200] , // Alternate background
+          ),
+          // Container(
+          //   color: Colors.grey[200] , // Alternate background
+          //   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       const Text(
+          //         'Average Daily Sales',
+          //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          //       ),
+          //       Flexible(
+          //         child: Text(
+          //             '${productData['avarageDailySales']}',
+          //           style:  const TextStyle(fontSize: 14,fontWeight: FontWeight.bold,),
+          //           overflow: TextOverflow.ellipsis,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          Container(
+            color: Colors.grey[200], // Alternate background
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -212,8 +241,11 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                 ),
                 Flexible(
                   child: Text(
-                      '${productData['rangeStatus']}',
-                    style:  const TextStyle(fontSize: 14,fontWeight: FontWeight.bold,),
+                    '${productData['rangeStatus']}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -222,25 +254,26 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
           ),
 
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             // padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
                 Text(
                   textAlign: TextAlign.start,
                   'Promotion:',
-                  style: TextStyle(fontSize: 16,color: Colors.black),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
                   // overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
-          ),Container(
+          ),
+          Container(
             alignment: Alignment.topLeft,
-            padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             color: Colors.yellow,
             child: Text(
               '${productData['promotion']}',
-              style: const TextStyle(fontSize: 16,color: Colors.black),
+              style: const TextStyle(fontSize: 16, color: Colors.black),
               // overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -285,14 +318,14 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
   String locationCode = '';
   String userId = '';
   String locationName = '';
+
   @override
   void initState() {
     super.initState();
     loadLocationCode();
-
   }
-  Future<void> loadLocationCode() async {
 
+  Future<void> loadLocationCode() async {
     final prefs = await SharedPreferences.getInstance();
 
     setState(() {
@@ -313,8 +346,8 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
     if (selectedLocation != null) {
       print("Selected Location: ${selectedLocation['locationName']}");
       setState(() {
-        locationCode =selectedLocation['locationCode'] ?? 'No Code Found';
-        locationName =selectedLocation['locationName'] ?? 'No Name Found';
+        locationCode = selectedLocation['locationCode'] ?? 'No Code Found';
+        locationName = selectedLocation['locationName'] ?? 'No Name Found';
       });
     }
   }
@@ -329,7 +362,7 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Product Quick Enquiry",
-          style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
         ),
       ),
       /* appBar: AppBar(
@@ -344,8 +377,6 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
             // const SizedBox(height: 8,),
             Row(
               children: [
-
-
                 Expanded(
                   child: TextField(
                     controller: _codeController,
@@ -362,11 +393,9 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                         print("onSubmitted:$d");
                       }
                     },
-
                     decoration: InputDecoration(
                       hintText: 'Enter Code or Scan Product',
                       border: const OutlineInputBorder(),
-
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.qr_code_scanner),
                         onPressed: _scanProduct,
@@ -378,18 +407,19 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 8,),
+            const SizedBox(
+              height: 8,
+            ),
 
             InkWell(
-              onTap: (){
-                showLocationDialog(context,"70002");
+              onTap: () {
+                showLocationDialog(context, "70002");
               },
               child: LocationDisplay(
                 locationCode: locationCode,
                 locationName: locationName,
               ),
             ),
-
 
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -400,7 +430,7 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                                 'No product data available. Please search or scan.'),
                           )
                         : _buildProductDetails(productData!)),
-           /* const Text(
+            /* const Text(
               '\nNote: This Functionality will work only when the staff is inside the store',
               style: TextStyle(fontStyle: FontStyle.italic),
             ),*/
