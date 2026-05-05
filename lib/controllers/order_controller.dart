@@ -11,6 +11,7 @@ import 'location_controller.dart';
 class OrderController extends GetxController {
   var isLoading = true.obs;
   var isError = false.obs;
+  var isHyperLocal = false.obs; // Added flag for OMS source
   var orders = <Map<String, dynamic>>[].obs;
   final LocationController locationController = Get.put(LocationController());
 
@@ -72,6 +73,47 @@ class OrderController extends GetxController {
         isError(true);
       }
     } catch (e) {
+      isError(true);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchEcomOrders(String storeID, String orderType, String status) async {
+    try {
+      orders.clear();
+      isLoading(true);
+      isError(false);
+
+      final url = "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/StoreOrderlist/$storeID/$orderType/open";
+      // final url = "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/StoreOrderlist/$storeID/$orderType/$status";
+
+      final response = await http.get(Uri.parse(url));
+
+      print("ECOM Orders URL: $url");
+      print("ECOM Orders Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'ok') {
+          orders.value = (data['data'] as List)
+              .map((order) => {
+                    'orderId': order['orderId'],
+                    'status': order['status'],
+                    'paymentMethod': order['paymentModeName'],
+                    'paymentStatus': order['paymentModeStatus'],
+                    'date': _formatDate(order['orderDate']),
+                    'icon': _getOrderIcon(order['status']),
+                    'iconColor': _getOrderIconColor(order['status']),
+                    'shippingMethod': order['shippingMethod'],
+                  })
+              .toList();
+        }
+      } else {
+        isError(true);
+      }
+    } catch (e) {
+      print("Error fetching ECOM orders: $e");
       isError(true);
     } finally {
       isLoading(false);

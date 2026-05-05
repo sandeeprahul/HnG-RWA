@@ -12,11 +12,13 @@ class OrderManagementScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Order Management Process',
-          style: TextStyle(color: Colors.white,fontSize: 16),
+          style: TextStyle(color: Colors.white, fontSize: 16),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
 
+        // backgroundColor: Colors.orange,
         backgroundColor: Colors.orange,
+
         // centerTitle: true,
       ),
       body: Padding(
@@ -31,7 +33,8 @@ class OrderManagementScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>  const OrderListScreen()));
+                        builder: (context) =>
+                            const OrderListScreen())); // isHyperLocal: true//
 
                 // Add functionality here
               },
@@ -44,7 +47,9 @@ class OrderManagementScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>  const OutForDeliveryScreen(type: 0,)));
+                        builder: (context) => const OutForDeliveryScreen(
+                              type: 0,
+                            )));
                 // Add functionality here
                 //OutForDeliveryScreen
               },
@@ -57,7 +62,9 @@ class OrderManagementScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>  const OutForDeliveryScreen(type: 1,)));
+                        builder: (context) => const OutForDeliveryScreen(
+                              type: 1,
+                            )));
                 // Add functionality here
               },
             ),
@@ -73,7 +80,8 @@ class CustomButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const CustomButton({super.key,
+  const CustomButton({
+    super.key,
     required this.icon,
     required this.label,
     required this.onPressed,

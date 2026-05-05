@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/common/constants.dart';
+import 'package:hng_flutter/presentation/delivery_options_screen.dart';
 import 'package:hng_flutter/presentation/home/operations/store_transfer_page.dart';
 import 'package:hng_flutter/presentation/home/operations/store_visit/store_visit_page.dart';
 import 'package:hng_flutter/presentation/home/operations/support_team_page.dart';
@@ -55,15 +56,15 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
-                itemCount: auditData.length ,
+                itemCount: auditData.length + 1,
                 padding: const EdgeInsets.all(16),
                 itemBuilder: (BuildContext context, int index) {
                   // 2. Check if we are at the last index
-                  // bool isStaticItem = index == auditData.length;
+                  bool isStaticItem = index == auditData.length;
 
-                  // if (isStaticItem) {
-                  //   return _buildStaticOmsTile(context);
-                  // }
+                  if (isStaticItem) {
+                    return _buildStaticOmsTile(context);
+                  }
 
                   final audit = auditData[index];
                   final formattedAuditName =
@@ -269,7 +270,8 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
       child: InkWell(
         onTap: () {
           // Define navigation for H&G OMS here
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => YourOMSScreen()));
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryOptionsScreen()));
+          Get.to(const DeliveryOptionsScreen());
         },
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -286,8 +288,8 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
               child: Text(
                 "H&G OMS",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.white),
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
           ],

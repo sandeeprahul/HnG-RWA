@@ -47,7 +47,6 @@ var latGlobal = '';
 var lngGlobal = '';
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-
   var isSelected = 0;
   final PageController _pageController = PageController();
 
@@ -59,15 +58,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   var status_ = 0;
   bool isUpdated = false;
+
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
       // When app resumes, navigate to home and clear stack
       // Get.offAllNamed('/home'); // Replace with your home route
       await getPendingTasks();
-
     }
   }
+
   // Suppose this is your full list
   final List<GetActvityTypes> allAudits = [
     GetActvityTypes(
@@ -126,26 +126,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     ),
   ];
 
+  List<GetActvityTypes> get diloList =>
+      allAudits.where((e) => e.auditId == "1").toList();
 
+  List<GetActvityTypes> get storeAuditList =>
+      allAudits.where((e) => e.auditId == "2").toList();
 
-   List<GetActvityTypes> get diloList =>
-  allAudits.where((e) => e.auditId == "1").toList();
+  List<GetActvityTypes> get lpdAuditList =>
+      allAudits.where((e) => e.auditId == "3").toList();
 
-   List<GetActvityTypes>get  storeAuditList =>
-  allAudits.where((e) => e.auditId == "2").toList();
+  List<GetActvityTypes> get diloEmployeeList =>
+      allAudits.where((e) => e.auditId == "4").toList();
 
-   List<GetActvityTypes> get lpdAuditList =>
-  allAudits.where((e) => e.auditId == "3").toList();
+  List<GetActvityTypes> get amStoreAuditList =>
+      allAudits.where((e) => e.auditId == "5").toList();
 
-   List<GetActvityTypes> get diloEmployeeList =>
-  allAudits.where((e) => e.auditId == "4").toList();
-
-   List<GetActvityTypes> get amStoreAuditList =>
-  allAudits.where((e) => e.auditId == "5").toList();
-
-   List<GetActvityTypes> get virtualMerchPageList =>
-  allAudits.where((e) => e.auditId == "6").toList();
-
+  List<GetActvityTypes> get virtualMerchPageList =>
+      allAudits.where((e) => e.auditId == "6").toList();
 
   Widget _buildTaskItem(Map<String, dynamic> task) {
     // Determine color based on priority
@@ -198,61 +195,59 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         onTap: () {
           // Navigate to respective screen
           setState(() {
-
             showPendingTask = false;
-
           });
           if (task['targetScreen'] != null) {
             if (task['targetScreen'] == 'storeAudit') {
               // Get.back();
 
-              Get.to(() => OutletSelectionScreen( storeAuditList[0]))?.then((_) {
+              Get.to(() => OutletSelectionScreen(storeAuditList[0]))?.then((_) {
                 print("Back from Store Audit to MainScreen");
                 getPendingTasks();
-
               });
 
               //
-            } else if (task['targetScreen'] == 'employee') {///employeeDilo
+            } else if (task['targetScreen'] == 'employee') {
+              ///employeeDilo
               // Get.back();
 
-              Get.to( OutletSelectionScreen(diloList[0]))?.then((_) {
+              Get.to(OutletSelectionScreen(diloList[0]))?.then((_) {
                 print("Back from employee to MainScreen");
                 getPendingTasks();
               });
-
-            }else if (task['targetScreen'] == 'employeeDILO') {///employeeDilo
+            } else if (task['targetScreen'] == 'employeeDILO') {
+              ///employeeDilo
               // Get.back();
 
-              Get.to( OutletSelectionScreen(diloEmployeeList[0]))?.then((_) {
+              Get.to(OutletSelectionScreen(diloEmployeeList[0]))?.then((_) {
                 print("Back from EmployeeDILO to MainScreen");
                 getPendingTasks();
               });
-
             } else if (task['targetScreen'] == 'attendance') {
               // Get.back();
 
               Get.to(const AttendenceScreen())?.then((_) {
                 print("Back from attendance to MainScreen");
                 getPendingTasks();
-
               });
             } else if (task['targetScreen'] == 'leaveForm') {
               // Get.back();
 
-              Get.to(const EmployeeListScreen(formattedAuditName: 'Record Attendance',))?.then((_) {
+              Get.to(const EmployeeListScreen(
+                formattedAuditName: 'Record Attendance',
+              ))?.then((_) {
                 print("Back from leaveForm to MainScreen");
                 getPendingTasks();
-
               });
               //EmployeeListScreen
-            }
-            else if (task['targetScreen'] == 'checkIn') {
+            } else if (task['targetScreen'] == 'checkIn') {
               // Get.back();
 
               setState(() {
                 // showPendingTask = false;
-                _pageController.animateToPage(0, duration: const Duration(milliseconds: 100), curve: Curves.ease);
+                _pageController.animateToPage(0,
+                    duration: const Duration(milliseconds: 100),
+                    curve: Curves.ease);
               });
               //EmployeeListScreen
             }
@@ -280,7 +275,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _init() async {
-
     await getHomeData();
     await firebase();
     await getPendingTasks();
@@ -310,13 +304,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         var respo = jsonDecode(response.body);
 
-        if (respo['status'] == true) {///true
+        if (respo['status'] == true) {
+          ///true
           // _showTextAlert(context, respo['desctext']);
           setState(() {
             tasks = respo['data'];
             showPendingTask = true;
           });
-       /*   showForceTaskCompletionAlert(respo['data'], onReturn: (result) {
+          /*   showForceTaskCompletionAlert(respo['data'], onReturn: (result) {
             if (result == 'checkIn') {
               // do something special
               setState(() {
@@ -362,9 +357,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return Scaffold(
       body: SafeArea(
         child: Scaffold(
-          // appBar: AppBar(),
+            // appBar: AppBar(),
             body: Stack(
-
           children: [
             Column(
               children: [
@@ -376,7 +370,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       SizedBox(
                           height: 50,
                           width: 100,
-                          child: SvgPicture.network('https://ik.imagekit.io/hng/desktop-assets/svgs/logo.svg')),
+                          child: SvgPicture.network(
+                              'https://ik.imagekit.io/hng/desktop-assets/svgs/logo.svg')),
                       const Icon(
                         Icons.notifications,
                         size: 20,
@@ -534,24 +529,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ],
                         )))),
             Visibility(
-              visible: showPendingTask,
+                visible: showPendingTask,
                 child: Container(
                   padding: const EdgeInsets.all(30),
                   height: double.infinity,
                   width: double.infinity,
                   color: Colors.black.withOpacity(0.2),
                   child: Stack(
-
                     children: [
                       BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             color: Colors.white,
-
-                          ),                        ),
+                          ),
+                        ),
                       ),
                       Container(
                         height: double.infinity,
@@ -559,53 +552,53 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           color: Colors.white,
-
                         ),
                         child: InkWell(
-                          onTap: (){},
+                          onTap: () {},
                           child: Stack(
                             children: [
-
                               Container(
                                 // color: Colors.white,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
                                   color: Colors.white,
-
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 26),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 26),
                                 child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue[800],
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[800],
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Pending Tasks',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  child: const Text(
-                                    'Pending Tasks',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'Please complete these pending tasks:',
+                                      style: TextStyle(fontSize: 16),
                                     ),
-                                  ),
+                                    const SizedBox(height: 16),
+                                    ...tasks
+                                        .map((task) => _buildTaskItem(task))
+                                        .toList(),
+                                  ],
                                 ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Please complete these pending tasks:',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(height: 16),
-                                ...tasks.map((task) => _buildTaskItem(task)).toList(),
-                                              ],
-                                            ),
                               ),
                             ],
                           ),
@@ -689,7 +682,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             label: 'Home',
             isSelected: isSelected == 0,
             onTap: () async {
-
               setState(() {
                 isSelected = 0;
                 _pageController.animateToPage(
@@ -716,7 +708,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 );
               });
               await getPendingTasks();
-
             },
           ),
           _buildNavItem(
@@ -734,7 +725,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 );
               });
               await getPendingTasks();
-
             },
           ),
           _buildNavItem(
@@ -752,7 +742,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 );
               });
               await getPendingTasks();
-
             },
           ),
         ],
@@ -815,11 +804,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ),
     );
   }
-
-
-
-
-
 
   void showAuditSummaryDialog(BuildContext context) async {
     AuditSummary? summary = await fetchAuditSummary();
@@ -1078,4 +1062,3 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 }
-

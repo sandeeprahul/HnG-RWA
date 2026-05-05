@@ -15,7 +15,8 @@ import 'order_details_screen.dart';
 import 'package:http/http.dart' as http;
 
 class OrderListScreen extends StatefulWidget {
-  const OrderListScreen({super.key});
+  final bool isHyperLocal;
+  const OrderListScreen({super.key,  this.isHyperLocal=true});
 
   @override
   State<OrderListScreen> createState() => _OrderListScreenState();
@@ -284,9 +285,15 @@ class _OrderListScreenState extends State<OrderListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'All Orders',
-          style: TextStyle(color: Colors.white),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('All Orders', style: TextStyle(color: Colors.white,)),
+            Text(
+              widget.isHyperLocal ? 'HyperLocal OMS' : 'H&G OMS',
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+          ],
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.orange,
