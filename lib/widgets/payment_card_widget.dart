@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hng_flutter/controllers/order_details_controller.dart';
 
 import '../data/order_model.dart';
 
 class PaymentSummary extends StatelessWidget {
   final Order order;
-  final OrderDetailsController orderController;
+  final dynamic orderController;
 
   const PaymentSummary({
     super.key,

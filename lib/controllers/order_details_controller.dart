@@ -198,7 +198,10 @@ class OrderDetailsController extends GetxController {
               borderColors[skuCode] = Colors.green;
               borderColors.assignAll({...borderColors}); // ✅ Forces UI update
 
-              Get.back();
+              // Get.back();
+              Navigator.of(Get.context!).pop();
+
+              // Navigator.pop(context);
             },
             child: const Text(
               "Confirm",

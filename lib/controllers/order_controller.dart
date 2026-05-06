@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
 
-import '../data/UserLocations.dart';
 import 'location_controller.dart';
 
 class OrderController extends GetxController {
@@ -109,6 +109,14 @@ class OrderController extends GetxController {
                   })
               .toList();
         }
+      } else if (response.statusCode == 404) {
+        String msg = "Orders not found (404)";
+        try {
+          final data = json.decode(response.body);
+          msg = data['message'] ?? data['Message'] ?? msg;
+        } catch (_) {}
+        Fluttertoast.showToast(msg: msg);
+        isError(true);
       } else {
         isError(true);
       }
@@ -118,6 +126,44 @@ class OrderController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<bool> updateHandedOverToCustomer(String orderId) async {
+    try {
+      isLoading.value = true;
+      const url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/UpdateHandedOverToCustomer';
+      
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"Order_id": orderId}),
+      );
+
+      if (response.statusCode == 200) {
+        var responseBody = jsonDecode(response.body);
+        if (responseBody['status'] == "ok") {
+          Fluttertoast.showToast(
+            msg: responseBody['message'] ?? 'Order handed over successfully',
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
+          return true;
+        } else {
+          Fluttertoast.showToast(
+            msg: responseBody['message'] ?? 'Failed to update status',
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        }
+      } else {
+        Fluttertoast.showToast(msg: "Server returned ${response.statusCode}");
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Update failed: $e");
+    } finally {
+      isLoading.value = false;
+    }
+    return false;
   }
 
   IconData _getOrderIcon(String status) {

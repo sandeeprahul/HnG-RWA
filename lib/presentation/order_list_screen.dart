@@ -239,7 +239,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
       double.parse(location.longitude),
     );
 
-    if (distance <= 100.0) {
+    if (distance >= 100.0) {
       // Max 100 meters
 
       // Get.snackbar("Failure", "You are near the store");

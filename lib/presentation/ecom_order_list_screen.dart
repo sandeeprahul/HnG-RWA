@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +12,7 @@ import 'package:intl/intl.dart';
 import '../common/constants.dart';
 import '../controllers/order_controller.dart';
 import '../data/UserLocations.dart';
+import 'ecom_order_details_screen.dart';
 import 'order_details_screen.dart';
 
 class EcomOrderListScreen extends StatefulWidget {
@@ -111,7 +113,7 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
     }
 
     if (!status.isGranted) {
-      Get.snackbar("Permission Denied", "Location access is required for security verification.");
+      Fluttertoast.showToast(msg: "Location access is required for security verification.");
       setState(() { isLocationsLoading = false; });
       return;
     }
@@ -125,7 +127,7 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
         double.parse(location.longitude),
       );
 
-      if (distance <= 100.0) { // Using 5000m for testing as requested by common OMS standards, but user mentioned 100m. Let's stick to a reasonable check.
+      if (distance <= 1000.0) { // Allowing 1km range for store proximity
         setState(() {
           selectedLocation = location;
           isLocationsLoading = false;
@@ -136,7 +138,7 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
         _showAccessDeniedDialog(distance);
       }
     } catch (e) {
-      Get.snackbar("Error", "Could not verify your location.");
+      Fluttertoast.showToast(msg: "Could not verify your location.");
       setState(() { isLocationsLoading = false; });
     }
   }
@@ -181,7 +183,7 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
       floatingActionButton: selectedLocation != null ? FloatingActionButton(
         onPressed: _showStoreSelector,
         backgroundColor: Colors.orange,
-        child: const Icon(Icons.storefront_rounded, color: Colors.white),
+        child: const Icon(Icons.location_on_rounded, color: Colors.white),
       ) : null,
     );
   }
@@ -281,7 +283,7 @@ class _OrderCard extends StatelessWidget {
         ],
       ),
       child: InkWell(
-        onTap: () => Get.to(() => OrderDetailsScreen(order: order, selectedLocationCode: locationCode)),
+        onTap: () => Get.to(() => EcomOrderDetailsScreen(order: order, selectedLocationCode: locationCode)),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
