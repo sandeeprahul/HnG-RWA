@@ -1,3 +1,4 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:hng_flutter/controllers/order_controller.dart';
@@ -74,7 +75,7 @@ class DeliveryController extends GetxController {
     }
   }
 
-  Future<void> submitDeliveryDetails({
+  Future<bool> submitDeliveryDetails({
     required String name,
     required String mobile,
     required int minutes,
@@ -110,31 +111,59 @@ class DeliveryController extends GetxController {
         final responseData = jsonDecode(response.body);
 
         if (responseData["status"] == "ok") {
-          Get.back();
-          Get.snackbar("Success", responseData["message"],
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
-              duration: const Duration(seconds: 2));
+          // Get.back(result: true);
+          Navigator.of(Get.context!).pop();
+          //
+          // Get.snackbar("Success", responseData["message"],
+          //     backgroundColor: Colors.green,
+          //     colorText: Colors.white,
+          //     duration: const Duration(seconds: 2));
+          showErrorSnackbar("Success","${responseData['message']}",isSuccess: 1);
+
+
 
           final OrderController orderController = Get.put(OrderController(0));
           orderController.fetchOrders(locationCode);
 
-          // await Future.delayed(const Duration(milliseconds: 500));
-          // Close delivery popup
+          return true;
         } else {
-          Get.snackbar("Error", responseData["message"],
-              backgroundColor: Colors.red, colorText: Colors.white);
+          showErrorSnackbar("Error","${responseData['message']}");
+
+          // Get.snackbar("Error", responseData["message"],
+          //     backgroundColor: Colors.red, colorText: Colors.white);
         }
       } else {
-        Get.snackbar("Failed", "Failed to submit. Please try again.",
-            backgroundColor: Colors.red, colorText: Colors.white);
+        final responseData = jsonDecode(response.body);
+
+        /*Get.snackbar("Failed", "Failed to submit. Please try again.",
+            backgroundColor: Colors.red, colorText: Colors.white);*/
+
+        showErrorSnackbar("Failed","Failed to submit. Please try again\n${responseData['message']}");
+
       }
     } catch (e) {
       isLoading.value = false;
-      Get.snackbar("Error", "Something went wrong: $e",
-          backgroundColor: Colors.red, colorText: Colors.white);
+      // Get.snackbar("Error", "Something went wrong: $e",
+      //     backgroundColor: Colors.red, colorText: Colors.white);
+
+      showErrorSnackbar("Error","Something went wrong: $e");
     }
+    return false;
   }
+
+
+  void showErrorSnackbar(String title, String message,{int isSuccess=0}) {
+    // Get.snackbar(title, message,backgroundColor: Colors.red,colorText: Colors.white);
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor:isSuccess==1? Colors.green: Colors.red,
+        textColor: Colors.white,
+        fontSize: 14.0
+    );
+  }
+
 
   Future<void> submitDelivered({
     required String orderId,

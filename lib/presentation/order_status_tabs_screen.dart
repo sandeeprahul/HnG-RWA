@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:hng_flutter/presentation/ecom_out_for_delivery_screen.dart';
 import '../common/progress_dialog.dart';
 import 'ecom_order_list_screen.dart';
 
@@ -113,10 +114,22 @@ class _OrderStatusTabsScreenState extends State<OrderStatusTabsScreen> {
                         title: status['screenStatusName'],
                         subtitle: "View all ${status['screenStatusName']} orders",
                         onTap: () {
-                          Get.to(() => EcomOrderListScreen(
-                                orderType: widget.orderTypeName,
-                                status: status['screenStatusName'],
-                              ));
+                          if (status['screenStatusName'] == 'Delivered') {
+                            Get.to(() => EcomOutForDeliveryScreen(
+                                  type: 1, // 1 for OFD -> Delivered/Handover
+                                  orderType: widget.orderTypeName,
+                                ));
+                          } else if (status['screenStatusName'] == 'Out for Delivery') {
+                            Get.to(() => EcomOutForDeliveryScreen(
+                                  type: 0, // 0 for RTS -> OFD/Assignment
+                                  orderType: widget.orderTypeName,
+                                ));
+                          } else {
+                            Get.to(() => EcomOrderListScreen(
+                                  orderType: widget.orderTypeName,
+                                  status: status['screenStatusName'],
+                                ));
+                          }
                         },
                       ),
                     );

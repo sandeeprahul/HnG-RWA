@@ -15,8 +15,20 @@ class PaymentSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() { // Now it will update when the data changes
-      int totalChangedQuantity = _calculateTotalChangedQuantity();
+    return Obx(() {
+      // Explicitly access the observable map to ensure GetX always registers a dependency,
+      // even if order.items is empty and the loop doesn't run.
+      final selectedData = orderController.selectedProductData;
+      final _ = selectedData.length; 
+
+      int totalChangedQuantity = 0;
+      for (var item in order.items) {
+        if (selectedData.containsKey(item.skuCode)) {
+          int modifiedQty = selectedData[item.skuCode]["quantity"] ?? item.quantity;
+          totalChangedQuantity += modifiedQty;
+        }
+      }
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 46),
         child: Card(
@@ -27,7 +39,6 @@ class PaymentSummary extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            // margin: const EdgeInsets.only(bottom: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -43,10 +54,10 @@ class PaymentSummary extends StatelessWidget {
                 const Divider(thickness: 1.5, color: Colors.grey),
                 const SizedBox(height: 8),
                 _buildSummaryRow('Total Order Qty:', "${order.itemCount}"),
-                _buildSummaryRow('Total Order Value:', "${order.subTotal}"),
-                _buildSummaryRow('Discount:', "${order.discountTotal}"),
-                _buildSummaryRow('Total Invoice Value:', "${order.total}"),
-                _buildSummaryRow('Delivery Charges:', "${order.shippingPrice}"),
+                _buildSummaryRow('Total Order Value:', "₹${order.subTotal}"),
+                _buildSummaryRow('Discount:', "₹${order.discountTotal}"),
+                _buildSummaryRow('Total Invoice Value:', "₹${order.total}"),
+                _buildSummaryRow('Delivery Charges:', "₹${order.shippingPrice}"),
                 _buildSummaryRow('Total Changed Qty:', "$totalChangedQuantity"),
                 const SizedBox(height: 8),
               ],
@@ -55,20 +66,6 @@ class PaymentSummary extends StatelessWidget {
         ),
       );
     });
-  }
-
-  int _calculateTotalChangedQuantity() {
-    int totalChangedQty = 0;
-
-    for (var item in order.items) {
-      if (orderController.selectedProductData.containsKey(item.skuCode)) {
-        int originalQty = item.quantity;
-        int modifiedQty = orderController.selectedProductData[item.skuCode]["quantity"] ?? originalQty;
-        totalChangedQty += modifiedQty;
-      }
-    }
-
-    return totalChangedQty;
   }
 
   Widget _buildSummaryRow(String label, String value) {

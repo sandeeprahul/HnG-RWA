@@ -151,7 +151,7 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
         double.parse(location.latitude), double.parse(location.longitude),
       );
 
-      if (distance <= 1000.0) {
+      if (distance >= 100.0) {
         setState(() {
           selectedLocation = location;
           isLoadingLocations = false;
@@ -170,7 +170,7 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
   void _showAccessDeniedDialog(double distance) {
     Get.defaultDialog(
       title: "Access Restricted",
-      middleText: "You are ${distance.toStringAsFixed(0)}m away. Please be within 1km of the store.",
+      middleText: "You are ${distance.toStringAsFixed(0)}m away. Please be within 100 meters of the store.",
       textConfirm: "OK",
       confirmTextColor: Colors.white,
       onConfirm: () => Get.back(),
@@ -255,13 +255,17 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
+          TextButton(onPressed: () {
+            Navigator.of(Get.context!).pop();
+            }, child: const Text("Cancel")),
           Obx(() => ElevatedButton(
             onPressed: deliveryController.isLoading.value ? null : () {
               if (nameController.text.isEmpty || mobileController.text.length != 10) {
                 Fluttertoast.showToast(msg: "Please enter valid details");
                 return;
               }
+              Navigator.of(Get.context!).pop();
+
               deliveryController.submitDeliveryDetails(
                 name: nameController.text,
                 mobile: mobileController.text,
@@ -271,6 +275,7 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
               ).then((_) {
                 _fetchOrders();
               });
+
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
             child: deliveryController.isLoading.value 
@@ -283,27 +288,127 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
   }
 
   void _showHandedOverPopup(Map<String, dynamic> order) {
+    final DeliveryController deliveryController = Get.put(DeliveryController());
+    final nameController = TextEditingController();
+    final mobileController = TextEditingController();
+    final otpController = TextEditingController();
+
+    deliveryController.otpVerified.value = false;
+
     Get.dialog(
       AlertDialog(
-        title: Text("Hand Over to Customer", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-        content: Text("Are you sure you want to mark Order ${order['orderId']} as Handed Over to Customer?", style: GoogleFonts.outfit()),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
-          Obx(() => ElevatedButton(
-            onPressed: ecomController.isLoading.value ? null : () async {
-              bool success = await ecomController.updateHandedOverToCustomer(order['orderId']);
-              if (success) {
-                Get.back();
-                _fetchOrders();
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: ecomController.isLoading.value 
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : Text("Confirm Handover", style: GoogleFonts.outfit(color: Colors.white)),
-          )),
-        ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        contentPadding: const EdgeInsets.all(16),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Order ID: ${order['orderId']}',
+                style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+
+              _buildPopupField('Delivered to Person Name', nameController),
+              const SizedBox(height: 12),
+              _buildPopupField('Delivered to Mobile No', mobileController, isPhone: true),
+              const SizedBox(height: 4),
+
+              // Send OTP Button
+              Obx(() {
+                return ElevatedButton(
+                  onPressed: () {
+                    if (mobileController.text.isEmpty) {
+                      Get.snackbar('Alert', "Please enter Mobile number",
+                          overlayBlur: 2,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white);
+                    } else {
+                      deliveryController.sendOtp(mobileController.text,
+                          nameController.text, order['orderId']);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    minimumSize: const Size(double.infinity, 45),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: deliveryController.isLoading.value
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : Text(
+                          'Send OTP',
+                          style: GoogleFonts.outfit(color: Colors.white),
+                        ),
+                );
+              }),
+              const SizedBox(height: 16),
+
+              _buildPopupField('Verify Otp', otpController, isPhone: true),
+              const SizedBox(height: 4),
+
+              ElevatedButton(
+                onPressed: () {
+                  if (otpController.text.isNotEmpty) {
+                    deliveryController.verifyOtp(otpController.text);
+                  } else {
+                    Get.snackbar("Alert!", "Please enter otp",
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        overlayBlur: 2);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  minimumSize: const Size(double.infinity, 45),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Verify OTP',
+                  style: GoogleFonts.outfit(color: Colors.white),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Final Delivered Button (Only visible if OTP is verified)
+              Obx(() {
+                return ElevatedButton(
+                  onPressed: deliveryController.otpVerified.value
+                      ? () async {
+                          bool success = await ecomController.updateHandedOverToCustomer(order['orderId']);
+                          if (success) {
+                            Get.back();
+                            _fetchOrders();
+                          }
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    minimumSize: const Size(double.infinity, 45),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: ecomController.isLoading.value
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : Text(
+                          'Delivered',
+                          style: GoogleFonts.outfit(color: Colors.white),
+                        ),
+                );
+              }),
+            ],
+          ),
+        ),
       ),
+      barrierDismissible: false,
     );
   }
 

@@ -28,8 +28,10 @@ class EcomOrderDetailsController extends GetxController {
         headers: {"Content-Type": "application/json"},
       );
 
+      print("https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=$locationCode&ean_code=$skuCode");
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
+        print(responseData);
 
         if (responseData["statusCode"] == "201") {
           borderColors[skuCode] = Colors.red;
@@ -54,6 +56,7 @@ class EcomOrderDetailsController extends GetxController {
         borderColors[skuCode] = Colors.red;
         try {
           var responseBody = jsonDecode(response.body);
+          print(responseBody);
           showErrorSnackbar("Not Found", responseBody['message'] ?? responseBody['Message'] ?? "Product not found (404)");
         } catch (e) {
           showErrorSnackbar("Not Found", "Product not found (404)");

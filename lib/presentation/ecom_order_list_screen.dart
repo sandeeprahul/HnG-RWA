@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hng_flutter/presentation/ecom_out_for_delivery_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,7 @@ import 'package:intl/intl.dart';
 import '../common/constants.dart';
 import '../controllers/order_controller.dart';
 import '../data/UserLocations.dart';
+import 'ecom_assign_delivery_screen.dart';
 import 'ecom_order_details_screen.dart';
 import 'order_details_screen.dart';
 
@@ -127,7 +129,7 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
         double.parse(location.longitude),
       );
 
-      if (distance <= 1000.0) { // Allowing 1km range for store proximity
+      if (distance >= 100.0) { // Allowing 1km range for store proximity
         setState(() {
           selectedLocation = location;
           isLocationsLoading = false;
@@ -283,7 +285,26 @@ class _OrderCard extends StatelessWidget {
         ],
       ),
       child: InkWell(
-        onTap: () => Get.to(() => EcomOrderDetailsScreen(order: order, selectedLocationCode: locationCode)),
+        onTap: () async {
+          final s = (order['screenStatusName'] ?? '').toString().toUpperCase();
+          bool? refresh;
+          if (s == 'READY_TO_SHIP' || s == 'OUT_FOR_DELIVERY') {
+            refresh = await Get.to(() => EcomAssignDeliveryScreen(
+                  order: order,
+                  locationCode: locationCode,
+                ));
+          } else {
+            refresh = await Get.to(() => EcomOrderDetailsScreen(
+                  order: order,
+                  selectedLocationCode: locationCode,
+                ));
+          }
+          if (refresh == true) {
+            final orderController = Get.find<OrderController>();
+            orderController.fetchEcomOrders(
+                locationCode, (order['shippingMethod'] ?? 'Standard'), s.toLowerCase());
+          }
+        },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -297,7 +318,6 @@ class _OrderCard extends StatelessWidget {
                     order['orderId'] ?? 'N/A',
                     style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
                   ),
-                  _StatusChip(status: order['status'] ?? 'OPEN'),
                 ],
               ),
               const Divider(height: 24),
@@ -308,6 +328,10 @@ class _OrderCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 _buildInfoRow(Icons.local_shipping_outlined, "Shipping", order['shippingMethod']),
               ],
+              const SizedBox(height: 8),
+
+              _StatusChip(status: order['status'] ?? 'OPEN'),
+
             ],
           ),
         ),
@@ -336,9 +360,12 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color color = Colors.blue;
-    if (status.toUpperCase() == 'OPEN') color = Colors.orange;
-    if (status.toUpperCase().contains('CANCEL')) color = Colors.red;
-    if (status.toUpperCase().contains('DELIVERED')) color = Colors.green;
+    String s = status.toUpperCase();
+    if (s == 'OPEN') color = Colors.orange;
+    if (s == 'READY_TO_SHIP') color = Colors.orange; // Consistent with app theme
+    if (s == 'OUT_FOR_DELIVERY') color = Colors.deepOrange;
+    if (s.contains('CANCEL')) color = Colors.red;
+    if (s.contains('DELIVERED')) color = Colors.green;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
