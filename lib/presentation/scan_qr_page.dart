@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:simple_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
+import 'package:hng_flutter/presentation/barcode_scanner_screen.dart';
 import 'package:http/http.dart' as http;
 
 import '../widgets/custom_elevated_button.dart';
@@ -137,19 +136,10 @@ class _ScanQrPageState extends State<ScanQrPage> {
   }
 
   Future<void> goToQrPage(String phone) async {
-    String? res = await SimpleBarcodeScanner.scanBarcode(
-      context,
-      barcodeAppBar: const BarcodeAppBar(
-        appBarTitle: 'HnG RWA',
-        centerTitle: false,
-        enableBackButton: true,
-        backButtonIcon: Icon(Icons.arrow_back_ios),
-      ),
-      isShowFlashIcon: true,
-      delayMillis: 2000,
-      cameraFace: CameraFace.back,
-    );
-    showAlert(res!, phone);
+    String? res = await Get.to<String>(() => const BarcodeScannerScreen(title: 'HnG RWA'));
+    if (res != null) {
+      showAlert(res, phone);
+    }
   }
 
   void showAlert(String barcode, String phone) {

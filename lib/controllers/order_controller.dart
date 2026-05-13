@@ -81,12 +81,13 @@ class OrderController extends GetxController {
 
   Future<void> fetchEcomOrders(String storeID, String orderType, String status) async {
     try {
+      print('fetchEcomOrders');
       orders.clear();
       isLoading(true);
       isError(false);
 
-      final url = "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/StoreOrderlist/$storeID/$orderType/open";
-      // final url = "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/StoreOrderlist/$storeID/$orderType/$status";
+      // final url = "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/StoreOrderlist/$storeID/$orderType/open";
+      final url = "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/StoreOrderlist/$storeID/$orderType/$status";
 
       final response = await http.get(Uri.parse(url));
 

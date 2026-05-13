@@ -946,7 +946,8 @@ class _PageHomeState extends State<PageHome> {
                                 left: 10, right: 10, bottom: 5),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
-                              color: Theme.of(context).primaryColor,
+                              color:Colors.deepOrangeAccent,
+                              // color: Theme.of(context).primaryColor,
                             ),
                             child: const Center(
                               child: Text(

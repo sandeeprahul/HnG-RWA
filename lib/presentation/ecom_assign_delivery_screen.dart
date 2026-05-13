@@ -8,11 +8,13 @@ import '../controllers/ecom_order_details_controller.dart';
 class EcomAssignDeliveryScreen extends StatefulWidget {
   final Map<String, dynamic> order;
   final String locationCode;
+  final String? title;
 
   const EcomAssignDeliveryScreen({
     super.key,
     required this.order,
     required this.locationCode,
+    this.title,
   });
 
   @override
@@ -39,7 +41,7 @@ class _EcomAssignDeliveryScreenState extends State<EcomAssignDeliveryScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "Out For Delivery — ${widget.order['orderId']}",
+          widget.title ?? "Out For Delivery — ${widget.order['orderId']}",
           style: GoogleFonts.outfit(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.orange,
@@ -57,31 +59,31 @@ class _EcomAssignDeliveryScreenState extends State<EcomAssignDeliveryScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              // Slot Info Box matching the design
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.access_time_filled, size: 18, color: Colors.orange.withOpacity(0.7)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        "Slot: Tomorrow 9AM – 1PM (read-only)",
-                        style: GoogleFonts.outfit(
-                          color: Colors.orange[800],
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
+              // // Slot Info Box matching the design
+              // Container(
+              //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              //   decoration: BoxDecoration(
+              //     color: Colors.orange.withOpacity(0.05),
+              //     borderRadius: BorderRadius.circular(12),
+              //   ),
+              //   child: Row(
+              //     children: [
+              //       Icon(Icons.access_time_filled, size: 18, color: Colors.orange.withOpacity(0.7)),
+              //       const SizedBox(width: 10),
+              //       Expanded(
+              //         child: Text(
+              //           "Slot: Tomorrow 9AM – 1PM (read-only)",
+              //           style: GoogleFonts.outfit(
+              //             color: Colors.orange[800],
+              //             fontSize: 14,
+              //             fontWeight: FontWeight.w500,
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 24),
               _buildLabel("DELIVERY EXECUTIVE NAME"),
               _buildTextField(nameController, "Rajan Kumar"),
               const SizedBox(height: 20),
@@ -220,7 +222,7 @@ class _EcomAssignDeliveryScreenState extends State<EcomAssignDeliveryScreen> {
     // Clean minutes input to extract only numbers
     int minutes = int.tryParse(minsController.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 30;
 
-    deliveryController.submitDeliveryDetails(
+    deliveryController.submitDeliveryDetailsECOM(
       name: nameController.text,
       mobile: mobileController.text,
       minutes: minutes,

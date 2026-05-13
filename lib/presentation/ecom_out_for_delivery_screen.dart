@@ -18,11 +18,13 @@ import '../data/UserLocations.dart';
 class EcomOutForDeliveryScreen extends StatefulWidget {
   final int type; // 0 for RTS -> OFD, 1 for OFD -> Delivered
   final String orderType; // e.g., "Standard", "Express"
+  final String screenStatusName;
 
   const EcomOutForDeliveryScreen({
     super.key,
     required this.type,
     required this.orderType,
+    required this.screenStatusName,
   });
 
   @override
@@ -184,8 +186,41 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
         ? Get.find<OrderController>() 
         : Get.put(OrderController(widget.type));
 
-    String apiStatus = widget.type == 0 ? "READY_TO_SHIP" : "OUT_FOR_DELIVERY";
-    orderController.fetchEcomOrders(selectedLocation!.locationCode, widget.orderType, apiStatus);
+    String apiStatus;
+
+    // Logic to determine the EXACT status string for the API
+    switch (widget.type) {
+      case 0: // RTS -> Out for Delivery
+        apiStatus = "Ready to Ship";
+        break;
+      case 1: // OFD -> Delivered or Handed Over
+      // If screen name is 'Handed Over to Customer', we might be viewing history
+      // otherwise we are looking for 'Out for Delivery' orders to process
+        apiStatus = (widget.screenStatusName == "Handed Over to Customer")
+            ? "Handed Over to Customer"
+            : "Out for Delivery";
+        break;
+      case 2: // Specific Ready to Ship View
+        apiStatus = "Ready to Ship";
+        break;
+      case 3: // Ready to Pick
+        apiStatus = "Ready to Pick";
+        break;
+      default:
+        apiStatus = widget.screenStatusName;
+    }
+
+    print("Fetching Orders for Location: ${selectedLocation!.locationCode}, Type: ${widget.type}, API Status: $apiStatus");
+
+    // Call the controller with the mapped status
+    await orderController.fetchEcomOrders(
+        selectedLocation!.locationCode,
+        widget.orderType,
+        apiStatus
+    );
+
+    // orderController.fetchEcomOrders(selectedLocation!.locationCode, widget.orderType, widget.screenStatusName=="Ready to Ship"?"Ready to Ship":widget.screenStatusName);
+    // orderController.fetchEcomOrders(selectedLocation!.locationCode, widget.orderType, widget.screenStatusName=="Ready to Ship"?"Ready to Pick":widget.screenStatusName);
   }
 
   @override
@@ -197,10 +232,10 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.type == 0 ? 'ECOM: Out For Delivery' : 'ECOM: Handover Update',
+          widget.screenStatusName,
           style: GoogleFonts.outfit(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.deepOrange,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoadingLocations
@@ -222,10 +257,25 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
               return OrderListWidget(
                 orders: orderController.orders,
                 onOrderTap: (order) {
-                  if (widget.type == 0) {
+                  if (widget.type == 0 || widget.type == 2 || widget.screenStatusName == "Ready to Ship") {
+                    // Screen for assigning executive
                     _showOutForDeliveryPopup(order);
-                  } else {
+                  }
+                  else if (widget.type == 1 || widget.screenStatusName == "Out for Delivery") {
+                    // Screen for OTP verification and delivery
                     _showHandedOverPopup(order);
+                  }
+                  else if (widget.screenStatusName == "Handed Over to Customer") {
+                    // Logic for already delivered (perhaps just show details or a message)
+                    Get.snackbar("Info", "Order already delivered to customer",
+                        backgroundColor: Colors.blue, colorText: Colors.white);
+                  }
+                  else if (widget.screenStatusName == "Read to Pick"|| widget.type == 3) {
+                    _showHandedOverPopup(order);
+                  }
+                  else {
+                    // Fallback for other statuses like Ready to Pick
+                    _showOutForDeliveryPopup(order);
                   }
                 },
               );
@@ -266,7 +316,7 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
               }
               Navigator.of(Get.context!).pop();
 
-              deliveryController.submitDeliveryDetails(
+              deliveryController.submitDeliveryDetailsECOM(
                 name: nameController.text,
                 mobile: mobileController.text,
                 minutes: int.tryParse(minsController.text) ?? 30,
@@ -327,7 +377,7 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
                           backgroundColor: Colors.red,
                           colorText: Colors.white);
                     } else {
-                      deliveryController.sendOtp(mobileController.text,
+                      deliveryController.sendOtpECOM(mobileController.text,
                           nameController.text, order['orderId']);
                     }
                   },
@@ -384,7 +434,9 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
                       ? () async {
                           bool success = await ecomController.updateHandedOverToCustomer(order['orderId']);
                           if (success) {
-                            Get.back();
+
+                              Navigator.of(Get.context!).pop();
+
                             _fetchOrders();
                           }
                         }

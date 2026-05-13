@@ -20,11 +20,13 @@ import 'order_details_screen.dart';
 class EcomOrderListScreen extends StatefulWidget {
   final String orderType;
   final String status;
+  final String? orderTypeName;
 
   const EcomOrderListScreen({
     super.key,
     required this.orderType,
     required this.status,
+     this.orderTypeName,
   });
 
   @override
@@ -48,6 +50,9 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
         : Get.put(OrderController(0));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      print("widget.status");
+      print(widget.status);
+
       _fetchStoreLocations();
     });
   }
@@ -134,7 +139,8 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
           selectedLocation = location;
           isLocationsLoading = false;
         });
-        orderController.fetchEcomOrders(location.locationCode, widget.orderType, widget.status);
+        orderController.fetchEcomOrders(location.locationCode, widget.orderType, widget.status=="ALL Orders"?"All":widget.status=="Ready to Pick"?"Ready to Ship":widget.status);
+        // orderController.fetchEcomOrders(location.locationCode, widget.orderType, widget.status=="ALL Orders"?"All":widget.status);
       } else {
         setState(() { isLocationsLoading = false; });
         _showAccessDeniedDialog(distance);
@@ -270,8 +276,9 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
 class _OrderCard extends StatelessWidget {
   final Map<String, dynamic> order;
   final String locationCode;
+  final String? orderTypeName;
 
-  const _OrderCard({required this.order, required this.locationCode});
+  const _OrderCard({required this.order, required this.locationCode,this.orderTypeName});
 
   @override
   Widget build(BuildContext context) {
@@ -285,19 +292,24 @@ class _OrderCard extends StatelessWidget {
         ],
       ),
       child: InkWell(
+
         onTap: () async {
-          final s = (order['screenStatusName'] ?? '').toString().toUpperCase();
+
+          final s = (order['status'] ?? '').toString().toUpperCase();
           bool? refresh;
-          if (s == 'READY_TO_SHIP' || s == 'OUT_FOR_DELIVERY') {
+          if (s == 'READY_TO_SHIP' || s == 'OUT_FOR_DELIVERY' || s == 'HANDED OVER TO CUSTOMER') {
             refresh = await Get.to(() => EcomAssignDeliveryScreen(
                   order: order,
                   locationCode: locationCode,
+                  title: s == 'HANDED OVER TO CUSTOMER' ? "Handed Over to Customer — ${order['orderId']}" : null,
                 ));
           } else {
             refresh = await Get.to(() => EcomOrderDetailsScreen(
                   order: order,
                   selectedLocationCode: locationCode,
+                orderTypeName:orderTypeName,
                 ));
+
           }
           if (refresh == true) {
             final orderController = Get.find<OrderController>();

@@ -136,25 +136,28 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen> {
                 floating: false,
                 pinned: true,
                 elevation: 0,
-                backgroundColor: const Color(0xFFF9FAFB).withOpacity(0.9),
+                backgroundColor:  Colors.deepOrangeAccent,
+                // backgroundColor: const Color(0xFFF9FAFB).withOpacity(0.9),
                 centerTitle: false,
                 leading: Padding(
                   padding: const EdgeInsets.only(left: 12.0),
                   child: Center(
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back_ios_new,
-                          size: 20, color: Color(0xFF111827)),
+                          size: 20, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
                 ),
                 flexibleSpace: FlexibleSpaceBar(
+                  // centerTitle: true,
+                  // background: Colors.deepOrangeAccent,
                   titlePadding: const EdgeInsets.only(left: 24, bottom: 20),
                   title: Text(
                     'Delivery Method',
                     style: GoogleFonts.outfit(
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
+                      color: Colors.white,
                       fontSize: 24,
                       letterSpacing: -0.5,
                     ),
@@ -163,7 +166,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen> {
                 actions: [
                   IconButton(
                     onPressed: fetchDeliveryMethods,
-                    icon: const Icon(Icons.refresh, color: Color(0xFF111827)),
+                    icon: const Icon(Icons.refresh, color: Colors.white),
                   )
                 ],
               ),
@@ -338,7 +341,7 @@ class _ProfessionalDeliveryCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         description,
-                        maxLines: 2,
+                        maxLines: 5,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.outfit(
                           fontSize: 13,

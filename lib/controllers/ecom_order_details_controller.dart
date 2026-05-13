@@ -8,7 +8,7 @@ import '../data/order_model.dart';
 class EcomOrderDetailsController extends GetxController {
   final RxMap<String, Color> borderColors = <String, Color>{}.obs;
   final RxMap<String, dynamic> selectedProductData = <String, dynamic>{}.obs;
-  
+
   var selectedMRP = "".obs;
   var selectedStockNo = "".obs;
   var quantityController = TextEditingController();
@@ -21,58 +21,94 @@ class EcomOrderDetailsController extends GetxController {
     selectedProductData.clear();
   }
 
-  Future<void> scanProduct(String skuCode, int originalQuantity, String locationCode) async {
+  Future<String?> scanProduct(
+      String skuCode, int originalQuantity, String locationCode) async {
+    skuCode = skuCode.trim();
     try {
       final response = await http.get(
-        Uri.parse("https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=$locationCode&ean_code=$skuCode"),
+        Uri.parse(
+            "https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=$locationCode&ean_code=$skuCode"),
         headers: {"Content-Type": "application/json"},
       );
 
-      print("https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=$locationCode&ean_code=$skuCode");
+      print("After Scann CONTROLLER ->>ean_code=$skuCode");
+      print(
+          "https://rwaweb.healthandglowonline.co.in/mposgetean/api/checkout/geteandetail?location=$locationCode&ean_code=$skuCode");
+
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         print(responseData);
 
         if (responseData["statusCode"] == "201") {
           borderColors[skuCode] = Colors.red;
-          showErrorSnackbar("Error", responseData["Message"] ?? responseData["message"] ?? "Product not found");
+          borderColors.refresh();
+          showErrorSnackbar(
+              "Error",
+              responseData["Message"] ??
+                  responseData["message"] ??
+                  "Product not found");
         } else if (responseData["statusCode"] == "401") {
-          showErrorSnackbar("Unauthorized", responseData["Message"] ?? responseData["message"] ?? "Access denied");
+          showErrorSnackbar(
+              "Unauthorized",
+              responseData["Message"] ??
+                  responseData["message"] ??
+                  "Access denied");
         } else {
-          bool isProductFound = responseData["product"]?.any((p) => p["SKU_CODE"] == skuCode) ?? false;
-          if (isProductFound) {
-            List batchList = responseData["batch"] ?? [];
-            if (batchList.isNotEmpty) {
-              showMRPSelectionDialog(batchList, skuCode, originalQuantity);
-            } else {
-              showErrorSnackbar("Error", "No batches found for this product");
+          var product = responseData["product"]?.firstWhere(
+              (p) =>
+                  p["SKU_CODE"].toString() == skuCode ||
+                  p["ean_code"].toString() == skuCode,
+              orElse: () => null);
+
+          if (product != null) {
+            // Inside scanProduct method
+            if (product != null) {// Use the scanned skuCode (the one used as key in UI)
+              // rather than the one returned by the API if they differ
+              String actualSkuCode = product["SKU_CODE"].toString();
+              List batchList = responseData["batch"] ?? [];
+              if (batchList.isNotEmpty) {
+                // Pass the original scanned skuCode to the dialog
+                showMRPSelectionDialog(batchList, actualSkuCode, originalQuantity);
+                return skuCode;
+              } else {
+                showErrorSnackbar("Error", "No batches found for this product");
+              }
             }
           } else {
             borderColors[skuCode] = Colors.red;
+            borderColors.refresh();
             showErrorSnackbar("Error", "Product detail not found");
           }
         }
       } else if (response.statusCode == 404) {
         borderColors[skuCode] = Colors.red;
+        borderColors.refresh();
         try {
           var responseBody = jsonDecode(response.body);
-          print(responseBody);
-          showErrorSnackbar("Not Found", responseBody['message'] ?? responseBody['Message'] ?? "Product not found (404)");
+          showErrorSnackbar(
+              "Not Found",
+              responseBody['message'] ??
+                  responseBody['Message'] ??
+                  "Product not found (404)");
         } catch (e) {
           showErrorSnackbar("Not Found", "Product not found (404)");
         }
       } else {
         borderColors[skuCode] = Colors.red;
+        borderColors.refresh();
         showErrorSnackbar("Error", "Server error: ${response.statusCode}");
       }
     } catch (e) {
       borderColors[skuCode] = Colors.red;
+      borderColors.refresh();
       showErrorSnackbar("Error", "Failed to scan product: $e");
     }
-    borderColors.refresh();
+    return null;
   }
 
-  void showMRPSelectionDialog(List batchList, String skuCode, int originalQuantity) {
+  void showMRPSelectionDialog(
+      List batchList, String skuCode, int originalQuantity)
+  {
     selectedMRP.value = "";
     selectedStockNo.value = "";
     quantityController.clear();
@@ -88,24 +124,27 @@ class EcomOrderDetailsController extends GetxController {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Obx(() => DropdownButton<String>(
-                  hint: const Text("Select MRP"),
-                  value: selectedStockNo.value.isEmpty ? null : selectedStockNo.value,
-                  isExpanded: true,
-                  items: batchList.map<DropdownMenuItem<String>>((batch) {
-                    final stockNo = batch["STORE_SKU_LOC_STOCK_NO"].toString();
-                    return DropdownMenuItem<String>(
-                      value: stockNo,
-                      child: Text("₹${batch["MRP"]} (Stock: $stockNo)"),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    selectedStockNo.value = value!;
-                    final selectedBatch = batchList.firstWhere(
-                      (batch) => batch["STORE_SKU_LOC_STOCK_NO"].toString() == value
-                    );
-                    selectedMRP.value = selectedBatch["MRP"].toString();
-                  },
-                )),
+                      hint: const Text("Select MRP"),
+                      value: selectedStockNo.value.isEmpty
+                          ? null
+                          : selectedStockNo.value,
+                      isExpanded: true,
+                      items: batchList.map<DropdownMenuItem<String>>((batch) {
+                        final stockNo =
+                            batch["STORE_SKU_LOC_STOCK_NO"].toString();
+                        return DropdownMenuItem<String>(
+                          value: stockNo,
+                          child: Text("₹${batch["MRP"]} (Stock: $stockNo)"),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        selectedStockNo.value = value!;
+                        final selectedBatch = batchList.firstWhere((batch) =>
+                            batch["STORE_SKU_LOC_STOCK_NO"].toString() ==
+                            value);
+                        selectedMRP.value = selectedBatch["MRP"].toString();
+                      },
+                    )),
                 const SizedBox(height: 10),
                 TextField(
                   controller: quantityController,
@@ -137,16 +176,25 @@ class EcomOrderDetailsController extends GetxController {
                 return;
               }
 
+              // selectedProductData[skuCode] = {
+              //   "mrp": double.parse(selectedMRP.value),
+              //   "quantity": quantity,
+              //   "stockNo": selectedProductData.value,
+              // };
+
+
               selectedProductData[skuCode] = {
                 "mrp": double.parse(selectedMRP.value),
                 "quantity": quantity,
-                "stockNo": selectedStockNo.value,
+                "stockNo": selectedStockNo.value, // FIXED: Use the specific observable for Stock No
               };
+
               borderColors[skuCode] = Colors.green;
               selectedProductData.refresh();
               borderColors.refresh();
-              // Get.back();
-              Navigator.of(Get.context!).pop();
+
+              print('DONE SELCTING QTY $selectedProductData');
+              Get.back();
             },
             child: const Text("Confirm"),
           ),
@@ -155,7 +203,7 @@ class EcomOrderDetailsController extends GetxController {
     );
   }
 
-  Future<bool> submitReadyToShip(String orderId) async {
+  Future<bool> submitReadyToShip(String orderId,{String orderTypeName=''}) async {
     if (selectedProductData.isEmpty) {
       showErrorSnackbar("Action Required", "Please scan items before shipping");
       return false;
@@ -174,8 +222,19 @@ class EcomOrderDetailsController extends GetxController {
           "sku_batch_no": data["stockNo"],
         });
       });
+      // SEPARATE URL LOGIC BASED ON ORDER TYPE
+      String url;
+      if (orderTypeName.toLowerCase().contains("click and collect")) {
+        // Endpoint for Click and Collect (Ready for Pick)
+        url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/UpdateRFP';
+      } else {
+        // Endpoint for Standard/Express (Ready to Ship)
+        url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/UpdateRTS_ECOM';
+      }
 
-      const url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/UpdateRFP';
+      print('Submitting to: $url');
+      print('Payload: ${jsonEncode(pickedItems)}');
+
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
@@ -185,6 +244,7 @@ class EcomOrderDetailsController extends GetxController {
       print('$url $pickedItems');
       print(' ${response.statusCode}');
       print(' ${response.body}');
+      print(' ${jsonEncode(selectedProductData)}');
 
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
@@ -197,16 +257,23 @@ class EcomOrderDetailsController extends GetxController {
               gravity: ToastGravity.BOTTOM,
               backgroundColor: Colors.green,
               textColor: Colors.white,
-              fontSize: 14.0
-          );
+              fontSize: 14.0);
           return true;
         } else {
-          showErrorSnackbar("Error", responseBody['message'] ?? responseBody['Message'] ?? 'Failed to update');
+          showErrorSnackbar(
+              "Error",
+              responseBody['message'] ??
+                  responseBody['Message'] ??
+                  'Failed to update');
         }
       } else if (response.statusCode == 404) {
         try {
           var responseBody = jsonDecode(response.body);
-          showErrorSnackbar("Not Found", responseBody['message'] ?? responseBody['Message'] ?? "Record not found (404)");
+          showErrorSnackbar(
+              "Not Found",
+              responseBody['message'] ??
+                  responseBody['Message'] ??
+                  "Record not found (404)");
         } catch (e) {
           showErrorSnackbar("Not Found", "Record not found (404)");
         }
@@ -215,6 +282,7 @@ class EcomOrderDetailsController extends GetxController {
       }
     } catch (e) {
       showErrorSnackbar("Error", "Submission failed: $e");
+      print(e);
     } finally {
       isLoading.value = false;
     }
@@ -224,8 +292,9 @@ class EcomOrderDetailsController extends GetxController {
   Future<bool> updateHandedOverToCustomer(String orderId) async {
     try {
       isLoading.value = true;
-      const url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/UpdateHandedOverToCustomer';
-      
+      const url =
+          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/UpdateHandedOverToCustomer';
+
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
@@ -242,7 +311,8 @@ class EcomOrderDetailsController extends GetxController {
           );
           return true;
         } else {
-          showErrorSnackbar("Error", responseBody['message'] ?? 'Failed to update status');
+          showErrorSnackbar(
+              "Error", responseBody['message'] ?? 'Failed to update status');
         }
       } else {
         showErrorSnackbar("Error", "Server returned ${response.statusCode}");
@@ -258,12 +328,11 @@ class EcomOrderDetailsController extends GetxController {
   void showErrorSnackbar(String title, String message) {
     // Get.snackbar(title, message,backgroundColor: Colors.red,colorText: Colors.white);
     Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 14.0
-    );
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 }

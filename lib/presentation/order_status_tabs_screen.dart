@@ -35,8 +35,10 @@ class _OrderStatusTabsScreenState extends State<OrderStatusTabsScreen> {
 
   Future<void> fetchOrderStatusTabs() async {
     final url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/GetOrderStatusByOrderType?orderTypeId=${widget.orderTypeId}';
-    
+
+    print(url);
     ProgressDialog.show(context, message: "Loading status options...");
+
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -114,20 +116,62 @@ class _OrderStatusTabsScreenState extends State<OrderStatusTabsScreen> {
                         title: status['screenStatusName'],
                         subtitle: "View all ${status['screenStatusName']} orders",
                         onTap: () {
-                          if (status['screenStatusName'] == 'Delivered') {
-                            Get.to(() => EcomOutForDeliveryScreen(
-                                  type: 1, // 1 for OFD -> Delivered/Handover
+                          final name = status['screenStatusName'];
+                          // Define types in a clear map
+                          final Map<String, int> statusTypeMap = {
+                            'Out for Delivery': 0,
+                            'Delivered': 1,
+                            'Handed Over to Customer': 1,
+                            'Ready to Ship': 2,
+                            'Ready to Pick': 3,
+                          };
+                          if (statusTypeMap.containsKey(name)) {
+                            Get.to(() =>
+                                EcomOutForDeliveryScreen(
+                                  type: statusTypeMap[name]!,
                                   orderType: widget.orderTypeName,
+                                  screenStatusName: name,
                                 ));
-                          } else if (status['screenStatusName'] == 'Out for Delivery') {
-                            Get.to(() => EcomOutForDeliveryScreen(
-                                  type: 0, // 0 for RTS -> OFD/Assignment
-                                  orderType: widget.orderTypeName,
-                                ));
-                          } else {
+                          }
+
+                          // if (status['screenStatusName'] == 'Delivered') {
+                          //   Get.to(() => EcomOutForDeliveryScreen(
+                          //         type: 1, // 1 for OFD -> Delivered/Handover
+                          //         orderType: widget.orderTypeName,
+                          //         screenStatusName: status['screenStatusName'],
+                          //       ));
+                          // } else if (status['screenStatusName'] == 'Out for Delivery') {
+                          //   Get.to(() => EcomOutForDeliveryScreen(
+                          //         type: 0, // 0 for RTS -> OFD/Assignment
+                          //         orderType: widget.orderTypeName,
+                          //         screenStatusName: status['screenStatusName'],
+                          //       ));
+                          // } else if (status['screenStatusName'] == 'Handed Over to Customer') {
+                          //   Get.to(() => EcomOutForDeliveryScreen(
+                          //         type: 1, // 0 for RTS -> OFD/Assignment
+                          //         orderType: widget.orderTypeName,
+                          //         screenStatusName: status['screenStatusName'],
+                          //       ));
+                          // } else if (status['screenStatusName'] == 'Ready to Pick') {
+                          //   Get.to(() => EcomOutForDeliveryScreen(
+                          //         type: 3, // 0 for RTS -> OFD/Assignment
+                          //         orderType: widget.orderTypeName,
+                          //         screenStatusName: status['screenStatusName'],
+                          //       ));
+                          // }
+                          // else if (status['screenStatusName'] == 'Ready to Ship') {
+                          //   Get.to(() => EcomOutForDeliveryScreen(
+                          //         type: 2, // 0 for RTS -> OFD/Assignment
+                          //         orderType: widget.orderTypeName,
+                          //         screenStatusName: status['screenStatusName'],
+                          //       ));
+                          // }
+                          //
+                          else {
                             Get.to(() => EcomOrderListScreen(
                                   orderType: widget.orderTypeName,
                                   status: status['screenStatusName'],
+                                orderTypeName:    widget.orderTypeName
                                 ));
                           }
                         },

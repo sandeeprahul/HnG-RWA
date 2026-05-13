@@ -296,7 +296,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
           ],
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.deepOrangeAccent,
       ),
       body: loading
           ? Center(
@@ -368,7 +368,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                           Expanded(
                             child: Container(
                               padding: const EdgeInsets.all(12),
-                              color: Colors.orange,
+                              color: Colors.deepOrangeAccent,
                               child: const Center(
                                   child: Text(
                                 'Filter',

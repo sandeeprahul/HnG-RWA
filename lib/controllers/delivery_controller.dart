@@ -57,6 +57,52 @@ class DeliveryController extends GetxController {
       print("Something went wrong: $e");
     }
   }
+  Future<void> sendOtpECOM(String mobile, String name, String orderId) async {
+    const String otpApiUrl =
+        "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/DeliveryConfSendOTP"; // Replace with actual API
+
+    Map<String, dynamic> requestBody = {
+      "order_id": orderId,
+      "Delivered_To_Person_Name": name,
+      "Delivered_To_Mobile_No": mobile
+    };
+
+    print("sendOtp: $requestBody ");
+    try {
+      isLoading.value = true; // Show loading
+      final response = await http.post(
+        Uri.parse(otpApiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(requestBody),
+      );
+
+      isLoading.value = false; // Hide loading
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        print("sendOtp Response: $responseData");
+        if (responseData["status"] == "ok" ||
+            responseData["message"] == "OTP sent successfully.") {
+          otpFromServer.value =
+              responseData["otp"].toString(); // Store OTP from API
+          isOtpSent.value = true; // Enable OTP verification
+          Get.snackbar("Success", "OTP sent successfully!",
+              backgroundColor: Colors.green, colorText: Colors.white);
+        } else {
+          Get.snackbar("Success", responseData["message"],
+              backgroundColor: Colors.green, colorText: Colors.white);
+        }
+      } else {
+        Get.snackbar("Error", "Failed to send OTP.",
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar("Error", "Something went wrong: $e",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      print("Something went wrong: $e");
+    }
+  }
 
   Future<void> verifyOtp(String enteredOtp) async {
     if (enteredOtp == otpFromServer.value.toString()) {
@@ -81,9 +127,87 @@ class DeliveryController extends GetxController {
     required int minutes,
     required String orderId,
     required String locationCode,
-  }) async {
+  }) async
+  {
     const String apiUrl =
         "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/DeliveryCheckoutDetails"; // Replace with actual API URL
+
+    Map<String, dynamic> requestBody = {
+      "order_id": orderId,
+      "DeliveryExecutiveName": name,
+      "DeliveryExecutiveMobileNo": mobile,
+      "EstimatedMinsForDelivery": minutes,
+    };
+
+
+    try {
+      isLoading.value = true; // Show progress dialog
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(requestBody),
+      );
+
+      isLoading.value = false; // Hide progress dialog
+      print("submitDeliveryDetails");
+
+      print(jsonEncode(requestBody));
+      print(apiUrl);
+      print(response.body);
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        if (responseData["status"] == "ok") {
+          // Get.back(result: true);
+          Navigator.of(Get.context!).pop();
+          //
+          // Get.snackbar("Success", responseData["message"],
+          //     backgroundColor: Colors.green,
+          //     colorText: Colors.white,
+          //     duration: const Duration(seconds: 2));
+          showErrorSnackbar("Success","${responseData['message']}",isSuccess: 1);
+
+
+
+          final OrderController orderController = Get.put(OrderController(0));
+          orderController.fetchOrders(locationCode);
+
+          return true;
+        } else {
+          showErrorSnackbar("Error","${responseData['message']}");
+
+          // Get.snackbar("Error", responseData["message"],
+          //     backgroundColor: Colors.red, colorText: Colors.white);
+        }
+      } else {
+        final responseData = jsonDecode(response.body);
+
+        /*Get.snackbar("Failed", "Failed to submit. Please try again.",
+            backgroundColor: Colors.red, colorText: Colors.white);*/
+
+        showErrorSnackbar("Failed","Failed to submit. Please try again\n${responseData['message']}");
+
+      }
+    } catch (e) {
+      isLoading.value = false;
+      // Get.snackbar("Error", "Something went wrong: $e",
+      //     backgroundColor: Colors.red, colorText: Colors.white);
+
+      showErrorSnackbar("Error","Something went wrong: $e");
+    }
+    return false;
+  }
+
+  Future<bool> submitDeliveryDetailsECOM({
+    required String name,
+    required String mobile,
+    required int minutes,
+    required String orderId,
+    required String locationCode,
+  }) async
+  {
+    const String apiUrl =
+        "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/DeliveryCheckoutDetails_ECOM"; // Replace with actual API URL
 
     Map<String, dynamic> requestBody = {
       "order_id": orderId,
@@ -171,7 +295,78 @@ class DeliveryController extends GetxController {
     required String name,
     required String locationCode,
 
-  }) async {
+  }) async
+  {
+    const String apiUrl =
+        "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/UpdateDeliveryStatus"; // Replace with actual API URL
+
+    print("submitDelivered: $apiUrl");
+
+    Map<String, dynamic> requestBody = {
+      "order_id": orderId,
+      "Delivered_To_Person_Name": name,
+      "Delivered_To_Mobile_No": mobile
+    };
+    print("submitDelivered: $requestBody");
+
+    try {
+      isLoading.value = true; // Show progress dialog
+      final response = await http.post(Uri.parse(apiUrl),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(requestBody));
+      print("submitDelivered: ${response.body}");
+
+      isLoading.value = false; // Hide progress dialog
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        print("submitDelivered: $responseData");
+
+        print("submitDelivered: $responseData");
+        if (responseData["status"] == "ok") {
+          Get.back();
+
+          Get.snackbar("Success", responseData["message"],
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 2));
+          // await Future.delayed(const Duration(milliseconds: 500));
+          final OrderController orderController = Get.put(OrderController(0));
+          orderController.fetchOrders(locationCode);
+          // Close delivery popup
+        } else {
+          Get.back();
+
+          Get.snackbar("Error", responseData["message"],
+              backgroundColor: Colors.red, colorText: Colors.white,overlayBlur: 2);
+
+        }
+      } else {
+        Get.back();
+
+        final responseData = jsonDecode(response.body);
+
+        Get.snackbar("Failed", "${responseData['message']}",
+            backgroundColor: Colors.red, colorText: Colors.white,overlayBlur: 2);
+
+      }
+    } catch (e) {
+      isLoading.value = false;
+      Get.back();
+
+      Get.snackbar("Error", "Something went wrong: $e",
+          backgroundColor: Colors.red, colorText: Colors.white,overlayBlur: 2);
+
+    }
+  }
+  Future<void> submitDeliveredECOM({
+    required String orderId,
+    required String mobile,
+    required String name,
+    required String locationCode,
+
+  }) async
+  {
     const String apiUrl =
         "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/UpdateDeliveryStatus"; // Replace with actual API URL
 

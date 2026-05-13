@@ -324,7 +324,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
           style: const TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.deepOrangeAccent,
       ),
       body: loading
           ? Center(
@@ -386,7 +386,7 @@ class _OutForDeliveryScreenState extends State<OutForDeliveryScreen> {
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.all(12),
-                          color: Colors.orange,
+                          color: Colors.deepOrangeAccent,
                           child: const Center(
                               child: Text(
                             'Filter',
