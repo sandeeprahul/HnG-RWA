@@ -99,53 +99,56 @@ class _EcomOrderDetailsScreenState extends State<EcomOrderDetailsScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.orange))
-          : errorMessage != null
-              ? Center(
-                  child:
-                      Text("Error: $errorMessage", style: GoogleFonts.outfit()))
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Stack(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildOrderHeader(),
-                          const SizedBox(height: 16),
-                          Expanded(
-                            child: ListView.builder(
-                                itemCount: orderDetails!.items.length + 1,
-                                itemBuilder: (context, index) {
-                                  if (index == orderDetails!.items.length) {
-                                    return PaymentSummary(
-                                      order: orderDetails!,
-                                      orderController: orderController,
-                                    );
-                                  }
+      body: SafeArea(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator(color: Colors.orange))
+            : errorMessage != null
+                ? Center(
+                    child:
+                        Text("Error: $errorMessage", style: GoogleFonts.outfit()))
+                : Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Stack(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildOrderHeader(),
+                            const SizedBox(height: 16),
+                            Expanded(
+                              child: ListView.builder(
+                                  itemCount: orderDetails!.items.length + 1,
+                                  itemBuilder: (context, index) {
+                                    if (index == orderDetails!.items.length) {
+                                      return PaymentSummary(
+                                        order: orderDetails!,
+                                        orderController: orderController,
+                                      );
+                                    }
 
-                                  final item = orderDetails!.items[index];
+                                    final item = orderDetails!.items[index];
 
-                                  return Obx(() {
-                                    final selectedData = orderController
-                                        .selectedProductData[item.skuCode];
+                                    return Obx(() {
+                                      final selectedData = orderController
+                                          .selectedProductData[item.skuCode];
 
-                                    return _buildProductCard(
-                                        item, selectedData);
-                                  });
-                                }),
-                          ),
-                          const SizedBox(height: 60), // Space for bottom button
-                        ],
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: _buildActionButton(),
-                      ),
-                    ],
+                                      return _buildProductCard(
+                                          item, selectedData);
+                                    });
+                                  }),
+                            ),
+                            const SizedBox(height: 60), // Space for bottom button
+                          ],
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: _buildActionButton(),
+                        ),
+
+                      ],
+                    ),
                   ),
-                ),
+      ),
     );
   }
 
@@ -460,7 +463,7 @@ class _EcomOrderDetailsScreenState extends State<EcomOrderDetailsScreen> {
             child: orderController.isLoading.value
                 ? const CircularProgressIndicator(color: Colors.white)
                 : Text(
-                    'READY TO SHIP',
+                    widget.orderTypeName == 'Click & Collect'?'READY TO PICK':'READY TO SHIP',
                     style: GoogleFonts.outfit(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -491,8 +494,14 @@ class _EcomOrderDetailsScreenState extends State<EcomOrderDetailsScreen> {
         onPressed: () {
           String enteredCode = codeController.text.trim();
           if (enteredCode.isNotEmpty) {
-            _scanProduct(enteredCode, quantity, locationCode, 0);
-            Get.back();
+            if(enteredCode==skuCode){
+              _scanProduct(enteredCode, quantity, locationCode, 0);
+              Navigator.pop(Get.context!);
+            }
+            // codeController.printError(info:"Code not matched");
+            Fluttertoast.showToast(msg: "Code not matched\nYou entered: $enteredCode\nbut the SKU code is $skuCode");
+
+            // Get.back();
           } else {
             Fluttertoast.showToast(msg: "Please enter a valid code");
           }
@@ -507,6 +516,7 @@ class _EcomOrderDetailsScreenState extends State<EcomOrderDetailsScreen> {
       String selectedLocationCode, int fromTextOrScan) async {
     print("_scanProduct ->>ean_code=$skuCode");
     if (fromTextOrScan == 0) {
+
       orderController.scanProduct(skuCode, quantity, selectedLocationCode);
     } else {
       String? scannedCode = await _goToQrPage();
@@ -543,11 +553,13 @@ class _EcomOrderDetailsScreenState extends State<EcomOrderDetailsScreen> {
   }
 
   void _submitReadyToShip() async {
+    print("_submitReadyToShip :${widget.orderTypeName} ");
     bool success = await orderController.submitReadyToShip(
         widget.order['orderId'],
         orderTypeName: widget.orderTypeName ?? '');
     if (success) {
-      Get.back(result: true);
+      Navigator.pop(context,true);
+      // Get.back(result: true);
     }
   }
 }

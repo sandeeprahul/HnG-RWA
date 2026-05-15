@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/common/constants.dart';
 import 'package:hng_flutter/common/zoomable_image.dart';
@@ -52,9 +53,10 @@ class _CheckListPageState extends State<CheckListPage> {
   List<CheckListItem> checkListItems = [];
   bool isLoading = false;
 
-  final CameraPageControllerForLowerVersions cameraPageController = Get.find<CameraPageControllerForLowerVersions>();
-  // final CameraPageController cameraPageController = Get.find<CameraPageController>();
+  final CameraPageControllerForLowerVersions cameraPageController =
+      Get.find<CameraPageControllerForLowerVersions>();
 
+  // final CameraPageController cameraPageController = Get.find<CameraPageController>();
 
   final ProgressController progressController = Get.put(ProgressController());
   Question? _question;
@@ -160,11 +162,11 @@ class _CheckListPageState extends State<CheckListPage> {
     setState(() {
       isLoading = false;
     });
-    Get.off(()=>CheckListSegregationScreen(
-      1,
-      widget.mGetActivityTypes,
-      widget.locationsList,
-    ));
+    Get.off(() => CheckListSegregationScreen(
+          1,
+          widget.mGetActivityTypes,
+          widget.locationsList,
+        ));
 /*    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -186,7 +188,7 @@ class _CheckListPageState extends State<CheckListPage> {
         msg: 'Are you sure to want go back?');
   }
 
-  Future<int> submitAllDilo() async {
+  Future<void> submitAllDilo() async {
     // progressController.show();
     final sharedPreferences = await SharedPreferences.getInstance();
 
@@ -201,33 +203,30 @@ class _CheckListPageState extends State<CheckListPage> {
       loading = true;
     });*/
 
-    var success = await checklistRepo.submitAllDilo(
+    var response = await checklistRepo.submitAllDilo(
       checklistAssignId: widget.activeCheckList.empChecklistAssignId,
       checklistMstItemId: widget.activeCheckList.checklisTId,
     );
 
-    /* setState(() {
-      loading = false;
-    });
-*/
-    // progressController.hide();
+    // FIX: Change 'response != null' to check the actual success value (e.g., 1 or true)
+    if (response == 1 || response == true) {
+      // 1. Close the confirmation dialog if it is still open
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
 
-    // showConfirmDialog(onConfirmed: (){}, title: 'Success', msg: '')
-    Get.off(()=>CheckListSegregationScreen(
-      1,
-      widget.mGetActivityTypes,
-      widget.locationsList,
-    ));
- /*   Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => checkListScreen_lpd(
+      // 2. Navigate away and REMOVE the current screen from the stack
+      Get.off(() => CheckListSegregationScreen(
             1,
             widget.mGetActivityTypes,
             widget.locationsList,
-          ),
-        ));*/
-    return 1;
+          ));
+
+      Fluttertoast.showToast(msg: "Submitted Successfully");
+    } else {
+      // Handle failure case if necessary
+      print("Submission failed or returned unexpected value");
+    }
   }
 
   final ScrollController _scrollController = ScrollController();
@@ -248,158 +247,162 @@ class _CheckListPageState extends State<CheckListPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Questions List'),iconTheme: const IconThemeData(color: Colors.black),),
+        appBar: AppBar(
+          title: const Text('Questions List'),
+          iconTheme: const IconThemeData(color: Colors.black),
+        ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child:
-             isLoading
-                ? const Center(
-              child:
-              CircularProgressIndicator(), // Display progress indicator
-            )
-                : Column(
-              children: [
-                Expanded(
-                  child: ListView.separated(
-                    controller: _scrollController,
-                    // shrinkWrap: true, // Allows ListView to work within a SingleChildScrollView
-                    // physics: const NeverScrollableScrollPhysics(), // Disables inner ListView scroll
-                    // itemCount:1,
-                    itemCount: checkListItems.length,
-                    itemBuilder: (context, questionIndex) {
-                      var checkListItem = checkListItems[
-                      questionIndex]; // Get the current checklist item
+          child: isLoading
+              ? const Center(
+                  child:
+                      CircularProgressIndicator(), // Display progress indicator
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.separated(
+                        controller: _scrollController,
+                        // shrinkWrap: true, // Allows ListView to work within a SingleChildScrollView
+                        // physics: const NeverScrollableScrollPhysics(), // Disables inner ListView scroll
+                        // itemCount:1,
+                        itemCount: checkListItems.length,
+                        itemBuilder: (context, questionIndex) {
+                          var checkListItem = checkListItems[
+                              questionIndex]; // Get the current checklist item
 
-                      return Card(
-                        key: itemKeys[questionIndex],
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              ListView.builder(
-                                shrinkWrap: true,
-                                // Allows ListView to work within a SingleChildScrollView
-                                physics:
-                                const NeverScrollableScrollPhysics(),
-                                // Disables inner ListView scroll
-                                itemCount:
-                                checkListItem.questions!.length,
-                                itemBuilder:
-                                    (context, subQuestionIndex) {
-                                  var question = checkListItem
-                                      .questions![subQuestionIndex];
+                          return Card(
+                            key: itemKeys[questionIndex],
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    // Allows ListView to work within a SingleChildScrollView
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    // Disables inner ListView scroll
+                                    itemCount: checkListItem.questions!.length,
+                                    itemBuilder: (context, subQuestionIndex) {
+                                      var question = checkListItem
+                                          .questions![subQuestionIndex];
 
-                                  return Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 20),
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 20),
 
-                                      // Display question text
-                                      // if (question.answerTypeId != 7)
-                                      buildQuestionText(question),
-                                      const SizedBox(height: 10),
+                                          // Display question text
+                                          // if (question.answerTypeId != 7)
+                                          buildQuestionText(question),
+                                          const SizedBox(height: 10),
 
-                                      // Different UI for each answer type
-                                      if (question.answerTypeId == 1)
-                                        buildCommentField(question),
-                                      if (question.answerTypeId == 4)
-                                        buildDropdown(question),
-                                      if (question.answerTypeId == 3)
-                                        buildAttachProofWidget(
-                                            question),
+                                          // Different UI for each answer type
+                                          if (question.answerTypeId == 1)
+                                            buildCommentField(question),
+                                          if (question.answerTypeId == 4)
+                                            buildDropdown(question),
+                                          if (question.answerTypeId == 3)
+                                            buildAttachProofWidget(question),
 
-                                      /*if(question.answerTypeId==8)
+                                          /*if(question.answerTypeId==8)
                                         buildAttachMultipleProofWidget(question),*/
 
-                                      // if (question.answerTypeId == 7) buildImageWidget(question),
-                                      // Separate each question visually
-                                    ],
-                                  );
-                                },
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  // print("CLICKED SUbMIT");
-                                  _submitCheckListItem(
-                                      checkListItem, questionIndex);
-                                },
-                                child: Container(
-                                  height: 45,
-                                  margin: EdgeInsets.zero,
-                                  decoration: BoxDecoration(
-                                    borderRadius:
-                                    BorderRadius.circular(12),
-                                    // color: Colors.red,
-                                    color: !submittedItems.contains(checkListItem.checkListItemId)?Colors.blue:Colors.green,
+                                          // if (question.answerTypeId == 7) buildImageWidget(question),
+                                          // Separate each question visually
+                                        ],
+                                      );
+                                    },
                                   ),
-                                  width: double.infinity,
-                                  child:  Center(
-                                      child: Obx(
-                                              () {
-                                            return Text(progressController.isLoading.value?'Submitting..': !submittedItems.contains(checkListItem.checkListItemId)?'Submit':'Submitted',
-                                                style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 18));
-                                          }
-                                      )),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                    separatorBuilder:
-                        (BuildContext context, int index) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Divider(
-                          thickness: 2.0,
-                          color: Colors.black,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: isAllSubmitted
-                      ? () {
-                    showConfirmDialog(
-                      onConfirmed: ()  {
-                submitAllDilo();
-                Navigator.pop(context);
-                    // if(goBack==1){
-                    //   Get.back();
-                    // }
-                      },
-                      title: "Submit all?",
-                      msg: "Are you sure?",
-                    );
-                  }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isAllSubmitted
-                        ? Colors.green
-                        : Colors.grey[700],
-                    // Background color
-                    // onPrimary: Colors.white, // Text color
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                                  InkWell(
+                                    onTap: () {
+                                      // print("CLICKED SUbMIT");
+                                      _submitCheckListItem(
+                                          checkListItem, questionIndex);
+                                    },
+                                    child: Container(
+                                      height: 45,
+                                      margin: EdgeInsets.zero,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        // color: Colors.red,
+                                        color: !submittedItems.contains(
+                                                checkListItem.checkListItemId)
+                                            ? Colors.blue
+                                            : Colors.green,
+                                      ),
+                                      width: double.infinity,
+                                      child: Center(child: Obx(() {
+                                        return Text(
+                                            progressController.isLoading.value
+                                                ? 'Submitting..'
+                                                : !submittedItems.contains(
+                                                        checkListItem
+                                                            .checkListItemId)
+                                                    ? 'Submit'
+                                                    : 'Submitted',
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18));
+                                      })),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Divider(
+                              thickness: 2.0,
+                              color: Colors.black,
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                    minimumSize: const Size(
-                        double.infinity, 50), // Width and height
-                  ),
-                  child: const Text(
-                    'Submit All',
-                    style:
-                    TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                    ElevatedButton(
+                      onPressed: isAllSubmitted
+                          ? () {
+                              showConfirmDialog(
+                                onConfirmed: () {
+                                  submitAllDilo();
+                                  // Navigator.pop(context);
+                                  // 3. Close the Screen (Go back to previous page)
+                                  // You can use Navigator or GetX depending on your preference
+                                  // Navigator.of(context).pop();
+
+                                  // if(goBack==1){
+                                  //   Get.back();
+                                  // }
+                                },
+                                title: "Alert",
+                                msg: 'Are you sure you want to submit all?',                              );
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isAllSubmitted ? Colors.green : Colors.grey[700],
+                        // Background color
+                        // onPrimary: Colors.white, // Text color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize:
+                            const Size(double.infinity, 50), // Width and height
+                      ),
+                      child: const Text(
+                        'Submit All',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                  ],
                 ),
-                const SizedBox(height: 48),
-              ],
-            )
-          ,
         ),
       ),
     );
@@ -454,9 +457,7 @@ class _CheckListPageState extends State<CheckListPage> {
                 ))
             .toList(),
         onChanged: (value) {
-
           setState(() {
-
             question.selectedOption = value;
             dropDownOptionAnswer = value!;
 
@@ -467,7 +468,6 @@ class _CheckListPageState extends State<CheckListPage> {
             dropDownOptionAnswerID =
                 "${selectedOption.checkListAnswerOptionId}";
             non_Compliance_Flag = "${selectedOption.nonComplianceFlag}";
-
           });
           print(
               "$dropDownOptionAnswer , $dropDownOptionAnswerID , $non_Compliance_Flag");
@@ -511,7 +511,8 @@ class _CheckListPageState extends State<CheckListPage> {
                     ),
                     onTap: () {
                       // Get.put(CameraPageControllerForLowerVersions()); // Registers and initializes the controller immediately
-                      Get.to(() => const CameraPageForLowerVersions(), binding: CameraBinding());
+                      Get.to(() => const CameraPageForLowerVersions(),
+                          binding: CameraBinding());
 
                       /*   setState(() {
                         cameraOpen = 0;
@@ -527,7 +528,6 @@ class _CheckListPageState extends State<CheckListPage> {
       ),
     );
   }
-
 
 /*  Widget buildAttachMultipleProofWidget(Question question) {
     return Padding(
@@ -600,7 +600,6 @@ class _CheckListPageState extends State<CheckListPage> {
       ),
     );
   }*/
-
 
   Widget buildImageWidget(Question question) {
     return Align(
@@ -711,9 +710,6 @@ class _CheckListPageState extends State<CheckListPage> {
         msg: "Are you sure you want to proceed?");*/
   }
 
-
-
-
   void scrollToKey(GlobalKey key) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final context = key.currentContext;
@@ -753,9 +749,9 @@ class _CheckListPageState extends State<CheckListPage> {
       int questionIndex) async {
     final prefs = await SharedPreferences.getInstance();
 
-    final cameraPageController = Get.find<CameraPageControllerForLowerVersions>();
+    final cameraPageController =
+        Get.find<CameraPageControllerForLowerVersions>();
     // final cameraPageController = Get.find<CameraPageController>();
-
 
     var userId = prefs.getString("userCode");
     String datetime = DateFormat("yyyy-MM-dd hh:mm:ss").format(DateTime.now());
@@ -824,7 +820,6 @@ class _CheckListPageState extends State<CheckListPage> {
           if (apiResponse.statusCode == "200") {
             // Get.snackbar("Success", "Checklist posted successfully!",duration: const Duration(seconds: 1));
 
-
             // Add to submittedItems if successful
             if (!submittedItems.contains(checkListItem.checkListItemId)) {
               setState(() {
@@ -838,8 +833,6 @@ class _CheckListPageState extends State<CheckListPage> {
                 msg: '${apiResponse.message}\n${apiResponse.statusCode}');
           }
         }
-
-
 
         print('Checklist posted successfully!');
       }
@@ -858,7 +851,6 @@ class _CheckListPageState extends State<CheckListPage> {
     }
   }
 
-
   // Function to check if all items are submitted
   void _checkAllSubmitted() {
     setState(() {
@@ -869,7 +861,6 @@ class _CheckListPageState extends State<CheckListPage> {
 
   Future<void> cloudstorageRef(var img, var empcode, var sendJson,
       CheckListItem checkListItem, int questionIndex) async {
-
     print("Coming to cloudstorageRef");
     final prefs = await SharedPreferences.getInstance();
 
@@ -887,7 +878,7 @@ class _CheckListPageState extends State<CheckListPage> {
     final imagesRef = storageRef.child("$locationCode/QuesAns/$empCode");
     progressController.show();
     try {
-     /* setState(() {
+      /* setState(() {
         isLoading = true;
       });*/
       // await imagesRef.putString(img, format: PutStringFormat.dataUrl);
@@ -912,7 +903,8 @@ class _CheckListPageState extends State<CheckListPage> {
       //       // Navigator.pop(context);
       //     },
       //     radius: 15);
-      Get.snackbar('Info', "Image post success",duration: const Duration(seconds: 1));
+      Get.snackbar('Info', "Image post success",
+          duration: const Duration(seconds: 1));
       final sharedPreferences = await SharedPreferences.getInstance();
 
       ApiService apiService = ApiService(baseUrl: Constants.apiHttpsUrl);
@@ -922,8 +914,8 @@ class _CheckListPageState extends State<CheckListPage> {
       try {
         final response = await checklistRepo.postChecklistData(sendJson);
         if (response.statusCode == "200") {
-
-          Get.snackbar('Alert!',  response.message,duration: const Duration(seconds: 1));
+          Get.snackbar('Alert!', response.message,
+              duration: const Duration(seconds: 1));
           // Add to submittedItems if successful
           if (!submittedItems.contains(checkListItem.checkListItemId)) {
             setState(() {
@@ -950,7 +942,6 @@ class _CheckListPageState extends State<CheckListPage> {
       progressController.hide();
 
       showSimpleDialog(title: 'Alert!', msg: 'Failed to upload image');
-
     }
   }
 

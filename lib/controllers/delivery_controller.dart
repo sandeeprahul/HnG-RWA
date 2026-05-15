@@ -86,21 +86,27 @@ class DeliveryController extends GetxController {
           otpFromServer.value =
               responseData["otp"].toString(); // Store OTP from API
           isOtpSent.value = true; // Enable OTP verification
-          Get.snackbar("Success", "OTP sent successfully!",
-              backgroundColor: Colors.green, colorText: Colors.white);
+        /*  Get.snackbar("Success", "OTP sent successfully!",
+              backgroundColor: Colors.green, colorText: Colors.white);*/
+          Fluttertoast.showToast(msg: "OTP sent successfully!",toastLength: Toast.LENGTH_LONG);
         } else {
-          Get.snackbar("Success", responseData["message"],
+          Get.snackbar("Alert!", responseData["message"],
               backgroundColor: Colors.green, colorText: Colors.white);
+          Fluttertoast.showToast(msg: "${responseData["message"]}",toastLength: Toast.LENGTH_LONG);
+
         }
       } else {
-        Get.snackbar("Error", "Failed to send OTP.",
-            backgroundColor: Colors.red, colorText: Colors.white);
+
+        Fluttertoast.showToast(msg: "Error: ${response.statusCode}\n${response.body}",toastLength: Toast.LENGTH_LONG,backgroundColor: Colors.red,textColor: Colors.white);
+
       }
     } catch (e) {
       isLoading.value = false;
-      Get.snackbar("Error", "Something went wrong: $e",
-          backgroundColor: Colors.red, colorText: Colors.white);
+      // Get.snackbar("Error", "Something went wrong: $e",
+      //     backgroundColor: Colors.red, colorText: Colors.white);
       print("Something went wrong: $e");
+      Fluttertoast.showToast(msg: "Error: $e",toastLength: Toast.LENGTH_LONG,backgroundColor: Colors.red,textColor: Colors.white);
+
     }
   }
 
@@ -252,11 +258,14 @@ class DeliveryController extends GetxController {
           return true;
         } else {
           showErrorSnackbar("Error","${responseData['message']}");
+          Navigator.of(Get.context!).pop();
 
           // Get.snackbar("Error", responseData["message"],
           //     backgroundColor: Colors.red, colorText: Colors.white);
         }
       } else {
+        Navigator.of(Get.context!).pop();
+
         final responseData = jsonDecode(response.body);
 
         /*Get.snackbar("Failed", "Failed to submit. Please try again.",
@@ -269,6 +278,7 @@ class DeliveryController extends GetxController {
       isLoading.value = false;
       // Get.snackbar("Error", "Something went wrong: $e",
       //     backgroundColor: Colors.red, colorText: Colors.white);
+      Navigator.of(Get.context!).pop();
 
       showErrorSnackbar("Error","Something went wrong: $e");
     }
@@ -375,7 +385,7 @@ class DeliveryController extends GetxController {
     Map<String, dynamic> requestBody = {
       "order_id": orderId,
       "Delivered_To_Person_Name": name,
-      "Delivered_To_Mobile_No": mobile
+      "Delivered_To_Mobile_No": mobile,
     };
     print("submitDelivered: $requestBody");
 

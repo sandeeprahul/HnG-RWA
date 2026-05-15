@@ -22,7 +22,8 @@ class EcomOrderDetailsController extends GetxController {
   }
 
   Future<String?> scanProduct(
-      String skuCode, int originalQuantity, String locationCode) async {
+      String skuCode, int originalQuantity, String locationCode) async
+  {
     skuCode = skuCode.trim();
     try {
       final response = await http.get(
@@ -194,7 +195,8 @@ class EcomOrderDetailsController extends GetxController {
               borderColors.refresh();
 
               print('DONE SELCTING QTY $selectedProductData');
-              Get.back();
+              // Get.back();/
+              Navigator.of(Get.context!).pop();
             },
             child: const Text("Confirm"),
           ),
@@ -224,7 +226,7 @@ class EcomOrderDetailsController extends GetxController {
       });
       // SEPARATE URL LOGIC BASED ON ORDER TYPE
       String url;
-      if (orderTypeName.toLowerCase().contains("click and collect")) {
+      if (orderTypeName.toLowerCase().contains("click & collect")) {
         // Endpoint for Click and Collect (Ready for Pick)
         url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/UpdateRFP';
       } else {
@@ -289,23 +291,48 @@ class EcomOrderDetailsController extends GetxController {
     return false;
   }
 
-  Future<bool> updateHandedOverToCustomer(String orderId) async {
+  Future<bool> updateHandedOverToCustomer(String orderId, String orderType,  {String name = '', String mobile = ''} )// Added optional named parameters)
+   async {
     try {
       isLoading.value = true;
-      const url =
-          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/UpdateHandedOverToCustomer';
+      //"Standard", "Express" = order type
+      String url;
+      Map<String, dynamic> requestBody;
+      // Control logic for API selection based on Order Type
+      // UpdateHandedOverToCustomer = Only for Click and Collect
+      // UpdateDeliveryStatus = For Standard & Express
+      if (orderType.toLowerCase().contains("click & collect")) {
+        url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/ECOMOrders/UpdateHandedOverToCustomer';
+        requestBody = {"Order_id": orderId};
+      } else {
+        url = 'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/StoreOrder/UpdateDeliveryStatus_ECOM';
+        requestBody = {
+          "order_id": orderId,
+          "Delivered_To_Person_Name": name,
+          "Delivered_To_Mobile_No": mobile,
+          "latitude": '0.0',
+          "IMG_URL": '',
+          "longitude": '0.0',
+        };
+      }
+
+      print('Handover Process -> OrderType: $orderType');
+      print('Submitting to: $url');
+      print('Payload: ${jsonEncode(requestBody)}');
 
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"Order_id": orderId}),
-      );
+        body: jsonEncode(requestBody),      );
+      var responseBody = jsonDecode(response.body);
+
+      print("RESPONSE $responseBody");
 
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
         if (responseBody['status'] == "ok") {
           Fluttertoast.showToast(
-            msg: responseBody['message'] ?? 'Order handed over successfully',
+            msg: responseBody['message'] ?? '',
             backgroundColor: Colors.green,
             textColor: Colors.white,
           );
@@ -315,7 +342,7 @@ class EcomOrderDetailsController extends GetxController {
               "Error", responseBody['message'] ?? 'Failed to update status');
         }
       } else {
-        showErrorSnackbar("Error", "Server returned ${response.statusCode}");
+        showErrorSnackbar("Error", "Server returned ${ responseBody['message']}");
       }
     } catch (e) {
       showErrorSnackbar("Error", "Update failed: $e");
@@ -329,7 +356,7 @@ class EcomOrderDetailsController extends GetxController {
     // Get.snackbar(title, message,backgroundColor: Colors.red,colorText: Colors.white);
     Fluttertoast.showToast(
         msg: message,
-        toastLength: Toast.LENGTH_SHORT,
+        toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.red,
         textColor: Colors.white,

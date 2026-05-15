@@ -293,7 +293,7 @@ class _applicableScreenState extends State<applicableScreen>
 
       print(url + " ACTIVEEEEEE ");
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
+          await http.get(Uri.parse(url)).timeout(const Duration(minutes: 3));
       print(response.body);
 
       var responseData = json.decode(response.body);
@@ -344,7 +344,7 @@ class _applicableScreenState extends State<applicableScreen>
             Container(
               padding: const EdgeInsets.all(15),
               decoration:
-                  const BoxDecoration(color: CupertinoColors.activeBlue),
+                   BoxDecoration(color: CupertinoColors.activeBlue,borderRadius: BorderRadius.circular(16)),
               child: InkWell(
                   onTap: () {
                     Navigator.of(context).pop();

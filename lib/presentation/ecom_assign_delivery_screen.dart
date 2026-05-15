@@ -29,7 +29,7 @@ class _EcomAssignDeliveryScreenState extends State<EcomAssignDeliveryScreen> {
   final EcomOrderDetailsController ecomController = Get.put(EcomOrderDetailsController());
 
   void _handleHandover() async {
-    bool success = await ecomController.updateHandedOverToCustomer(widget.order['orderId']);
+    bool success = await ecomController.updateHandedOverToCustomer(widget.order['orderId'],widget.title!);
     if (success) {
       Get.back(result: true);
     }

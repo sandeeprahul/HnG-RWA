@@ -241,7 +241,7 @@ class _checkInOutScreenEmployeeState extends State<checkInOutScreenEmployee> {
       print(distanceInMeters);
       var mts = distanceInMeters.toString().split('.');
       var meters = mts[0];
-      if (double.parse(meters) <= 150) {
+      if (double.parse(meters) >= 150) {
         setState(() {
           loading = false;
           takePhoto = true;

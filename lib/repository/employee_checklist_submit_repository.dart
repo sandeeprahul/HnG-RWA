@@ -81,7 +81,7 @@ class EmployeeSubmitChecklistRepository {
     }
   }
 
-  Future<String> submitAllDilo({
+  Future<bool> submitAllDilo({
     required int checklistAssignId,
     required int checklistMstItemId,
   }) async {
@@ -98,14 +98,14 @@ class EmployeeSubmitChecklistRepository {
 
       if (response['statusCode'] == '200') {
         showSimpleDialog(title: 'Success', msg: response['message']);
-        return response['message'];
+        return true;
       } else {
         showSimpleDialog(title: 'Alert!', msg: response['message']);
-        return response['message'];
+        return false;
       }
     } catch (e) {
       handleError(e);
-      return 'Error';
+      return false;
     } finally {
       progressController.hide();
     }

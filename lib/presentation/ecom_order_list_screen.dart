@@ -167,30 +167,35 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(),
-          if (isLocationsLoading)
-            SliverFillRemaining(
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(color: Colors.orange),
-                    const SizedBox(height: 16),
-                    Text(loadingMessage, style: GoogleFonts.outfit(color: Colors.grey[600])),
-                  ],
-                ),
-              ),
-            )
-          else
-            _buildOrderList(),
-        ],
+      backgroundColor: Colors.deepOrange,
+      // backgroundColor: const Color(0xFFF3F4F6),
+      body: SafeArea(
+        child: Container(color:const Color(0xFFF3F4F6) ,
+          child: CustomScrollView(
+            slivers: [
+              _buildAppBar(),
+              if (isLocationsLoading)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(color: Colors.orange),
+                        const SizedBox(height: 16),
+                        Text(loadingMessage, style: GoogleFonts.outfit(color: Colors.grey[600])),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                _buildOrderList(),
+            ],
+          ),
+        ),
       ),
       floatingActionButton: selectedLocation != null ? FloatingActionButton(
         onPressed: _showStoreSelector,
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.deepOrange,
         child: const Icon(Icons.location_on_rounded, color: Colors.white),
       ) : null,
     );
@@ -201,7 +206,8 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
       expandedHeight: 120.0,
       floating: false,
       pinned: true,
-      backgroundColor: Colors.orange,
+      primary: false,
+      backgroundColor: Colors.deepOrange,
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
@@ -226,11 +232,12 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
         ),
         background: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [Colors.orange, Colors.deepOrange],
-            ),
+            color: Colors.deepOrange
+            // gradient: LinearGradient(
+            //   begin: Alignment.topRight,
+            //   end: Alignment.bottomLeft,
+            //   colors: [Colors.orange, Colors.deepOrange],
+            // ),
           ),
         ),
       ),
@@ -263,7 +270,7 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               final order = orderController.orders[index];
-              return _OrderCard(order: order, locationCode: selectedLocation?.locationCode ?? "");
+              return _OrderCard(order: order, locationCode: selectedLocation?.locationCode ?? "",orderTypeName:widget.orderTypeName,);
             },
             childCount: orderController.orders.length,
           ),
@@ -297,13 +304,14 @@ class _OrderCard extends StatelessWidget {
 
           final s = (order['status'] ?? '').toString().toUpperCase();
           bool? refresh;
-          if (s == 'READY_TO_SHIP' || s == 'OUT_FOR_DELIVERY' || s == 'HANDED OVER TO CUSTOMER') {
+          if (s == 'READY_TO_SHIP' || s == 'OUT_FOR_DELIVERY' || s == 'HANDED OVER TO CUSTOMERff') {
             refresh = await Get.to(() => EcomAssignDeliveryScreen(
                   order: order,
                   locationCode: locationCode,
                   title: s == 'HANDED OVER TO CUSTOMER' ? "Handed Over to Customer — ${order['orderId']}" : null,
                 ));
           } else {
+            print("EcomOrderDetailsScreen ; $orderTypeName");
             refresh = await Get.to(() => EcomOrderDetailsScreen(
                   order: order,
                   selectedLocationCode: locationCode,

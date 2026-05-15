@@ -152,8 +152,13 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen> {
                 flexibleSpace: FlexibleSpaceBar(
                   // centerTitle: true,
                   // background: Colors.deepOrangeAccent,
-                  titlePadding: const EdgeInsets.only(left: 24, bottom: 20),
-                  title: Text(
+                  expandedTitleScale: 1.3,
+
+                  // Adjust padding: Use directional padding to handle the collapsed state better
+                  titlePadding: const EdgeInsetsDirectional.only(
+                    start: 56, // This aligns the title to the right of the back button when collapsed
+                    bottom: 16,
+                  ),                  title: Text(
                     'Delivery Method',
                     style: GoogleFonts.outfit(
                       fontWeight: FontWeight.w700,
