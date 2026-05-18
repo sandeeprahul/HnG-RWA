@@ -291,9 +291,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> getPendingTasks() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      var locationCode = prefs.getString('locationCode') ?? '106';
+      var locationCode = prefs.getString('locationCode') ?? '777';
       // var userID =  '71002';
-      var userID = prefs.getString('userCode') ?? '105060';
+      var userID = prefs.getString('userCode') ?? '800001';
       //
       String url =
           "${Constants.apiHttpsUrl}/forcetaskcompletion/Data/$locationCode/$userID";

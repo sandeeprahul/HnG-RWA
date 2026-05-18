@@ -431,10 +431,12 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
                 return ElevatedButton(
                   onPressed: () {
                     if (mobileController.text.isEmpty) {
-                      Get.snackbar('Alert', "Please enter Mobile number",
-                          overlayBlur: 2,
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white);
+                      // Get.snackbar('Alert', "Please enter Mobile number",
+                      //     overlayBlur: 2,
+                      //     backgroundColor: Colors.red,
+                      //     colorText: Colors.white);
+                      Fluttertoast.showToast(msg: "Please enter Mobile number",backgroundColor: Colors.red);
+
                     } else {
                       deliveryController.sendOtpECOM(mobileController.text,
                           nameController.text, order['orderId']);

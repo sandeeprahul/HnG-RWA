@@ -274,7 +274,7 @@ class _OutletSelectionScreenState extends State<OutletSelectionScreen>with Widge
 
       print(url);
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 120));
       print(response.body);
 
       var responseData = json.decode(response.body);

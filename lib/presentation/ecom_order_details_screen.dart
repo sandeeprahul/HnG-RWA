@@ -497,9 +497,12 @@ class _EcomOrderDetailsScreenState extends State<EcomOrderDetailsScreen> {
             if(enteredCode==skuCode){
               _scanProduct(enteredCode, quantity, locationCode, 0);
               Navigator.pop(Get.context!);
+            }else{
+              Fluttertoast.showToast(msg: "Code not matched\nYou entered: $enteredCode\nbut the SKU code is $skuCode");
+              Navigator.pop(Get.context!);
             }
             // codeController.printError(info:"Code not matched");
-            Fluttertoast.showToast(msg: "Code not matched\nYou entered: $enteredCode\nbut the SKU code is $skuCode");
+            // Fluttertoast.showToast(msg: "Code not matched\nYou entered: $enteredCode\nbut the SKU code is $skuCode");
 
             // Get.back();
           } else {
