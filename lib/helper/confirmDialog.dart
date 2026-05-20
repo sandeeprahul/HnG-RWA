@@ -12,7 +12,9 @@ void showConfirmDialog(
       actions: [
         ElevatedButton(
           onPressed: () {
-            Get.back(); // Close the dialog
+            // Get.back(); // Close the dialog
+            Navigator.pop(Get.context!);
+
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
@@ -28,7 +30,9 @@ void showConfirmDialog(
         ElevatedButton(
           onPressed: () {
              // Close the dialog
-            Get.back();
+            // Get.back();
+            Navigator.pop(Get.context!);
+
             onConfirmed(); // Execute the callback function
 
           },

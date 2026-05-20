@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hng_flutter/helper/confirmDialog.dart';
 import 'package:hng_flutter/helper/simpleDialog.dart';
@@ -43,8 +44,10 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
+        // iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           widget.formattedAuditName,
+          style: const TextStyle(color: Colors.white),
         ),
       ),
       body: loading
@@ -53,31 +56,28 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
               children: [
                 // Dropdown for Leave Types
                 Padding(
-                  padding: const EdgeInsets.only(top: 16, left: 16, bottom: 16,right: 16),
+                  padding: const EdgeInsets.only(
+                      top: 16, left: 16, bottom: 16, right: 16),
                   child: Row(
                     children: [
                       const Expanded(
                         child: Text(
                           'Message: ',
                           style: TextStyle(
-
-                            fontSize: 18,
-                              decoration: TextDecoration.underline
-                            /*  decoration: TextDecoration.underline,    decorationColor: Colors.grey,*/ // Set the underline color here
-                          ),
+                              fontSize: 18, decoration: TextDecoration.underline
+                              /*  decoration: TextDecoration.underline,    decorationColor: Colors.grey,*/ // Set the underline color here
+                              ),
                         ),
-                      ),Expanded(
+                      ),
+                      Expanded(
                         flex: 2,
                         child: Text(
                           descriptionList[0].message,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 3,
-                          style: const TextStyle(
-
-                            fontSize: 18,
-                            color: Colors.red
-                            /*  decoration: TextDecoration.underline,    decorationColor: Colors.grey,*/ // Set the underline color here
-                          ),
+                          style: const TextStyle(fontSize: 18, color: Colors.red
+                              /*  decoration: TextDecoration.underline,    decorationColor: Colors.grey,*/ // Set the underline color here
+                              ),
                         ),
                       ),
                     ],
@@ -256,6 +256,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                             showConfirmDialog(
                                 onConfirmed: () {
                                   submitLeaves();
+                                  // Navigator.pop(Get.context!);
                                 },
                                 title: 'Alert!',
                                 msg: 'Confirm Submit?');
@@ -290,12 +291,12 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
     String? locationCode = preferences.getString("locationCode");
 
-
     // Collect all employees, including selected and unselected, and prepare JSON output
     List<Map<String, String>> jsonOutput = employees.map((employee) {
       bool isSelected = selectedEmployees[employee.empCode] == true;
       // Parse the original string to a DateTime object
-      DateTime parsedDate = DateFormat("dd-MM-yyyy HH:mm:ss").parse(employee.date);
+      DateTime parsedDate =
+          DateFormat("dd-MM-yyyy HH:mm:ss").parse(employee.date);
 
       // Format the DateTime object to the desired format
       String formattedDate = DateFormat("yyyy-MM-dd").format(parsedDate);
@@ -339,15 +340,20 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         print("Leave submission successful!");
         final Map<String, dynamic> responseData = json.decode(response.body);
         if (responseData["statusCode"] == "200") {
-          showSimpleDialog(title: 'Success', msg: responseData["message"]);
-          Navigator.pop(context);
+          loadData();
+          // showSimpleDialog(title: 'Success', msg: responseData["message"]);
+          Fluttertoast.showToast(msg: '${responseData["message"]}');
           print(responseData["message"]); // Output: "Updated Successfully"
+
           // Handle success (e.g., show a success message to the user)
         } else {
           setState(() {
             loading = false;
           });
-          showSimpleDialog(title: 'Error', msg: responseData["message"]);
+          Fluttertoast.showToast(msg: '${responseData["message"]}',toastLength: Toast.LENGTH_LONG);
+
+          // showSimpleDialog(title: 'Error', msg: responseData["message"]);
+          // Navigator.pop(Get.context!);
 
           // Handle error case if statusCode is not 200
         }
@@ -358,17 +364,21 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         });
         print("Failed to submit leaves. Status code: ${response.statusCode}");
         print("Response body: ${response.body}");
-        showSimpleDialog(
-            title: 'Error',
-            msg:
-                'Failed to submit leaves. Status code: ${response.statusCode}');
+        // showSimpleDialog(
+        //     title: 'Error',
+        //     msg:
+        //         'Failed to submit leaves. Status code: ${response.statusCode}');
+        Fluttertoast.showToast(msg: 'Failed to submit leaves. Status code: ${response.statusCode}',toastLength: Toast.LENGTH_LONG);
+
       }
     } catch (e) {
       setState(() {
         loading = false;
       });
       print("Error submitting leaves: $e");
-      showSimpleDialog(title: 'Error', msg: 'Failed to submit leaves.  $e');
+      Fluttertoast.showToast(msg: 'Failed to submit leaves.  $e',toastLength: Toast.LENGTH_LONG);
+
+      // showSimpleDialog(title: 'Error', msg: 'Failed to submit leaves.  $e');
     }
   }
 
@@ -437,7 +447,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
     List<Map<String, String>> jsonOutput = employees.map((employee) {
       bool isSelected = selectedEmployees[employee.empCode] == true;
-      DateTime parsedDate = DateFormat("dd-MM-yyyy HH:mm:ss").parse(employee.date);
+      DateTime parsedDate =
+          DateFormat("dd-MM-yyyy HH:mm:ss").parse(employee.date);
 
       // Format the DateTime object to the desired format
       String formattedDate = DateFormat("yyyy-MM-dd").format(parsedDate);

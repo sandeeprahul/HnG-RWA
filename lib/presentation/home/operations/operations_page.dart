@@ -45,6 +45,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
 
   @override
   Widget build(BuildContext context) {
+
     return isLoading
         ? const Center(
             child:
@@ -332,6 +333,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
         setState(() {
           auditData =
               parsedResponse.map((json) => Audit.fromJson(json)).toList();
+          auditData.removeWhere((audit) => audit.auditId == 108);
           isLoading = false; // Data has been fetched, loading is complete
         });
       } else {
