@@ -134,7 +134,7 @@ class _EcomOrderListScreenState extends State<EcomOrderListScreen> {
         double.parse(location.longitude),
       );
 
-      if (distance >= 100.0) { // Allowing 1km range for store proximity
+      if (distance <= 150.0) { // Allowing 1km range for store proximity
         setState(() {
           selectedLocation = location;
           isLocationsLoading = false;

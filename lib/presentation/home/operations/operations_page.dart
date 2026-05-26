@@ -13,7 +13,6 @@ import 'package:hng_flutter/presentation/home/operations/weekoff_apply_page.dart
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../WebViewScreen.dart';
 import '../../../data/opeartions/audit.dart';
 import '../../../helper/StringUtils.dart';
@@ -21,7 +20,11 @@ import '../../../provider/store_transfer_provider.dart';
 import '../../../provider/week_off_provider.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../tester_flow_binding.dart';
+import '../../../tester_product_controller.dart';
+import '../../../tester_screen.dart';
 import '../../dashboard_page.dart';
+import '../../ecom_child_products_screen.dart';
 import '../../order_management_screen.dart';
 import '../../week_off_employee_list_page.dart';
 import 'employees_leave_apply_page.dart';
@@ -45,7 +48,6 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
 
   @override
   Widget build(BuildContext context) {
-
     return isLoading
         ? const Center(
             child:
@@ -57,14 +59,18 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
-                itemCount: auditData.length + 1,
+                itemCount: auditData.length + 2,
                 padding: const EdgeInsets.all(16),
                 itemBuilder: (BuildContext context, int index) {
                   // 2. Check if we are at the last index
                   bool isStaticItem = index == auditData.length;
+                  bool isStaticItem2 = index == auditData.length + 1;
 
                   if (isStaticItem) {
                     return _buildStaticOmsTile(context);
+                  }
+                  if (isStaticItem2) {
+                    return _buildStaticChildProductsTile(context);
                   }
 
                   final audit = auditData[index];
@@ -288,6 +294,61 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
             Center(
               child: Text(
                 "H&G OMS",
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStaticChildProductsTile(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          // Using a slightly different blue or your preferred color
+          colors: [Colors.blue.shade300, Colors.blue.shade500],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          // Define navigation for H&G OMS here
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryOptionsScreen()));
+          // Get.to(const DeliveryOptionsScreen());
+          Get.to(
+                () => const TesterScreen(),
+            binding: TestterBinding(), // This automatically initializes ProductController & ScanController
+          );
+        },
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: Icon(
+                Icons.science, // Choose an appropriate icon
+                color: Colors.white,
+                size: 60,
+              ),
+            ),
+            SizedBox(height: 5),
+            Center(
+              child: Text(
+                "Tester",
                 textAlign: TextAlign.center,
                 style:
                     TextStyle(fontWeight: FontWeight.bold, color: Colors.white),

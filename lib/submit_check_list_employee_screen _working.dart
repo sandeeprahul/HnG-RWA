@@ -213,14 +213,18 @@ class _CheckListPageState extends State<CheckListPage> {
       // 1. Close the confirmation dialog if it is still open
       if (Get.isDialogOpen ?? false) {
         Get.back();
-      }
+      }    Get.offAll(
+            () => CheckListSegregationScreen(
+          1,
+          widget.mGetActivityTypes,
+          widget.locationsList,
+        ),
+      );
+      if (mounted)  Navigator.canPop(context);
 
       // 2. Navigate away and REMOVE the current screen from the stack
-      Get.off(() => CheckListSegregationScreen(
-            1,
-            widget.mGetActivityTypes,
-            widget.locationsList,
-          ));
+      // 2. SUCCESS FIX: Replace the current screen context completely using the native Navigator
+
 
       Fluttertoast.showToast(msg: "Submitted Successfully");
     } else {

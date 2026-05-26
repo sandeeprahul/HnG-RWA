@@ -129,7 +129,16 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
                       subtitle: Text("Code: ${loc.locationCode}"),
                       onTap: () {
                         Navigator.pop(context);
-                        _verifyProximityAndFetch(loc);
+                        // Skip proximity check for "Out for Delivery" and "Handed Over to Customer"
+                        if (widget.screenStatusName == "Out for Delivery" ||
+                            widget.screenStatusName == "Handed Over to Customer") {
+                          setState(() {
+                            selectedLocation = loc;
+                          });
+                          _fetchOrders();
+                        } else {
+                          _verifyProximityAndFetch(loc);
+                        }
                       },
                     );
                   },
@@ -169,7 +178,7 @@ class _EcomOutForDeliveryScreenState extends State<EcomOutForDeliveryScreen> {
         double.parse(location.longitude),
       );
 
-      if (distance >= 100.0) {
+      if (distance <= 150.0) {
         setState(() {
           selectedLocation = location;
           isLoadingLocations = false;

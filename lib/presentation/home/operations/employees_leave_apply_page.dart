@@ -50,7 +50,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           style: const TextStyle(color: Colors.white),
         ),
       ),
-      body: loading
+      body: SafeArea(child:loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
@@ -254,7 +254,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
 
                             // Collect selected employees and print JSON
                             showConfirmDialog(
-                                onConfirmed: () {
+                                onConfirmed: () async{
                                   submitLeaves();
                                   // Navigator.pop(Get.context!);
                                 },
@@ -278,6 +278,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                 ),
               ],
             ),
+    ),
     );
   }
 
