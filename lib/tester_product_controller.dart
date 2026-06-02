@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:get/get.dart';
+import 'presentation/testerFlow/tester_models.dart';
 
 class ProductController extends GetxController {
   final Rx<ParentInfo> parentInfo = ParentInfo(
@@ -11,7 +11,7 @@ class ProductController extends GetxController {
     brand: 'LAKME|COSMETICS',
   ).obs;
 
-  final RxList<ChildProduct> childProducts = <ChildProduct>[].obs;
+  final RxList<ChildProductFromController> childProducts = <ChildProductFromController>[].obs;
   final RxList<ScanRecord> recentScans = <ScanRecord>[].obs;
   late RxInt todayScansCount = 0.obs;
   final RxString lastUpdated = ''.obs;
@@ -25,19 +25,19 @@ class ProductController extends GetxController {
 
   void _loadDummyData() {
     childProducts.assignAll([
-      ChildProduct(
+      ChildProductFromController(
         sku: '301114',
         shadeName: 'Soft Pink',
         status: ProductStatus.pending,
         isSelected: true,
       ),
-      ChildProduct(
+      ChildProductFromController(
         sku: '301115',
         shadeName: 'RoseBlush',
         status: ProductStatus.available,
         isSelected: true,
       ),
-      ChildProduct(
+      ChildProductFromController(
         sku: '301116',
         shadeName: 'Coral Dream',
         status: ProductStatus.unavailable,
@@ -173,26 +173,26 @@ extension ProductStatusExtension on ProductStatus {
   }
 }
 
-class ChildProduct {
+class ChildProductFromController {
   final String sku;
   final String shadeName;
   final ProductStatus status;
   final bool isSelected;
 
-  ChildProduct({
+  ChildProductFromController({
     required this.sku,
     required this.shadeName,
     required this.status,
     this.isSelected = false,
   });
 
-  ChildProduct copyWith({
+  ChildProductFromController copyWith({
     String? sku,
     String? shadeName,
     ProductStatus? status,
     bool? isSelected,
   }) {
-    return ChildProduct(
+    return ChildProductFromController(
       sku: sku ?? this.sku,
       shadeName: shadeName ?? this.shadeName,
       status: status ?? this.status,

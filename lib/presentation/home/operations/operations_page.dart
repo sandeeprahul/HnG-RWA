@@ -23,9 +23,12 @@ import 'package:http/http.dart' as http;
 import '../../../tester_flow_binding.dart';
 import '../../../tester_product_controller.dart';
 import '../../../tester_screen.dart';
+import '../../attendance/attendanceNewController.dart';
+import '../../attendance/record_attendance_new_screen.dart';
 import '../../dashboard_page.dart';
 import '../../ecom_child_products_screen.dart';
 import '../../order_management_screen.dart';
+import '../../testerFlow/tester_new_screen.dart';
 import '../../week_off_employee_list_page.dart';
 import 'employees_leave_apply_page.dart';
 
@@ -105,15 +108,23 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                     child: InkWell(
                       onTap: () {
                         if (audit.auditId == 101) {
+                          Get.lazyPut<AttendanceNewController>(() => AttendanceNewController());
+                          // DashboardScreen
                           Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DashboardScreen(
+                                // formattedAuditName: formattedAuditName,
+                              ),
+                            ),
+                          );/*     Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => EmployeeListScreen(
                                 formattedAuditName: formattedAuditName,
                               ),
-                              // builder: (context) => const WeekOffEmployeeListPage(),
                             ),
-                          );
+                          );*/
                         } else if (audit.auditId == 102) {
                           Navigator.push(
                             context,
@@ -331,7 +342,8 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
           // Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryOptionsScreen()));
           // Get.to(const DeliveryOptionsScreen());
           Get.to(
-                () => const TesterScreen(),
+                () =>  TesterNewScreen(),
+                // () => const TesterScreen(),
             binding: TestterBinding(), // This automatically initializes ProductController & ScanController
           );
         },

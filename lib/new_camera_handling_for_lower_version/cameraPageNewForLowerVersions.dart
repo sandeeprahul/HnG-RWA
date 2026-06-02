@@ -70,7 +70,9 @@ class _CameraPageForLowerVersionsState
       final result = await controller.cropAndProcessImage(imagePath);
 
       if (result == 1) {
-        Get.back(result: controller.imagePath.value);
+        Navigator.of(context).pop(controller.imagePath.value);
+        // Get.back(result: controller.imagePath.value);
+        // Navigator.pop(Get.context!,controller.imagePath.value);
       } else {
         Get.back();
       }
@@ -83,46 +85,48 @@ class _CameraPageForLowerVersionsState
   Widget build(BuildContext context) {
     // iOS never reaches this UI → it directly opens ImagePicker camera
     return Scaffold(
-      appBar: AppBar(title: const Text("Capture Image")),
-      body: Obx(() {
-        if (Platform.isIOS) {
-          return const Center(
-            child: Text(
-              "Opening camera...",
-              style: TextStyle(fontSize: 16),
-            ),
-          );
-        }
+      appBar: AppBar(title: const Text("Capture Image"),centerTitle: true),
+      body: SafeArea(
+        child: Obx(() {
+          if (Platform.isIOS) {
+            return const Center(
+              child: Text(
+                "Opening camera...",
+                style: TextStyle(fontSize: 16),
+              ),
+            );
+          }
 
-        /// ANDROID PREVIEW UI
-        final bool isInitialized = controller.isCameraInitialized.value;
-        final CameraController? camController =
-            controller.cameraControllerRx.value;
+          /// ANDROID PREVIEW UI
+          final bool isInitialized = controller.isCameraInitialized.value;
+          final CameraController? camController =
+              controller.cameraControllerRx.value;
 
-        if (isInitialized && camController != null) {
-          return Stack(
-            children: [
-              Positioned.fill(child: CameraPreview(camController)),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: InkWell(
-                  onTap: _captureAndroidImage,
-                  child: const Padding(
-                    padding: EdgeInsets.all(15),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 35,
-                      child: Icon(Icons.camera_alt),
+          if (isInitialized && camController != null) {
+            return Stack(
+              children: [
+                Positioned.fill(child: CameraPreview(camController)),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: InkWell(
+                    onTap: _captureAndroidImage,
+                    child: const Padding(
+                      padding: EdgeInsets.all(15),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 35,
+                        child: Icon(Icons.camera_alt),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          );
-        }
+              ],
+            );
+          }
 
-        return const Center(child: CircularProgressIndicator());
-      }),
+          return const Center(child: CircularProgressIndicator());
+        }),
+      ),
     );
   }
 }

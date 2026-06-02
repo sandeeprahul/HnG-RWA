@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hng_flutter/HomeScreen.dart';
 import 'package:hng_flutter/data/ActiveCheckListLpd.dart';
 import 'package:hng_flutter/data/GetActvityTypes.dart';
 import 'package:hng_flutter/storeAuditCheckListScreen.dart';
@@ -84,11 +85,27 @@ class _CheckListSegregationScreenState extends State<CheckListSegregationScreen>
     getActiveCheckListData();
   }
 
+  Future<bool> _onWillPop() async {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+      );
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-          child: Stack(
+        body: WillPopScope(
+          onWillPop: _onWillPop,
+          child: SafeArea(
+            child: Stack(
             children: [
               Column(
                 children: [
@@ -97,9 +114,7 @@ class _CheckListSegregationScreenState extends State<CheckListSegregationScreen>
                     child: Row(
                       children: [
                         InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
+                          onTap: _onWillPop,
                           child: const Padding(
                             padding: EdgeInsets.only(left: 15),
                             child: Icon(Icons.arrow_back),
@@ -376,7 +391,7 @@ class _CheckListSegregationScreenState extends State<CheckListSegregationScreen>
                   ))
             ],
           ),
-        ));
+        )));
   }
 
   Widget checkListViewLpd() {
