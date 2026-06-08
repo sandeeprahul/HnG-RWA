@@ -1,142 +1,181 @@
 // screen3_ba_attendance.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'attendanceNewController.dart';
+import 'record_attendance_new_screen.dart';
 import 'success_confirmation.dart';
 
 
 
-// ----------------------------- CONTROLLER FOR BA STAFF ---------------------------------
+// ----------------------------- CONTROLLER FOR BA STAFF (API-backed) ---------------------------------
 class BaAttendanceController extends GetxController {
-  final RxList<BaEmployee> employees = <BaEmployee>[
-    BaEmployee(
-      id: "83108",
-      name: "Hema Nalva",
-      brand: "Sugar Cosmetics",
-      role: "Brand Advisor",
-      avatarInitials: "HN",
-      avatarColor: AppColors.brandBlue,
-      status: AttendanceStatus.present,
-      checkIn: "10:05 AM",
-      checkOut: "07:30 PM",
-      absenceReason: null,
-      relieverId: null,
-      missedReason: null,
-      customCheckIn: null,
-      customCheckOut: null,
-    ),
-    BaEmployee(
-      id: "84143",
-      name: "Bahar Sultana",
-      brand: "Revlon",
-      role: "Brand Advisor",
-      avatarInitials: "BS",
-      avatarColor: const Color(0xFF8B5CF6),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      absenceReason: "Reliever (with ID)",
-      relieverId: "Manasa N P – Loreal (83744)",
-      missedReason: null,
-      customCheckIn: null,
-      customCheckOut: null,
-    ),
-    BaEmployee(
-      id: "83744",
-      name: "Manasa N P",
-      brand: "Loreal",
-      role: "Brand Advisor",
-      avatarInitials: "MN",
-      avatarColor: const Color(0xFF0EA5E9),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      absenceReason: "Missed Marking Attendance",
-      relieverId: null,
-      missedReason: "Mobile Issue",
-      customCheckIn: "09:30",
-      customCheckOut: "18:30",
-    ),
-    BaEmployee(
-      id: "84201",
-      name: "Anusha Krishnaveni",
-      brand: "Lakme",
-      role: "Brand Advisor",
-      avatarInitials: "AK",
-      avatarColor: const Color(0xFFF43F5E),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      absenceReason: "Week Off",
-      relieverId: null,
-      missedReason: null,
-      customCheckIn: null,
-      customCheckOut: null,
-    ),
-    // Additional BA staff to match total 24 (only key ones shown, but design is consistent)
-    BaEmployee(
-      id: "83001",
-      name: "Kavya S",
-      brand: "MAC",
-      role: "Brand Advisor",
-      avatarInitials: "KS",
-      avatarColor: AppColors.brandBlue,
-      status: AttendanceStatus.present,
-      checkIn: "09:45 AM",
-      checkOut: "06:30 PM",
-    ),
-    BaEmployee(
-      id: "83222",
-      name: "Rahul Mehta",
-      brand: "Clinique",
-      role: "Brand Advisor",
-      avatarInitials: "RM",
-      avatarColor: const Color(0xFF8B5CF6),
-      status: AttendanceStatus.present,
-      checkIn: "10:15 AM",
-      checkOut: "07:15 PM",
-    ),
-    BaEmployee(
-      id: "83999",
-      name: "Sonali Patil",
-      brand: "Estée Lauder",
-      role: "Brand Advisor",
-      avatarInitials: "SP",
-      avatarColor: const Color(0xFF0EA5E9),
-      status: AttendanceStatus.present,
-      checkIn: "09:30 AM",
-      checkOut: "06:45 PM",
-    ),
-    BaEmployee(
-      id: "84567",
-      name: "Priyanka Rao",
-      brand: "Bobbi Brown",
-      role: "Brand Advisor",
-      avatarInitials: "PR",
-      avatarColor: const Color(0xFFF43F5E),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      absenceReason: null,
-    ),
-    BaEmployee(
-      id: "84789",
-      name: "Vinod Kumar",
-      brand: "Sugar Cosmetics",
-      role: "Brand Advisor",
-      avatarInitials: "VK",
-      avatarColor: AppColors.brandBlue,
-      status: AttendanceStatus.present,
-      checkIn: "09:55 AM",
-      checkOut: "07:00 PM",
-    ),
-    // ... more employees can be added; for brevity we keep the key ones from design
-  ].obs;
+  BaAttendanceController({required this.attendanceDate, this.initialLocationName});
 
+  // yyyy-MM-dd, supplied by the screen (from the dashboard's selected day).
+  final String attendanceDate;
+  final String? initialLocationName;
+
+  static const String _baseUrl =
+      'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api';
+
+  final RxBool isLoading = false.obs;
+  final RxList<BaEmployee> employees = <BaEmployee>[].obs;
+  final RxList<BaLeaveType> leaveTypes = <BaLeaveType>[].obs;
   final Rx<AttendanceFilter> currentFilter = AttendanceFilter.all.obs;
 
+  // Page meta from API
+  final RxString locationName = ''.obs;
+  final RxString locationCode = ''.obs;
+  final RxInt totalCount = 0.obs;
+  final RxInt presentTotal = 0.obs;
+  final RxInt pendingTotal = 0.obs;
+
+  // Resolved logged-in user id (used in fetch + submit payloads).
+  int? userId;
+
+  static const List<Color> _avatarPalette = [
+    AppColors.brandBlue,
+    Color(0xFF8B5CF6),
+    Color(0xFF0EA5E9),
+    Color(0xFFF43F5E),
+  ];
+
+  @override
+  void onInit() {
+    super.onInit();
+    locationName.value = initialLocationName ?? '';
+    fetchData();
+  }
+
+  // ----------------------------- FETCH PAGE (POST) ---------------------------------
+  Future<void> fetchData() async {
+    try {
+      isLoading.value = true;
+      final prefs = await SharedPreferences.getInstance();
+      final userCode = prefs.getString("userCode");
+
+      if (userCode == null || userCode.isEmpty) {
+        isLoading.value = false;
+        Fluttertoast.showToast(msg: 'User not found. Please login again.');
+        return;
+      }
+
+      userId = int.tryParse(userCode);
+      final Map<String, dynamic> payload = {
+        "userId": userId ?? userCode,
+        "attendanceDate": attendanceDate,
+      };
+
+      final url = '$_baseUrl/Login/GetBAAttendancePage';
+      print("BA ATTENDANCE FETCH: $url  payload: ${jsonEncode(payload)}");
+
+      final response = await http
+          .post(
+            Uri.parse(url),
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+            },
+            body: jsonEncode(payload),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (data['status'] == true) {
+          locationName.value = (data['locationName'] ?? '').toString();
+          locationCode.value = (data['locationCode'] ?? '').toString();
+          totalCount.value = _toInt(data['total']);
+          presentTotal.value = _toInt(data['present']);
+          pendingTotal.value = _toInt(data['pending']);
+
+          final List<dynamic> rawTypes =
+              (data['leaveTypes'] as List<dynamic>?) ?? [];
+          leaveTypes.assignAll(rawTypes
+              .map((e) =>
+                  BaLeaveType.fromJson((e as Map<String, dynamic>?) ?? {}))
+              .toList());
+
+          final List<dynamic> rawEmps =
+              (data['employees'] as List<dynamic>?) ?? [];
+          final parsed = <BaEmployee>[];
+          for (var i = 0; i < rawEmps.length; i++) {
+            final e = (rawEmps[i] as Map<String, dynamic>?) ?? {};
+            parsed.add(
+                BaEmployee.fromApi(e, _avatarPalette[i % _avatarPalette.length]));
+          }
+          employees.assignAll(parsed);
+        } else {
+          Fluttertoast.showToast(
+            msg: (data['message'] ?? 'Failed to fetch data.').toString(),
+            toastLength: Toast.LENGTH_LONG,
+          );
+        }
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Failed to load data. Status code: ${response.statusCode}',
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
+    } catch (e) {
+      print("Error fetching BA attendance: $e");
+      Fluttertoast.showToast(
+        msg: 'Error fetching data. Please try again.',
+        toastLength: Toast.LENGTH_LONG,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // ----------------------------- FETCH RELIEVER LIST (GET) ---------------------------------
+  Future<void> fetchRelieverList(BaEmployee emp) async {
+    if (emp.relieverOptions.isNotEmpty || emp.relieverLoading) return;
+    try {
+      emp.relieverLoading = true;
+      employees.refresh();
+
+      final url = '$_baseUrl/Login/GetBARelieverEmployeeList/${emp.id}';
+      print("BA RELIEVER FETCH: $url");
+
+      final response =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (data['status'] == true) {
+          final List<dynamic> raw =
+              (data['relieverEmployees'] as List<dynamic>?) ?? [];
+          emp.relieverOptions = raw
+              .map((e) =>
+                  BaRelieverEmployee.fromJson((e as Map<String, dynamic>?) ?? {}))
+              .toList();
+        } else {
+          Fluttertoast.showToast(
+              msg: (data['message'] ?? 'No relievers found.').toString());
+        }
+      } else {
+        Fluttertoast.showToast(
+            msg: 'Failed to load relievers (${response.statusCode}).');
+      }
+    } catch (e) {
+      print("Error fetching reliever list: $e");
+      Fluttertoast.showToast(msg: 'Error loading relievers.');
+    } finally {
+      emp.relieverLoading = false;
+      employees.refresh();
+    }
+  }
+
+  // ----------------------------- DERIVED / FILTERS ---------------------------------
   List<BaEmployee> get filteredEmployees {
     switch (currentFilter.value) {
       case AttendanceFilter.all:
@@ -150,40 +189,66 @@ class BaAttendanceController extends GetxController {
     }
   }
 
-  int get presentCount => employees.where((e) => e.status == AttendanceStatus.present).length;
-  int get pendingCount => employees.where((e) => e.status == AttendanceStatus.pending).length;
+  int get presentCount =>
+      employees.where((e) => e.status == AttendanceStatus.present).length;
+  int get pendingCount =>
+      employees.where((e) => e.status == AttendanceStatus.pending).length;
+  int get absentCount =>
+      employees.where((e) => e.status == AttendanceStatus.absent).length;
 
   void setFilter(AttendanceFilter filter) {
     currentFilter.value = filter;
   }
 
-  void updateAbsenceReason(String employeeId, String? reason) {
+  // Returns the full leave type (with sub types) currently selected for an employee.
+  BaLeaveType? selectedLeaveTypeFor(BaEmployee emp) {
+    if (emp.leaveTypeId == null) return null;
+    return leaveTypes.firstWhereOrNull((t) => t.id == emp.leaveTypeId);
+  }
+
+  // True when the selected reason needs a system reliever employee (with ID).
+  bool needsRelieverWithId(BaEmployee emp) {
+    final name = (emp.absenceReason ?? '').toLowerCase();
+    return name.contains('reliever') &&
+        name.contains('with id') &&
+        !name.contains('without');
+  }
+
+  // ----------------------------- UPDATE HELPERS ---------------------------------
+  void updateAbsenceReason(String employeeId, String? reasonName) {
+    final index = employees.indexWhere((e) => e.id == employeeId);
+    if (index == -1) return;
+    final emp = employees[index];
+    emp.absenceReason = reasonName;
+    final type = leaveTypes.firstWhereOrNull((t) => t.name == reasonName);
+    emp.leaveTypeId = type?.id;
+    // Reset dependent fields whenever the reason changes.
+    emp.missedReason = null;
+    emp.subTypeId = null;
+    emp.relieverId = null;
+    emp.relieverEmployeeCode = null;
+    employees.refresh();
+
+    // Pre-load the reliever list when needed.
+    if (needsRelieverWithId(emp)) {
+      fetchRelieverList(emp);
+    }
+  }
+
+  void updateSubType(String employeeId, BaLeaveSubType? subType) {
     final index = employees.indexWhere((e) => e.id == employeeId);
     if (index != -1) {
-      employees[index].absenceReason = reason;
-      // Reset sub-fields when reason changes
-      if (reason != "Reliever (with ID)") employees[index].relieverId = null;
-      if (reason != "Missed Marking Attendance") {
-        employees[index].missedReason = null;
-        employees[index].customCheckIn = null;
-        employees[index].customCheckOut = null;
-      }
+      employees[index].missedReason = subType?.name;
+      employees[index].subTypeId = subType?.id;
       employees.refresh();
     }
   }
 
-  void updateRelieverId(String employeeId, String? reliever) {
+  void updateReliever(String employeeId, BaRelieverEmployee? reliever) {
     final index = employees.indexWhere((e) => e.id == employeeId);
     if (index != -1) {
-      employees[index].relieverId = reliever;
-      employees.refresh();
-    }
-  }
-
-  void updateMissedReason(String employeeId, String? reason) {
-    final index = employees.indexWhere((e) => e.id == employeeId);
-    if (index != -1) {
-      employees[index].missedReason = reason;
+      employees[index].relieverId = reliever?.displayName;
+      employees[index].relieverEmployeeCode = reliever?.employeeCode;
       employees.refresh();
     }
   }
@@ -191,103 +256,311 @@ class BaAttendanceController extends GetxController {
   void updateCustomTimes(String employeeId, String? checkIn, String? checkOut) {
     final index = employees.indexWhere((e) => e.id == employeeId);
     if (index != -1) {
-      employees[index].customCheckIn = checkIn;
-      employees[index].customCheckOut = checkOut;
-      employees.refresh();
+      // Store only; no refresh so the text field keeps focus while typing.
+      if (checkIn != null) employees[index].customCheckIn = checkIn;
+      if (checkOut != null) employees[index].customCheckOut = checkOut;
     }
   }
 
   void saveDraft() {
     Get.snackbar("Draft Saved", "BA attendance changes saved locally.",
-        snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.neutral800, colorText: AppColors.white);
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.neutral800,
+        colorText: AppColors.white);
+  }
+
+  void updateRelieverWithoutId(
+      String employeeId, String? name, String? mobile, String? source) {
+    final index = employees.indexWhere((e) => e.id == employeeId);
+    if (index != -1) {
+      employees[index].nameWithoutId = name;
+      employees[index].mobileWithoutId = mobile;
+      employees[index].sourceWithoutId = source;
+      employees.refresh();
+    }
+  }
+
+  String? nullOrValue(dynamic value) {
+    if (value == null) return null;
+    return nullIfEmpty(value.toString());
+  }
+
+  String? nullIfEmpty(String? v) =>
+      (v == null || v.trim().isEmpty) ? null : v.trim();
+
+
+  // ----------------------------- PER-EMPLOYEE SUBMIT (POST) ---------------------------------
+  Future<void> submitEmployee(BaEmployee emp) async {
+    // Validation
+    if (emp.absenceReason == null || emp.absenceReason!.isEmpty) {
+      Fluttertoast.showToast(msg: 'Please select a reason for ${emp.name}.');
+      return;
+    }
+    final selectedType = selectedLeaveTypeFor(emp);
+    if ((selectedType?.subTypes.isNotEmpty ?? false) && emp.subTypeId == null) {
+      Fluttertoast.showToast(msg: 'Please select a detail for ${emp.name}.');
+      return;
+    }
+    if (needsRelieverWithId(emp) &&
+        (emp.relieverEmployeeCode == null ||
+            emp.relieverEmployeeCode!.isEmpty)) {
+      Fluttertoast.showToast(msg: 'Please select a reliever for ${emp.name}.');
+      return;
+    }
+    final isWithout = (emp.absenceReason ?? '').toLowerCase().contains('without');
+    if (isWithout &&
+        ((emp.nameWithoutId ?? '').trim().isEmpty ||
+            (emp.mobileWithoutId ?? '').trim().isEmpty)) {
+      Fluttertoast.showToast(msg: 'Please add reliever details for ${emp.name}.');
+      return;
+    }
+
+    // String? nullIfEmpty(String? v) =>
+    //     (v == null || v.trim().isEmpty) ? null : v.trim();
+// Optimized to convert any dynamic object to a trimmed string or return null if empty
+
+
+    String emptyIfNull(dynamic value) => value?.toString() ?? '';
+
+    // final relieverCode = nullIfEmpty(emp.relieverEmployeeCode);
+    final relieverCode = nullIfEmpty(emp.relieverEmployeeCode);
+    final Map<String, dynamic> payload = {
+      "userId": nullOrValue(userId),
+      "employeeCode": nullOrValue(emp.id),
+      "attendanceDate": nullOrValue(attendanceDate),
+      "reasonId": nullOrValue(emp.leaveTypeId), // Replaced empty string fallback with null
+      "reason": nullOrValue(emp.absenceReason),
+      "subTypeReasonId": nullOrValue(emp.subTypeId), // Replaced empty string fallback with null
+      "subTypeReason": nullOrValue(emp.missedReason),
+      "relieverEmpId": nullOrValue(relieverCode),
+      "nameWithoutId": nullOrValue(emp.nameWithoutId),
+      "mobileWithoutId": nullOrValue(emp.mobileWithoutId),
+      "sourceWithoutId": nullOrValue(emp.sourceWithoutId),
+      "inTime": nullOrValue(emp.customCheckIn),
+      "outTime": nullOrValue(emp.customCheckOut),
+    };
+
+    // final Map<String, dynamic> payload = {
+    //   "userId": userId,
+    //   "employeeCode": emptyIfNull(emp.id),
+    //   "attendanceDate": emptyIfNull(attendanceDate),
+    //   "reasonId": emp.leaveTypeId ?? "",
+    //   "reason": emptyIfNull(emp.absenceReason),
+    //   "subTypeReasonId": emp.subTypeId ?? "",
+    //   "subTypeReason": emptyIfNull(emp.missedReason),
+    //   "relieverEmpId": emptyIfNull(relieverCode),
+    //   "nameWithoutId": emptyIfNull(emp.nameWithoutId),
+    //   "mobileWithoutId": emptyIfNull(emp.mobileWithoutId),
+    //   "sourceWithoutId": emptyIfNull(emp.sourceWithoutId),
+    //   "inTime": emptyIfNull(emp.customCheckIn),
+    //   "outTime": emptyIfNull(emp.customCheckOut),
+    // };
+    // final Map<String, dynamic> payload = {
+    //   "userId": userId,
+    //   "employeeCode": emp.id,
+    //   "attendanceDate": attendanceDate,
+    //   "reasonId": emp.leaveTypeId,
+    //   "reason": emp.absenceReason,
+    //   "subTypeReasonId": emp.subTypeId,
+    //   "subTypeReason": nullIfEmpty(emp.missedReason),
+    //   "relieverEmpId":
+    //       relieverCode == null ? null : (int.tryParse(relieverCode) ?? relieverCode),
+    //   "nameWithoutId": nullIfEmpty(emp.nameWithoutId),
+    //   "mobileWithoutId": nullIfEmpty(emp.mobileWithoutId),
+    //   "sourceWithoutId": nullIfEmpty(emp.sourceWithoutId),
+    //   "inTime": nullIfEmpty(emp.customCheckIn),
+    //   "outTime": nullIfEmpty(emp.customCheckOut),
+    // };
+
+    final url = '$_baseUrl/Login/SaveBAAttendanceException';
+    print("BA SUBMIT: $url  payload: ${jsonEncode(payload)}");
+
+    try {
+      emp.submitting = true;
+      employees.refresh();
+
+      final response = await http
+          .post(
+            Uri.parse(url),
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+            },
+            body: jsonEncode(payload),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (data['status'] == true) {
+          Fluttertoast.showToast(
+            msg: (data['message'] ?? 'Attendance submitted for ${emp.name}.')
+                .toString(),
+          );
+          await fetchData();
+        } else {
+          Fluttertoast.showToast(
+            msg: (data['message'] ?? 'Failed to submit attendance.').toString(),
+            toastLength: Toast.LENGTH_LONG,
+          );
+        }
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Failed to submit. Status code: ${response.statusCode}',
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
+    } catch (e) {
+      print("Error submitting BA attendance: $e");
+      Fluttertoast.showToast(
+        msg: 'Error submitting attendance. Please try again.',
+        toastLength: Toast.LENGTH_LONG,
+      );
+    } finally {
+      emp.submitting = false;
+      employees.refresh();
+    }
   }
 
   void submitAttendance() {
-    // Here you would call API with updated attendance data
+    // Global submit retained for now; navigates to the success screen.
     Get.to(() => SuccessConfirmationScreen());
-
-    // Get.snackbar("Submitted", "BA attendance has been submitted successfully.",
-    //     snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.presentGreen, colorText: AppColors.white);
   }
 
-  // For popup: when "Reliever BA without ID" is selected, we show a modal. We'll handle by showing a dialog.
-  void showRelieverWithoutIdPopup(BuildContext context) {
+  // For popup: when "Reliever BA without ID" is selected, show a modal.
+  void showRelieverWithoutIdPopup(BuildContext context, BaEmployee emp) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _RelieverWithoutIdPopup(),
+      builder: (context) => _RelieverWithoutIdPopup(employee: emp, controller: this),
     );
+  }
+
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
   }
 }
 
-class _RelieverWithoutIdPopup extends StatelessWidget {
+class _RelieverWithoutIdPopup extends StatefulWidget {
+  final BaEmployee employee;
+  final BaAttendanceController controller;
+  const _RelieverWithoutIdPopup(
+      {required this.employee, required this.controller});
+
+  @override
+  State<_RelieverWithoutIdPopup> createState() =>
+      _RelieverWithoutIdPopupState();
+}
+
+class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _mobileCtrl;
+  late List<String> _sources;
+  String? _selectedSource;
+
+  @override
+  void initState() {
+    super.initState();
+    final emp = widget.employee;
+    _nameCtrl = TextEditingController(text: emp.nameWithoutId ?? '');
+    _mobileCtrl = TextEditingController(text: emp.mobileWithoutId ?? '');
+    // Source options come from the selected leave type's sub types.
+    final type = widget.controller.selectedLeaveTypeFor(emp);
+    _sources = (type?.subTypes ?? const <BaLeaveSubType>[])
+        .map((s) => s.name)
+        .toList();
+    if (_sources.isEmpty) {
+      _sources = const ["Brand – GT Counter", "Brand – Reliever Pool"];
+    }
+    _selectedSource = (emp.sourceWithoutId != null &&
+            _sources.contains(emp.sourceWithoutId))
+        ? emp.sourceWithoutId
+        : null;
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _mobileCtrl.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final name = _nameCtrl.text.trim();
+    final mobile = _mobileCtrl.text.trim();
+    if (name.isEmpty || mobile.isEmpty || _selectedSource == null) {
+      Fluttertoast.showToast(msg: 'Please fill all reliever details.');
+      return;
+    }
+    widget.controller
+        .updateRelieverWithoutId(widget.employee.id, name, mobile, _selectedSource);
+    Get.back();
+    Fluttertoast.showToast(msg: 'Reliever details saved.');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.neutral300, borderRadius: BorderRadius.circular(2))),
-          const SizedBox(height: 16),
-          Text("Reliever Details", style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
-          const SizedBox(height: 4),
-          Text("Enter details of the reliever who reported without a system ID", style: GoogleFonts.dmSans(fontSize: 12, color: AppColors.neutral500)),
-          const SizedBox(height: 16),
-          const _FormField(label: "Full Name *", hint: "e.g. Kavya Reddy", initialValue: "Kavya Reddy"),
-          const SizedBox(height: 12),
-          const _FormField(label: "Mobile Number *", hint: "10-digit mobile number", initialValue: "9876543210", keyboardType: TextInputType.phone),
-          const SizedBox(height: 12),
-          const _DropdownField(label: "Source *", items: ["Brand – GT Counter", "Brand – Reliever Pool"], initialValue: "Brand – GT Counter"),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => Get.back(),
-                  child: Container(padding: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: AppColors.neutral100, borderRadius: BorderRadius.circular(12)), child: Center(child: Text("Cancel", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.neutral600)))),
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.neutral300, borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 16),
+            Text("Reliever Details", style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
+            const SizedBox(height: 4),
+            Text("Enter details of the reliever who reported without a system ID", style: GoogleFonts.dmSans(fontSize: 12, color: AppColors.neutral500), textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            _field("Full Name *", "e.g. Kavya Reddy", _nameCtrl),
+            const SizedBox(height: 12),
+            _field("Mobile Number *", "10-digit mobile number", _mobileCtrl, keyboardType: TextInputType.phone),
+            const SizedBox(height: 12),
+            _sourceDropdown(),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => Get.back(),
+                    child: Container(padding: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: AppColors.neutral100, borderRadius: BorderRadius.circular(12)), child: Center(child: Text("Cancel", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.neutral600)))),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                flex: 2,
-                child: GestureDetector(
-                  onTap: () {
-                    Get.back();
-                    Get.snackbar("Saved", "Reliever details saved.", snackPosition: SnackPosition.BOTTOM);
-                  },
-                  child: Container(padding: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: AppColors.brandOrange, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(color: Color(0x59F47B20), blurRadius: 12)]), child: Center(child: Text("Confirm & Save", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.white)))),
+                const SizedBox(width: 10),
+                Expanded(
+                  flex: 2,
+                  child: GestureDetector(
+                    onTap: _save,
+                    child: Container(padding: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: AppColors.brandOrange, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(color: Color(0x59F47B20), blurRadius: 12)]), child: Center(child: Text("Confirm & Save", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.white)))),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _FormField extends StatelessWidget {
-  final String label;
-  final String hint;
-  final String initialValue;
-  final TextInputType keyboardType;
-  const _FormField({required this.label, required this.hint, required this.initialValue, this.keyboardType = TextInputType.text});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _field(String label, String hint, TextEditingController ctrl,
+      {TextInputType keyboardType = TextInputType.text}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
         const SizedBox(height: 6),
-        TextFormField(
-          initialValue: initialValue,
+        TextField(
+          controller: ctrl,
+          keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.dmSans(fontSize: 12, color: AppColors.neutral400),
@@ -296,35 +569,27 @@ class _FormField extends StatelessWidget {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)),
           ),
-          keyboardType: keyboardType,
         ),
       ],
     );
   }
-}
 
-class _DropdownField extends StatelessWidget {
-  final String label;
-  final List<String> items;
-  final String initialValue;
-  const _DropdownField({required this.label, required this.items, required this.initialValue});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _sourceDropdown() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+        Text("Source *", style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(border: Border.all(color: AppColors.neutral200), borderRadius: BorderRadius.circular(8), color: AppColors.neutral50),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: initialValue,
+              value: _selectedSource,
+              hint: const Text("— Choose source —", style: TextStyle(fontSize: 12)),
               isExpanded: true,
-              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-              onChanged: (value) {},
+              items: _sources.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 12)))).toList(),
+              onChanged: (value) => setState(() => _selectedSource = value),
             ),
           ),
         ),
@@ -337,21 +602,94 @@ class _DropdownField extends StatelessWidget {
 enum AttendanceStatus { present, pending, absent }
 enum AttendanceFilter { all, present, absent, pending }
 
-class BaEmployee {
-  final String id;
+class BaLeaveSubType {
+  final int id;
   final String name;
-  final String brand;
+  BaLeaveSubType({required this.id, required this.name});
+
+  factory BaLeaveSubType.fromJson(Map<String, dynamic> json) => BaLeaveSubType(
+        id: BaAttendanceController._toInt(json['leaveSubTypeId']),
+        name: (json['leaveSubTypeName'] ?? '').toString(),
+      );
+}
+
+class BaLeaveType {
+  final int id;
+  final String name;
+  final List<BaLeaveSubType> subTypes;
+  BaLeaveType({required this.id, required this.name, required this.subTypes});
+
+  factory BaLeaveType.fromJson(Map<String, dynamic> json) {
+    final raw = (json['subTypes'] as List<dynamic>?) ?? [];
+    return BaLeaveType(
+      id: BaAttendanceController._toInt(json['leaveTypeId']),
+      name: (json['leaveTypeName'] ?? '').toString(),
+      subTypes: raw
+          .map((e) =>
+              BaLeaveSubType.fromJson((e as Map<String, dynamic>?) ?? {}))
+          .toList(),
+    );
+  }
+}
+
+class BaRelieverEmployee {
+  final String employeeCode;
+  final String employeeName;
+  final String brandName;
+  final String displayName;
+  BaRelieverEmployee({
+    required this.employeeCode,
+    required this.employeeName,
+    required this.brandName,
+    required this.displayName,
+  });
+
+  factory BaRelieverEmployee.fromJson(Map<String, dynamic> json) {
+    final code = (json['employeeCode'] ?? '').toString();
+    final name = (json['employeeName'] ?? '').toString();
+    final brand = (json['brandName'] ?? '').toString();
+    final display = (json['displayName'] ?? '').toString();
+    return BaRelieverEmployee(
+      employeeCode: code,
+      employeeName: name,
+      brandName: brand,
+      displayName: display.isNotEmpty ? display : "$name ($code)",
+    );
+  }
+}
+
+class BaEmployee {
+  final String id; // employeeCode
+  final String name;
+  final String brand; // brandName
   final String role;
   final String avatarInitials;
   final Color avatarColor;
   final AttendanceStatus status;
-  final String? checkIn;
-  final String? checkOut;
-  String? absenceReason;
-  String? relieverId;
-  String? missedReason;
+  final String? checkIn; // inTime
+  final String? checkOut; // outTime
+  final String phoneNumber;
+  final String reliever; // "Y" / "N"
+
+  // Editable / selection state
+  String? absenceReason; // selected leave type name
+  int? leaveTypeId;
+  String? missedReason; // selected sub type name
+  int? subTypeId;
+  String? relieverId; // selected reliever displayName
+  String? relieverEmployeeCode;
   String? customCheckIn;
   String? customCheckOut;
+
+  // Manual reliever details (when "Reliever BA without ID" is chosen)
+  String? nameWithoutId;
+  String? mobileWithoutId;
+  String? sourceWithoutId;
+
+  // Reliever list fetch state (per row)
+  List<BaRelieverEmployee> relieverOptions;
+  bool relieverLoading;
+  bool submitting;
 
   BaEmployee({
     required this.id,
@@ -363,19 +701,101 @@ class BaEmployee {
     required this.status,
     this.checkIn,
     this.checkOut,
+    this.phoneNumber = "",
+    this.reliever = "N",
     this.absenceReason,
-    this.relieverId,
+    this.leaveTypeId,
     this.missedReason,
+    this.subTypeId,
+    this.relieverId,
+    this.relieverEmployeeCode,
     this.customCheckIn,
     this.customCheckOut,
-  });
+    List<BaRelieverEmployee>? relieverOptions,
+    this.relieverLoading = false,
+    this.submitting = false,
+  }) : relieverOptions = relieverOptions ?? <BaRelieverEmployee>[];
+
+  factory BaEmployee.fromApi(Map<String, dynamic> json, Color avatarColor) {
+    final String code = (json['employeeCode'] ?? '').toString();
+    final String empName = (json['employeeName'] ?? '').toString().trim();
+    final String brandName = (json['brandName'] ?? '').toString();
+    final String statusStr =
+        (json['attendanceStatus'] ?? '').toString().trim().toUpperCase();
+    final String inTime = (json['inTime'] ?? '').toString().trim();
+    final String outTime = (json['outTime'] ?? '').toString().trim();
+
+    AttendanceStatus status;
+    switch (statusStr) {
+      case 'PRESENT':
+        status = AttendanceStatus.present;
+        break;
+      case 'ABSENT':
+        status = AttendanceStatus.absent;
+        break;
+      default:
+        status = AttendanceStatus.pending;
+    }
+
+    return BaEmployee(
+      id: code,
+      name: empName,
+      brand: brandName,
+      role: "Brand Advisor",
+      avatarInitials: _initials(empName),
+      avatarColor: avatarColor,
+      status: status,
+      checkIn: inTime.isEmpty ? null : inTime,
+      checkOut: outTime.isEmpty ? null : outTime,
+      phoneNumber: (json['phoneNumber'] ?? '').toString(),
+      reliever: (json['reliever'] ?? 'N').toString(),
+    );
+  }
+
+  static String _initials(String name) {
+    final parts =
+        name.trim().split(RegExp(r"\s+")).where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return "?";
+    if (parts.length == 1) {
+      final p = parts.first;
+      return (p.length >= 2 ? p.substring(0, 2) : p).toUpperCase();
+    }
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
 }
 
 // ----------------------------- SCREEN 3 WIDGET ---------------------------------
 class BaAttendanceScreen extends StatelessWidget {
-  BaAttendanceScreen({super.key});
+  BaAttendanceScreen({
+    super.key,
+    this.attendanceDay,
+    this.staffCount,
+    this.locationName,
+  });
 
-  final BaAttendanceController controller = Get.put(BaAttendanceController());
+  // Data passed from the dashboard card so it can be used on this screen.
+  final AttendanceDay? attendanceDay;
+  final StaffCount? staffCount;
+  final String? locationName;
+
+  late final BaAttendanceController controller = _initController();
+
+  BaAttendanceController _initController() {
+    // Replace any cached controller so the date/location match this screen.
+    if (Get.isRegistered<BaAttendanceController>()) {
+      Get.delete<BaAttendanceController>();
+    }
+    return Get.put(BaAttendanceController(
+      attendanceDate: _resolveDate(),
+      initialLocationName: locationName,
+    ));
+  }
+
+  // yyyy-MM-dd date used for the GetBAAttendancePage request.
+  String _resolveDate() {
+    final date = attendanceDay?.date ?? DateTime.now();
+    return DateFormat('yyyy-MM-dd').format(date);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -392,34 +812,58 @@ class BaAttendanceScreen extends StatelessWidget {
                 children: [
                   GestureDetector(onTap: () => Get.back(), child: Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.white.withOpacity(0.2), shape: BoxShape.circle), child: const Center(child: Text("←", style: TextStyle(fontSize: 16, color: AppColors.white))))),
                   const SizedBox(width: 12),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("BA Staff Attendance", style: GoogleFonts.dmSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.white)), const SizedBox(height: 2), Text("Today · 30 May 2026 · 24 employees", style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.white.withOpacity(0.8)))]),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("BA Staff Attendance", style: GoogleFonts.dmSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.white)), const SizedBox(height: 2), Obx(() => Text(_headerSubtitle(), style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.white.withOpacity(0.8))))]),
+                  ),
                 ],
               ),
             ),
             // Content
             Expanded(
-              child: Obx(() => Column(
-                children: [
-                  _buildFilterBar(controller),
-                  const SizedBox(height: 6,),
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 80),
-                      itemCount: controller.filteredEmployees.length,
-                      itemBuilder: (context, index) {
-                        final emp = controller.filteredEmployees[index];
-                        return _buildEmployeeCard(emp, controller, context);
-                      },
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator(color: AppColors.brandOrange));
+                }
+                return Column(
+                  children: [
+                    _buildFilterBar(controller),
+                    const SizedBox(height: 6,),
+                    Expanded(
+                      child: controller.filteredEmployees.isEmpty
+                          ? Center(child: Text("No employees found.", style: GoogleFonts.dmSans(fontSize: 13, color: AppColors.neutral500)))
+                          : ListView.builder(
+                              padding: const EdgeInsets.only(bottom: 80),
+                              itemCount: controller.filteredEmployees.length,
+                              itemBuilder: (context, index) {
+                                final emp = controller.filteredEmployees[index];
+                                return _buildEmployeeCard(emp, controller, context);
+                              },
+                            ),
                     ),
-                  ),
-                ],
-              )),
+                  ],
+                );
+              }),
             ),
-            _buildBottomBar(controller),
+            // _buildBottomBar(controller),
           ],
         ),
       ),
     );
+  }
+
+  String _headerSubtitle() {
+    final parts = <String>[];
+    if (controller.locationName.value.isNotEmpty) parts.add(controller.locationName.value);
+    final date = attendanceDay?.date;
+    if (date != null) {
+      final dayType = attendanceDay?.dayType;
+      final pretty = DateFormat("dd MMM yyyy").format(date);
+      parts.add(dayType != null && dayType.isNotEmpty
+          ? "${dayType[0].toUpperCase()}${dayType.substring(1).toLowerCase()} · $pretty"
+          : pretty);
+    }
+    parts.add("${controller.employees.length} employees");
+    return parts.join(" · ");
   }
 
   Widget _buildFilterBar(BaAttendanceController controller) {
@@ -434,7 +878,7 @@ class BaAttendanceScreen extends StatelessWidget {
             const SizedBox(width: 8),
             _filterChip("Present (${controller.presentCount})", AttendanceFilter.present, controller),
             const SizedBox(width: 8),
-            _filterChip("Absent (0)", AttendanceFilter.absent, controller),
+            _filterChip("Absent (${controller.absentCount})", AttendanceFilter.absent, controller),
             const SizedBox(width: 8),
             _filterChip("Pending (${controller.pendingCount})", AttendanceFilter.pending, controller),
           ],
@@ -454,7 +898,8 @@ class BaAttendanceScreen extends StatelessWidget {
           border: Border.all(color: isActive ? _getFilterActiveColor(filter) : AppColors.neutral200, width: 1.5),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(label, style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w600, color: isActive ? _getFilterTextColor(filter) : AppColors.neutral600)),
+        child: Text(label, style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w600, color: isActive ? Colors.white : AppColors.neutral600)),
+        // child: Text(label, style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w600, color: isActive ? _getFilterTextColor(filter) : AppColors.neutral600)),
       ),
     );
   }
@@ -480,7 +925,16 @@ class BaAttendanceScreen extends StatelessWidget {
   Widget _buildEmployeeCard(BaEmployee emp, BaAttendanceController controller, BuildContext context) {
     final isPresent = emp.status == AttendanceStatus.present;
     final isPending = emp.status == AttendanceStatus.pending;
-    final borderColor = isPresent ? AppColors.presentGreen.withOpacity(0.3) : (isPending ? AppColors.brandOrange.withOpacity(0.35) : AppColors.neutral200);
+
+    // Senior Developer Note: Prioritize the reliever status check. 
+    // If reliever is "N", we show a red border.
+    final Color borderColor = emp.reliever == "N"
+        ? AppColors.absentRed.withOpacity(0.3)
+        : (isPresent
+            ? AppColors.presentGreen.withOpacity(0.3)
+            : (isPending
+                ? AppColors.brandOrange.withOpacity(0.35)
+                : AppColors.neutral200));
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
@@ -532,35 +986,80 @@ class BaAttendanceScreen extends StatelessWidget {
   }
 
   Widget _buildPendingSection(BaEmployee emp, BaAttendanceController controller, BuildContext context) {
+    final selectedType = controller.selectedLeaveTypeFor(emp);
+    final subTypes = selectedType?.subTypes ?? const <BaLeaveSubType>[];
+    final hasReason = emp.absenceReason != null && emp.absenceReason!.isNotEmpty;
+    final isRelieverWithout =
+        (emp.absenceReason ?? '').toLowerCase().contains('without');
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(border: const Border(top: BorderSide(color: AppColors.neutral100)), color: const Color(0xFFFEF0E6).withOpacity(0.4)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Editable check-in / check-out times for pending rows.
+          Text("⏱ Attendance Time", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Expanded(child: _timeField(emp, controller, isCheckIn: true)),
+              const SizedBox(width: 8),
+              Expanded(child: _timeField(emp, controller, isCheckIn: false)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Reason dropdown (data-driven from API leaveTypes).
           Row(children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.brandOrange, shape: BoxShape.circle)), const SizedBox(width: 6), Text("Reason for Absence", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600))]),
           const SizedBox(height: 6),
           Container(
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.neutral200)),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
-                value: emp.absenceReason?.isEmpty ?? true ? null : emp.absenceReason,
-                hint: const Text("— Choose reason —"),
+                value: hasReason ? emp.absenceReason : null,
+                hint: const Text("— Choose reason —", style: TextStyle(fontSize: 12)),
                 isExpanded: true,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                items: const [
-                  "Reliever (with ID)",
-                  "Missed Marking Attendance",
-                  "Week Off",
-                  "Planned Leave",
-                  "Reliever BA without ID"
-                ].map((reason) => DropdownMenuItem(value: reason, child: Text(reason, style: const TextStyle(fontSize: 12)))).toList(),
+                items: controller.leaveTypes
+                    .map((t) => DropdownMenuItem(value: t.name, child: Text(t.name, style: const TextStyle(fontSize: 12))))
+                    .toList(),
                 onChanged: (value) => controller.updateAbsenceReason(emp.id, value),
               ),
             ),
           ),
-          // Sub-form for Reliever (with ID)
-          if (emp.absenceReason == "Reliever (with ID)")
+          // Sub-type dropdown (leave types with sub types, except the
+          // "without ID" case whose source is captured in the popup).
+          if (subTypes.isNotEmpty && !isRelieverWithout)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("📋 Select Detail", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+                  const SizedBox(height: 6),
+                  Container(
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.neutral200)),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        value: emp.subTypeId,
+                        hint: const Text("— Choose —", style: TextStyle(fontSize: 12)),
+                        isExpanded: true,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        items: subTypes
+                            .map((s) => DropdownMenuItem(value: s.id, child: Text(s.name, style: const TextStyle(fontSize: 12))))
+                            .toList(),
+                        onChanged: (value) {
+                          final sub = subTypes.firstWhereOrNull((s) => s.id == value);
+                          controller.updateSubType(emp.id, sub);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          // Reliever employee dropdown (loaded on demand for "Reliever (with ID)").
+          if (controller.needsRelieverWithId(emp))
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Column(
@@ -568,86 +1067,95 @@ class BaAttendanceScreen extends StatelessWidget {
                 children: [
                   Text("🔁 Select Reliever Employee", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
                   const SizedBox(height: 6),
-                  Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.neutral200)),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: emp.relieverId ?? "Manasa N P – Loreal (83744)",
-                        isExpanded: true,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        items: const ["Manasa N P – Loreal (83744)", "Hema Nalva – Sugar (83108)", "Anusha K – MAC (84201)"].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        onChanged: (value) => controller.updateRelieverId(emp.id, value),
+                  if (emp.relieverLoading)
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.brandOrange)))
+                  else if (emp.relieverOptions.isEmpty)
+                    Text("No relievers available.", style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.neutral500))
+                  else
+                    Container(
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.neutral200)),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: emp.relieverEmployeeCode,
+                          hint: const Text("— Choose reliever —", style: TextStyle(fontSize: 12)),
+                          isExpanded: true,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          items: emp.relieverOptions
+                              .map((r) => DropdownMenuItem(value: r.employeeCode, child: Text(r.displayName, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)))
+                              .toList(),
+                          onChanged: (value) {
+                            final r = emp.relieverOptions.firstWhereOrNull((x) => x.employeeCode == value);
+                            controller.updateReliever(emp.id, r);
+                          },
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
-          // Sub-form for Missed Marking Attendance
-          if (emp.absenceReason == "Missed Marking Attendance")
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("📋 Reason for Missed Marking", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
-                  const SizedBox(height: 6),
-                  Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.neutral200)),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: emp.missedReason ?? "Mobile Issue",
-                        isExpanded: true,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        items: const ["Mobile Issue", "Login Issue", "New Mobile"].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        onChanged: (value) => controller.updateMissedReason(emp.id, value),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text("⏱ Actual Attendance Time", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text("CHECK IN", style: GoogleFonts.dmSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
-                          const SizedBox(height: 3),
-                          TextFormField(
-                            initialValue: emp.customCheckIn ?? "09:30",
-                            decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)), contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                            onChanged: (val) => controller.updateCustomTimes(emp.id, val, emp.customCheckOut),
-                          ),
-                        ]),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text("CHECK OUT", style: GoogleFonts.dmSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
-                          const SizedBox(height: 3),
-                          TextFormField(
-                            initialValue: emp.customCheckOut ?? "18:30",
-                            decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)), contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                            onChanged: (val) => controller.updateCustomTimes(emp.id, emp.customCheckIn, val),
-                          ),
-                        ]),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          // Special case: Reliever BA without ID triggers popup
-          if (emp.absenceReason == "Reliever BA without ID")
+          // Reliever BA without ID -> manual details popup.
+          if (isRelieverWithout)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: GestureDetector(
-                onTap: () => controller.showRelieverWithoutIdPopup(context),
-                child: Container(padding: const EdgeInsets.symmetric(vertical: 10), decoration: BoxDecoration(color: AppColors.brandOrangeLight, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.brandOrange.withOpacity(0.3))), child: Center(child: Text("+ Add Reliever Details", style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.brandOrange)))),
+                onTap: () => controller.showRelieverWithoutIdPopup(context, emp),
+                child: Container(padding: const EdgeInsets.symmetric(vertical: 10), decoration: BoxDecoration(color: AppColors.brandOrangeLight, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.brandOrange.withOpacity(0.3))), child: Center(child: Text((emp.nameWithoutId != null && emp.nameWithoutId!.isNotEmpty) ? "✓ ${emp.nameWithoutId} · ${emp.sourceWithoutId ?? ''}" : "+ Add Reliever Details", style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.brandOrange)))),
               ),
             ),
+          // Per-row submit button.
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: emp.submitting ? null : () => controller.submitEmployee(emp),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 11),
+              decoration: BoxDecoration(
+                color: emp.submitting ? AppColors.neutral300 : AppColors.brandBlueDeep,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: emp.submitting
+                    ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white))
+                    : Text("Submit", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.white)),
+              ),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  // Editable time field for a pending employee. Keyed so it keeps its text
+  // across reactive rebuilds of the card.
+  Widget _timeField(BaEmployee emp, BaAttendanceController controller, {required bool isCheckIn}) {
+    final initial = isCheckIn
+        ? (emp.customCheckIn ?? emp.checkIn ?? "")
+        : (emp.customCheckOut ?? emp.checkOut ?? "");
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(isCheckIn ? "CHECK IN" : "CHECK OUT", style: GoogleFonts.dmSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
+        const SizedBox(height: 3),
+        TextFormField(
+          key: ValueKey("${emp.id}_${isCheckIn ? 'in' : 'out'}"),
+          initialValue: initial,
+          decoration: InputDecoration(
+            hintText: isCheckIn ? "e.g. 09:30 AM" : "e.g. 06:30 PM",
+            hintStyle: GoogleFonts.dmSans(fontSize: 11, color: AppColors.neutral400),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          ),
+          style: const TextStyle(fontSize: 12),
+          onChanged: (val) {
+            if (isCheckIn) {
+              controller.updateCustomTimes(emp.id, val, null);
+            } else {
+              controller.updateCustomTimes(emp.id, null, val);
+            }
+          },
+        ),
+      ],
     );
   }
 

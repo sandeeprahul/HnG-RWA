@@ -1,23 +1,179 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hng_flutter/common/constants.dart';
 import 'package:hng_flutter/presentation/attendance/attendanceNewController.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ba_attendance_screen.dart';
 import 'staff_list_screen.dart';
 
 
 // ----------------------------- DASHBOARD SCREEN (Screen 1) ---------------------------------
-class DashboardScreen extends StatelessWidget {
-  DashboardScreen({super.key});
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
 
-  final AttendanceNewController controller = Get.find();
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
 
-  // Hardcoded date to match HTML design: Saturday, 30 May 2026
-  final String currentDate = "Saturday, 30 May 2026";
-  final String yesterdayDate = "Yesterday · 29 May";
-  final String todayLabel = "Today · 30 May";
+class _DashboardScreenState extends State<DashboardScreen> {
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  String _locationName = "";
+  List<AttendanceDay> _attendanceData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAttendanceCount();
+  }
+
+  Future<void> _fetchAttendanceCount() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString("userCode");
+
+      if (userId == null || userId.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = "User not found. Please login again.";
+        });
+        return;
+      }
+
+      final url =
+          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/Login/StoreAttendancecount/$userId';
+
+      print("URL FETCH ATTENDANCE: $url");
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        if (data['status'] == true) {
+          final List<dynamic> rawList =
+              (data['attendanceData'] as List<dynamic>?) ?? [];
+
+          setState(() {
+            _locationName = (data['locationName'] ?? "").toString();
+            _attendanceData = rawList
+                .map((e) => AttendanceDay.fromJson(
+                    (e as Map<String, dynamic>?) ?? {}))
+                .toList();
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+            _errorMessage =
+                (data['message'] ?? "Failed to fetch attendance.").toString();
+          });
+        }
+      } else {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = "Server error (${response.statusCode}).";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = "Something went wrong. Please try again.";
+      });
+    }
+  }
+
+  // Header date e.g. "Saturday, 07 June 2026" – derived from TODAY if present, else first available day.
+  // String get _headerDate {
+  //   final DateTime? date = (_findDay("TODAY") ?? _firstDay)?.date;
+  //   if (date == null) return "";
+  //   return DateFormat("EEEE, dd MMMM yyyy").format(date);
+  // }
+  // String get _headerDate {
+  //   // Look for TODAY first. If null, look for YESTERDAY. Fallback to the first item if both are null.
+  //   final dayObj = _findDay("TODAY") ?? _findDay("YESTERDAY") ?? _firstDay;
+  //   final DateTime? date = dayObj?.date;
+  //
+  //   if (date == null) return "";
+  //   return DateFormat("EEEE, dd MMMM yyyy").format(date);
+  // }
+
+  String get _headerDate {
+    final today = _findDay("TODAY");
+    final yesterday = _findDay("YESTERDAY");
+
+    // Prioritize Today, then Yesterday
+    final dayObj = today ?? yesterday ?? _firstDay;
+    if (dayObj?.date == null) return "";
+
+    String dateStr = DateFormat("EEEE, dd MMMM yyyy").format(dayObj!.date!);
+
+    // Optional: Add the label if it's not today to avoid confusion
+    if (today == null && yesterday != null) {
+      return "Yesterday, ${DateFormat("dd MMM").format(dayObj.date!)}";
+    }
+
+    return dateStr;
+  }
+
+
+  /// 3. Helper to find a specific day type from your parsed data list
+  AttendanceDay? _findDay(String dayType) {
+    try {
+      return _attendanceData.firstWhere((element) => element.dayType == dayType);
+    } catch (_) {
+      return null; // Returns null cleanly if dayType is not found
+    }
+  }
+
+  // AttendanceDay? _findDay(String dayType) {
+  //   for (final day in _attendanceData) {
+  //     if ((day.dayType ?? "").toUpperCase() == dayType.toUpperCase()) {
+  //       return day;
+  //     }
+  //   }
+  //   return null;
+  // }
+  //
+  // AttendanceDay? get _firstDay =>
+  //     _attendanceData.isNotEmpty ? _attendanceData.first : null;
+  /// 4. Fallback helper to get the first available item in the list
+  AttendanceDay? get _firstDay {
+    return _attendanceData.isNotEmpty ? _attendanceData.first : null;
+  }
+  // Section label e.g. "Today · 07 Jun" or fallback to dayType.
+  String _sectionLabel(AttendanceDay day) {
+    final String typeLabel = _prettyDayType(day.dayType);
+    if (day.date != null) {
+      return "$typeLabel · ${DateFormat("dd MMM").format(day.date!)}";
+    }
+    return typeLabel;
+  }
+
+  String _prettyDayType(String? dayType) {
+    switch ((dayType ?? "").toUpperCase()) {
+      case "TODAY":
+        return "Today";
+      case "YESTERDAY":
+        return "Yesterday";
+      default:
+        return (dayType == null || dayType.isEmpty) ? "Attendance" : dayType;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +190,9 @@ class DashboardScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
               child: Row(
                 children: [
-                  // Back button placeholder
+                  // Back button
                   GestureDetector(
-                    onTap: () {
-                      Get.snackbar(
-                        "Back",
-                        "Navigation will be available in next screens",
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: AppColors.neutral800,
-                        colorText: AppColors.white,
-                      );
-                    },
+                    onTap: () => Get.back(),
                     child: Container(
                       width: 32,
                       height: 32,
@@ -65,106 +213,37 @@ class DashboardScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Record Attendance",
-                        style: GoogleFonts.dmSans(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
-                          color: AppColors.white,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Record Attendance",
+                          style: GoogleFonts.dmSans(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                            color: AppColors.white,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        currentDate,
-                        style: GoogleFonts.dmSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.white.withOpacity(0.8),
+                        const SizedBox(height: 2),
+                        Text(
+                          _headerSubtitle(),
+                          style: GoogleFonts.dmSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.white.withOpacity(0.8),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
             // Scrollable Content
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    // Info Banner
-                    _buildInfoBanner(),
-                    const SizedBox(height: 8),
-                    // YESTERDAY SECTION
-                    _buildSectionLabel(yesterdayDate),
-                    // H&G Card - Yesterday
-                    Obx(() => _buildAttendanceCard(
-
-                      cardType: CardType.hg,
-                      dateType: DateType.yesterday,
-                      total: controller.hgYesterdayTotal.value,
-                      presentCount: controller.hgYesterdayPresent.value,
-                      secondaryCount: controller.hgYesterdayAbsent.value,
-                      secondaryLabel: "Absent",
-                      actionText: "View Details →",
-                      iconEmoji: "🏪",
-                      title: "H&G Staff",
-                      subtitle: "Store & Operations Team",
-                    )),
-                    const SizedBox(height: 8),
-                    // BA Card - Yesterday
-                    Obx(() => _buildAttendanceCard(
-                      cardType: CardType.ba,
-                      dateType: DateType.yesterday,
-                      total: controller.baYesterdayTotal.value,
-                      presentCount: controller.baYesterdayPresent.value,
-                      secondaryCount: controller.baYesterdayAbsent.value,
-                      secondaryLabel: "Absent",
-                      actionText: "View Details →",
-                      iconEmoji: "💄",
-                      title: "BA Staff",
-                      subtitle: "Brand Advisors",
-                    )),
-                    const SizedBox(height: 16),
-                    // TODAY SECTION
-                    _buildSectionLabel(todayLabel),
-                    // H&G Card - Today
-                    Obx(() => _buildAttendanceCard(
-                      cardType: CardType.hg,
-                      dateType: DateType.today,
-                      total: controller.hgTodayTotal.value,
-                      presentCount: controller.hgTodayPresent.value,
-                      secondaryCount: controller.hgTodayPending.value,
-                      secondaryLabel: "Pending",
-                      actionText: "Record Now →",
-                      iconEmoji: "🏪",
-                      title: "H&G Staff",
-                      subtitle: "Store & Operations Team",
-                    )),
-                    const SizedBox(height: 8),
-                    // BA Card - Today
-                    Obx(() => _buildAttendanceCard(
-                      cardType: CardType.ba,
-                      dateType: DateType.today,
-                      total: controller.baTodayTotal.value,
-                      presentCount: controller.baTodayPresent.value,
-                      secondaryCount: controller.baTodayPending.value,
-                      secondaryLabel: "Pending",
-                      actionText: "Record Now →",
-                      iconEmoji: "💄",
-                      title: "BA Staff",
-                      subtitle: "Brand Advisors",
-                    )),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
+              child: _buildBody(),
             ),
             // Bottom Navigation Bar
             // _buildBottomNavBar(),
@@ -172,6 +251,132 @@ class DashboardScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _headerSubtitle() {
+    final parts = <String>[];
+    if (_locationName.isNotEmpty) parts.add(_locationName);
+    if (_headerDate.isNotEmpty) parts.add(_headerDate);
+    // return parts.isEmpty ? "Attendance overview" : parts.join("  ·  ");
+    return parts.isEmpty ? "Attendance overview" : parts.join("  ·  ");
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.brandOrange),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("⚠️", style: TextStyle(fontSize: 32)),
+              const SizedBox(height: 12),
+              Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.dmSans(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.neutral600,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _fetchAttendanceCount,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.brandOrange,
+                ),
+                child: Text(
+                  "Retry",
+                  style: GoogleFonts.dmSans(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_attendanceData.isEmpty) {
+      return Center(
+        child: Text(
+          "No attendance records found.",
+          style: GoogleFonts.dmSans(
+            fontSize: 13,
+            color: AppColors.neutral500,
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          _buildInfoBanner(),
+          const SizedBox(height: 8),
+          // Build a section per available day (handles missing TODAY/YESTERDAY).
+          ..._attendanceData.expand((day) => _buildDaySection(day)),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  // Builds a section (label + H&G card + BA card) for a single day.
+  List<Widget> _buildDaySection(AttendanceDay day) {
+    final bool isToday = (day.dayType ?? "").toUpperCase() == "TODAY";
+    final DateType dateType = isToday ? DateType.today : DateType.yesterday;
+    final String secondaryLabel = isToday ? "Pending" : "Absent";
+    final String actionText = isToday ? "Record Now →" : "View Details →";
+
+    final StaffCount hg = day.staffFor(1);
+    final StaffCount ba = day.staffFor(2);
+
+    return [
+      const SizedBox(height: 8),
+      _buildSectionLabel(_sectionLabel(day)),
+      _buildAttendanceCard(
+        cardType: CardType.hg,
+        dateType: dateType,
+        total: hg.total,
+        presentCount: hg.present,
+        secondaryCount: hg.absent,
+        secondaryLabel: secondaryLabel,
+        actionText: actionText,
+        iconEmoji: "🏪",
+        title: hg.staffName.isNotEmpty ? hg.staffName : "H&G Staff",
+        subtitle: "Store & Operations Team",
+        day: day,
+        staff: hg,
+      ),
+      const SizedBox(height: 8),
+      _buildAttendanceCard(
+        cardType: CardType.ba,
+        dateType: dateType,
+        total: ba.total,
+        presentCount: ba.present,
+        secondaryCount: ba.absent,
+        secondaryLabel: secondaryLabel,
+        actionText: actionText,
+        iconEmoji: "💄",
+        title: ba.staffName.isNotEmpty ? ba.staffName : "BA Staff",
+        subtitle: "Brand Advisors",
+        day: day,
+        staff: ba,
+      ),
+      const SizedBox(height: 8),
+    ];
   }
 
   // Info Banner Widget
@@ -264,6 +469,8 @@ class DashboardScreen extends StatelessWidget {
     required String iconEmoji,
     required String title,
     required String subtitle,
+    required AttendanceDay day,
+    required StaffCount staff,
   }) {
     Color borderColor = (cardType == CardType.hg)
         ? AppColors.brandBlue.withOpacity(0.2)
@@ -271,16 +478,21 @@ class DashboardScreen extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Get.to(() => HgAttendanceScreen());
-        Get.to(() => BaAttendanceScreen());
-
-        // Get.snackbar(
-        //   "Navigation",
-        //   "Navigate to ${title} details (Screen 2/3 coming next)",
-        //   snackPosition: SnackPosition.BOTTOM,
-        //   backgroundColor: AppColors.neutral800,
-        //   colorText: AppColors.white,
-        // );
+        // staffType 2 = BA Staff -> BaAttendanceScreen
+        // staffType 1 = H&G Staff -> HgAttendanceScreen
+        if (cardType == CardType.ba) {
+          Get.to(() => BaAttendanceScreen(
+                attendanceDay: day,
+                staffCount: staff,
+                locationName: _locationName,
+              ));
+        } else {
+          Get.to(() => HgAttendanceScreen(
+                attendanceDay: day,
+                staffCount: staff,
+                locationName: _locationName,
+              ));
+        }
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -525,3 +737,86 @@ class DashboardScreen extends StatelessWidget {
 // Enums for type safety
 enum CardType { hg, ba }
 enum DateType { yesterday, today }
+
+// ----------------------------- API MODELS (null-safe) ---------------------------------
+class AttendanceDay {
+  final DateTime? date;
+  final String? dayType;
+  final List<StaffCount> staffCounts;
+
+  AttendanceDay({
+    required this.date,
+    required this.dayType,
+    required this.staffCounts,
+  });
+
+  factory AttendanceDay.fromJson(Map<String, dynamic> json) {
+    final rawDate = json['attendanceDate']?.toString();
+    DateTime? parsedDate;
+    if (rawDate != null && rawDate.isNotEmpty) {
+      // Take only the "2026-06-07" part to avoid timezone shifts
+      parsedDate = DateTime.tryParse(rawDate.split('T')[0]);
+    }
+
+    final rawStaff = (json['staffCounts'] as List<dynamic>?) ?? [];
+
+    return AttendanceDay(
+      // date: rawDate == null ? null : DateTime.tryParse(rawDate),
+      dayType: json['dayType']?.toString(),
+
+      date: parsedDate,
+      staffCounts: rawStaff
+          .map((e) => StaffCount.fromJson((e as Map<String, dynamic>?) ?? {}))
+          .toList(),
+    );
+  }
+
+  // Returns the staff count for a given staffType, or an empty (zero) one if absent.
+  StaffCount staffFor(int staffType) {
+    for (final s in staffCounts) {
+      if (s.staffType == staffType) return s;
+    }
+    return StaffCount.empty();
+  }
+}
+
+class StaffCount {
+  final int staffType;
+  final String staffName;
+  final int total;
+  final int present;
+  final int absent;
+
+  StaffCount({
+    required this.staffType,
+    required this.staffName,
+    required this.total,
+    required this.present,
+    required this.absent,
+  });
+
+  factory StaffCount.empty() => StaffCount(
+        staffType: 0,
+        staffName: "",
+        total: 0,
+        present: 0,
+        absent: 0,
+      );
+
+  factory StaffCount.fromJson(Map<String, dynamic> json) {
+    return StaffCount(
+      staffType: _toInt(json['staffType']),
+      staffName: json['staffName']?.toString() ?? "",
+      total: _toInt(json['total']),
+      present: _toInt(json['present']),
+      absent: _toInt(json['absent']),
+    );
+  }
+
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
+  }
+}

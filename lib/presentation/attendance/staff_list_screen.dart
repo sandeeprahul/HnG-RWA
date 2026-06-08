@@ -1,215 +1,33 @@
 // screen2_hg_attendance.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hng_flutter/helper/confirmDialog.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'attendanceNewController.dart';
+import 'record_attendance_new_screen.dart';
 
 // Import the shared controller and colors from Screen 1 (or define them again for standalone)
 // For simplicity, I'll reuse the same AppColors and extend the AttendanceController.
 
-// ----------------------------- EXTEND CONTROLLER FOR SCREEN 2 ---------------------------------
+// ----------------------------- CONTROLLER FOR SCREEN 2 (API-backed) ---------------------------------
 class HgAttendanceController extends GetxController {
-  // Mock employee list for H&G Staff (18 employees)
-  final RxList<HgEmployee> employees = <HgEmployee>[
-    HgEmployee(
-      id: "EMP-1042",
-      name: "Rajesh Sharma",
-      role: "Cashier",
-      avatarInitials: "RS",
-      avatarColor: AppColors.brandBlue,
-      status: AttendanceStatus.present,
-      checkIn: "09:02 AM",
-      checkOut: "06:18 PM",
-      leaveReason: null,
-    ),
-    HgEmployee(
-      id: "EMP-1019",
-      name: "Priya Subramaniam",
-      role: "Floor Manager",
-      avatarInitials: "PS",
-      avatarColor: const Color(0xFF8B5CF6),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      leaveReason: "Week Off",
-    ),
-    HgEmployee(
-      id: "EMP-1031",
-      name: "Nisha Krishnan",
-      role: "Beautician",
-      avatarInitials: "NK",
-      avatarColor: const Color(0xFF0EA5E9),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      leaveReason: "Casual Leave",
-    ),
-    HgEmployee(
-      id: "EMP-1055",
-      name: "Aisha Mohammed",
-      role: "Sales Exec",
-      avatarInitials: "AM",
-      avatarColor: const Color(0xFFF43F5E),
-      status: AttendanceStatus.present,
-      checkIn: "09:15 AM",
-      checkOut: null, // Not checked out yet
-      leaveReason: null,
-    ),
-    // Additional employees to reach 18 total (only a few shown for brevity, but full list matches HTML mockup)
-    HgEmployee(
-      id: "EMP-1001",
-      name: "Amit Kumar",
-      role: "Store Manager",
-      avatarInitials: "AK",
-      avatarColor: AppColors.brandBlue,
-      status: AttendanceStatus.present,
-      checkIn: "08:45 AM",
-      checkOut: "07:00 PM",
-    ),
-    HgEmployee(
-      id: "EMP-1005",
-      name: "Sneha Reddy",
-      role: "Beauty Consultant",
-      avatarInitials: "SR",
-      avatarColor: const Color(0xFF8B5CF6),
-      status: AttendanceStatus.present,
-      checkIn: "09:30 AM",
-      checkOut: "06:45 PM",
-    ),
-    HgEmployee(
-      id: "EMP-1022",
-      name: "Karthik Venkat",
-      role: "Visual Merchandiser",
-      avatarInitials: "KV",
-      avatarColor: const Color(0xFF0EA5E9),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      leaveReason: null,
-    ),
-    HgEmployee(
-      id: "EMP-1048",
-      name: "Divya S",
-      role: "Cashier",
-      avatarInitials: "DS",
-      avatarColor: const Color(0xFFF43F5E),
-      status: AttendanceStatus.present,
-      checkIn: "09:10 AM",
-      checkOut: "06:30 PM",
-    ),
-    HgEmployee(
-      id: "EMP-1060",
-      name: "Rohit Nair",
-      role: "Floor Executive",
-      avatarInitials: "RN",
-      avatarColor: AppColors.brandBlue,
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      leaveReason: "Sick Leave",
-    ),
-    HgEmployee(
-      id: "EMP-1072",
-      name: "Lavanya Priya",
-      role: "Beautician",
-      avatarInitials: "LP",
-      avatarColor: const Color(0xFF8B5CF6),
-      status: AttendanceStatus.present,
-      checkIn: "09:20 AM",
-      checkOut: "06:15 PM",
-    ),
-    HgEmployee(
-      id: "EMP-1088",
-      name: "Manish Gupta",
-      role: "Sales Associate",
-      avatarInitials: "MG",
-      avatarColor: const Color(0xFF0EA5E9),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      leaveReason: null,
-    ),
-    HgEmployee(
-      id: "EMP-1093",
-      name: "Swati Bhatia",
-      role: "Customer Support",
-      avatarInitials: "SB",
-      avatarColor: const Color(0xFFF43F5E),
-      status: AttendanceStatus.present,
-      checkIn: "09:05 AM",
-      checkOut: "06:20 PM",
-    ),
-    HgEmployee(
-      id: "EMP-1102",
-      name: "Ganesh Iyer",
-      role: "Inventory Lead",
-      avatarInitials: "GI",
-      avatarColor: AppColors.brandBlue,
-      status: AttendanceStatus.present,
-      checkIn: "08:55 AM",
-      checkOut: "07:15 PM",
-    ),
-    HgEmployee(
-      id: "EMP-1115",
-      name: "Pooja Desai",
-      role: "Beauty Advisor",
-      avatarInitials: "PD",
-      avatarColor: const Color(0xFF8B5CF6),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      leaveReason: "Privilege Leave",
-    ),
-    HgEmployee(
-      id: "EMP-1120",
-      name: "Arjun Shetty",
-      role: "Floor Manager",
-      avatarInitials: "AS",
-      avatarColor: const Color(0xFF0EA5E9),
-      status: AttendanceStatus.present,
-      checkIn: "09:12 AM",
-      checkOut: "06:50 PM",
-    ),
-    HgEmployee(
-      id: "EMP-1133",
-      name: "Meera Nair",
-      role: "Cashier",
-      avatarInitials: "MN",
-      avatarColor: const Color(0xFFF43F5E),
-      status: AttendanceStatus.pending,
-      checkIn: null,
-      checkOut: null,
-      leaveReason: null,
-    ),
-    HgEmployee(
-      id: "EMP-1145",
-      name: "Vikram Singh",
-      role: "Sales Executive",
-      avatarInitials: "VS",
-      avatarColor: AppColors.brandBlue,
-      status: AttendanceStatus.present,
-      checkIn: "09:18 AM",
-      checkOut: "06:40 PM",
-    ),
-    HgEmployee(
-      id: "EMP-1150",
-      name: "Anjali Sharma",
-      role: "Beautician",
-      avatarInitials: "AS",
-      avatarColor: const Color(0xFF8B5CF6),
-      status: AttendanceStatus.present,
-      checkIn: "09:25 AM",
-      checkOut: "06:55 PM",
-    ),
-  ].obs;
+  // Employees loaded from API.
+  final RxList<HgEmployee> employees = <HgEmployee>[].obs;
 
   // Filter state
   final Rx<AttendanceFilter> currentFilter = AttendanceFilter.all.obs;
   final RxBool selectAllPending = false.obs;
+  final RxBool isLoading = false.obs;
 
-  // List of available leave reasons (matching HTML dropdown)
-  final List<String> leaveReasons = [
+  // Leave reasons / types loaded from API (falls back to a default list).
+  final RxList<String> leaveReasons = <String>[
     "Absent / Loss of Pay (LOP)",
     "Casual Leave",
     "Compensatory Off",
@@ -222,9 +40,85 @@ class HgAttendanceController extends GetxController {
     "Privilege Leave",
     "Sick Leave",
     "Week Off",
+  ].obs;
+
+  // Avatar color palette used when building employees from API data.
+  static const List<Color> _avatarPalette = [
+    AppColors.brandBlue,
+    Color(0xFF8B5CF6),
+    Color(0xFF0EA5E9),
+    Color(0xFFF43F5E),
   ];
 
-  // Getters for filtered employees
+  @override
+  void onInit() {
+    super.onInit();
+    fetchData();
+  }
+
+  // ----------------------------- FETCH (GET) ---------------------------------
+  Future<void> fetchData() async {
+    try {
+      isLoading.value = true;
+      final prefs = await SharedPreferences.getInstance();
+      final userCode = prefs.getString("userCode");
+
+      if (userCode == null || userCode.isEmpty) {
+        isLoading.value = false;
+        Fluttertoast.showToast(msg: 'User not found. Please login again.');
+        return;
+      }
+
+      final url =
+          "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/GetLeaveTypesAndEmployess/$userCode";
+      print("HG ATTENDANCE FETCH: $url");
+
+      final response =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        // Leave types
+        final List<dynamic> leaveList =
+            (data['leavetypelist'] as List<dynamic>?) ?? [];
+        if (leaveList.isNotEmpty) {
+          leaveReasons.assignAll(
+            leaveList
+                .map((e) => (e?['leaveType'] ?? '').toString())
+                .where((s) => s.isNotEmpty)
+                .toList(),
+          );
+        }
+
+        // Employees
+        final List<dynamic> empList =
+            (data['employeelist'] as List<dynamic>?) ?? [];
+        final parsed = <HgEmployee>[];
+        for (var i = 0; i < empList.length; i++) {
+          final e = (empList[i] as Map<String, dynamic>?) ?? {};
+          parsed.add(HgEmployee.fromApi(e, _avatarPalette[i % _avatarPalette.length]));
+        }
+        employees.assignAll(parsed);
+        _recomputeSelectAll();
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Failed to load data. Status code: ${response.statusCode}',
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
+    } catch (e) {
+      print("Error fetching HG attendance: $e");
+      Fluttertoast.showToast(
+        msg: 'Error fetching data. Please try again.',
+        toastLength: Toast.LENGTH_LONG,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // ----------------------------- FILTERS ---------------------------------
   List<HgEmployee> get filteredEmployees {
     switch (currentFilter.value) {
       case AttendanceFilter.all:
@@ -254,8 +148,10 @@ class HgAttendanceController extends GetxController {
     }
   }
 
+  // ----------------------------- SELECTION (select all / select one) ---------------------------------
   void toggleSelectAllPending() {
     selectAllPending.value = !selectAllPending.value;
+    // Mirrors EmployeeListScreen: select all rows that still need marking (pending).
     for (var emp in employees) {
       if (emp.status == AttendanceStatus.pending) {
         emp.isSelectedForBulk = selectAllPending.value;
@@ -269,11 +165,15 @@ class HgAttendanceController extends GetxController {
     if (index != -1 && employees[index].status == AttendanceStatus.pending) {
       employees[index].isSelectedForBulk = !employees[index].isSelectedForBulk;
       employees.refresh();
-      // Update selectAllPending state based on all pending selections
-      final allPending = employees.where((e) => e.status == AttendanceStatus.pending).toList();
-      final anyUnselected = allPending.any((e) => !e.isSelectedForBulk);
-      selectAllPending.value = !anyUnselected && allPending.isNotEmpty;
+      _recomputeSelectAll();
     }
+  }
+
+  void _recomputeSelectAll() {
+    final allPending =
+        employees.where((e) => e.status == AttendanceStatus.pending).toList();
+    final anyUnselected = allPending.any((e) => !e.isSelectedForBulk);
+    selectAllPending.value = !anyUnselected && allPending.isNotEmpty;
   }
 
   void saveDraft() {
@@ -286,18 +186,91 @@ class HgAttendanceController extends GetxController {
     );
   }
 
+  // ----------------------------- SUBMIT (POST) ---------------------------------
   void submitAttendance() {
-    // Filter only pending employees that have been updated or selected
-    final pendingList = employees.where((e) => e.status == AttendanceStatus.pending).toList();
-    final updatedList = pendingList.where((e) => e.leaveReason != null && e.leaveReason!.isNotEmpty).toList();
-    Get.snackbar(
-      "Submitted",
-      "Attendance for ${updatedList.length} employee(s) updated.\nTotal present: $presentCount, pending left: ${pendingList.length - updatedList.length}",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.presentGreen,
-      colorText: AppColors.white,
+    showConfirmDialog(
+      title: 'Alert!',
+      msg: 'Confirm Submit?',
+      onConfirmed: () async {
+        await _postAttendance();
+      },
     );
-    // Here you would call API to POST updated attendance
+  }
+
+  Future<void> _postAttendance() async {
+    try {
+      isLoading.value = true;
+      final prefs = await SharedPreferences.getInstance();
+      final userCode = prefs.getString("userCode");
+      final locationCode = prefs.getString("locationCode");
+
+      // Same JSON forming as EmployeeListScreen: include every employee row.
+      // A pending employee with a chosen reason posts that reason; otherwise the
+      // employee's existing/original status is posted unchanged.
+      final List<Map<String, String>> jsonOutput = employees.map((emp) {
+        final bool isSelected = emp.status == AttendanceStatus.pending &&
+            (emp.leaveReason != null && emp.leaveReason!.isNotEmpty);
+
+        String formattedDate = emp.rawDate;
+        try {
+          final parsedDate =
+              DateFormat("dd-MM-yyyy HH:mm:ss").parse(emp.rawDate);
+          formattedDate = DateFormat("yyyy-MM-dd").format(parsedDate);
+        } catch (_) {
+          // Keep rawDate as-is if it doesn't match the expected format.
+        }
+
+        return {
+          "empCode": emp.id,
+          "date": formattedDate,
+          "leaveType": isSelected ? emp.leaveReason! : emp.originalStatus,
+          "locationCode": locationCode ?? '',
+          "updatedby": userCode ?? '',
+        };
+      }).toList();
+
+      final String jsonBody = json.encode(jsonOutput);
+      print("HG ATTENDANCE UPLOADING: $jsonBody");
+
+      const String url =
+          "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/attendanceupdate";
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: jsonBody,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        if (responseData["statusCode"] == "200") {
+          Fluttertoast.showToast(msg: '${responseData["message"]}');
+          await fetchData();
+        } else {
+          isLoading.value = false;
+          Fluttertoast.showToast(
+            msg: '${responseData["message"]}',
+            toastLength: Toast.LENGTH_LONG,
+          );
+        }
+      } else {
+        isLoading.value = false;
+        Fluttertoast.showToast(
+          msg: 'Failed to submit. Status code: ${response.statusCode}',
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
+    } catch (e) {
+      isLoading.value = false;
+      print("Error submitting HG attendance: $e");
+      Fluttertoast.showToast(
+        msg: 'Failed to submit attendance. $e',
+        toastLength: Toast.LENGTH_LONG,
+      );
+    }
   }
 }
 
@@ -317,6 +290,10 @@ class HgEmployee {
   String? leaveReason;
   bool isSelectedForBulk;
 
+  // Raw values from the API, needed to rebuild the POST payload.
+  final String originalStatus; // raw status string from API ("" when unmarked)
+  final String rawDate; // raw date string from API ("dd-MM-yyyy HH:mm:ss")
+
   HgEmployee({
     required this.id,
     required this.name,
@@ -328,12 +305,63 @@ class HgEmployee {
     this.checkOut,
     this.leaveReason,
     this.isSelectedForBulk = false,
+    this.originalStatus = "",
+    this.rawDate = "",
   });
+
+  // Maps a single employee JSON object (empCode/empName/designation/date/status)
+  // into the UI model. An empty status means the row still needs marking (pending);
+  // a non-empty status means it has already been recorded (shown as present).
+  factory HgEmployee.fromApi(Map<String, dynamic> json, Color avatarColor) {
+    final String empCode = (json['empCode'] ?? '').toString();
+    final String empName = (json['empName'] ?? '').toString();
+    final String designation = (json['designation'] ?? '').toString();
+    final String rawDate = (json['date'] ?? '').toString();
+    final String statusStr = (json['status'] ?? '').toString().trim();
+
+    final bool isPending = statusStr.isEmpty;
+
+    return HgEmployee(
+      id: empCode,
+      name: empName,
+      role: designation,
+      avatarInitials: _initials(empName),
+      avatarColor: avatarColor,
+      status: isPending ? AttendanceStatus.pending : AttendanceStatus.present,
+      checkIn: null,
+      checkOut: null,
+      // Pre-fill the dropdown when a reason was already recorded.
+      leaveReason: isPending ? null : statusStr,
+      originalStatus: statusStr,
+      rawDate: rawDate,
+    );
+  }
+
+  static String _initials(String name) {
+    final parts =
+        name.trim().split(RegExp(r"\s+")).where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return "?";
+    if (parts.length == 1) {
+      final p = parts.first;
+      return (p.length >= 2 ? p.substring(0, 2) : p).toUpperCase();
+    }
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
 }
 
 // ----------------------------- SCREEN 2 WIDGET ---------------------------------
 class HgAttendanceScreen extends StatelessWidget {
-  HgAttendanceScreen({super.key});
+  HgAttendanceScreen({
+    super.key,
+    this.attendanceDay,
+    this.staffCount,
+    this.locationName,
+  });
+
+  // Data passed from the dashboard card so it can be used on this screen.
+  final AttendanceDay? attendanceDay;
+  final StaffCount? staffCount;
+  final String? locationName;
 
   final HgAttendanceController controller = Get.put(HgAttendanceController());
 
@@ -352,6 +380,7 @@ class HgAttendanceScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
               child: Row(
                 children: [
+                  
                   GestureDetector(
                     onTap: () => Get.back(),
                     child: Container(
@@ -367,7 +396,7 @@ class HgAttendanceScreen extends StatelessWidget {
                     children: [
                       Text("H&G Staff Attendance", style: GoogleFonts.dmSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.white)),
                       const SizedBox(height: 2),
-                      Text("Today · 30 May 2026 · 18 employees", style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.white.withOpacity(0.8))),
+                      Obx(() => Text(_headerSubtitle(), style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.white.withOpacity(0.8)))),
                     ],
                   ),
                 ],
@@ -375,22 +404,34 @@ class HgAttendanceScreen extends StatelessWidget {
             ),
             // Filter chips and content
             Expanded(
-              child: Obx(() => Column(
-                children: [
-                  _buildFilterBar(controller),
-                  _buildSelectAllRow(controller),
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 80),
-                      itemCount: controller.filteredEmployees.length,
-                      itemBuilder: (context, index) {
-                        final emp = controller.filteredEmployees[index];
-                        return _buildEmployeeCard(emp, controller);
-                      },
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator(color: AppColors.brandOrange));
+                }
+                return Column(
+                  children: [
+                    _buildFilterBar(controller),
+                    _buildSelectAllRow(controller),
+                    Expanded(
+                      child: controller.filteredEmployees.isEmpty
+                          ? Center(
+                              child: Text(
+                                "No employees found.",
+                                style: GoogleFonts.dmSans(fontSize: 13, color: AppColors.neutral500),
+                              ),
+                            )
+                          : ListView.builder(
+                              padding: const EdgeInsets.only(bottom: 80),
+                              itemCount: controller.filteredEmployees.length,
+                              itemBuilder: (context, index) {
+                                final emp = controller.filteredEmployees[index];
+                                return _buildEmployeeCard(emp, controller);
+                              },
+                            ),
                     ),
-                  ),
-                ],
-              )),
+                  ],
+                );
+              }),
             ),
             // Bottom action bar
             _buildBottomBar(controller),
@@ -398,6 +439,20 @@ class HgAttendanceScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _headerSubtitle() {
+    final parts = <String>[];
+    final date = attendanceDay?.date;
+    final dayType = attendanceDay?.dayType;
+    if (date != null) {
+      final pretty = DateFormat("dd MMM yyyy").format(date);
+      parts.add(dayType != null && dayType.isNotEmpty
+          ? "${dayType[0].toUpperCase()}${dayType.substring(1).toLowerCase()} · $pretty"
+          : pretty);
+    }
+    parts.add("${controller.employees.length} employees");
+    return parts.join(" · ");
   }
 
   Widget _buildFilterBar(HgAttendanceController controller) {
