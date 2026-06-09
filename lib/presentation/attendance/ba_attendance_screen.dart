@@ -206,6 +206,11 @@ class BaAttendanceController extends GetxController {
     return leaveTypes.firstWhereOrNull((t) => t.id == emp.leaveTypeId);
   }
 
+  // True when the selected reason is the manual "Reliever BA without ID" case.
+  bool isRelieverWithoutId(BaEmployee emp) {
+    return (emp.absenceReason ?? '').toLowerCase().contains('without');
+  }
+
   // True when the selected reason needs a system reliever employee (with ID).
   bool needsRelieverWithId(BaEmployee emp) {
     final name = (emp.absenceReason ?? '').toLowerCase();
@@ -296,8 +301,14 @@ class BaAttendanceController extends GetxController {
       Fluttertoast.showToast(msg: 'Please select a reason for ${emp.name}.');
       return;
     }
+    final isWithout = isRelieverWithoutId(emp);
     final selectedType = selectedLeaveTypeFor(emp);
-    if ((selectedType?.subTypes.isNotEmpty ?? false) && emp.subTypeId == null) {
+    // Sub-type is required only for normal leave types. The "Reliever BA
+    // without ID" case captures its source via the popup (sourceWithoutId),
+    // so we skip the generic sub-type check here.
+    if (!isWithout &&
+        (selectedType?.subTypes.isNotEmpty ?? false) &&
+        emp.subTypeId == null) {
       Fluttertoast.showToast(msg: 'Please select a detail for ${emp.name}.');
       return;
     }
@@ -307,7 +318,6 @@ class BaAttendanceController extends GetxController {
       Fluttertoast.showToast(msg: 'Please select a reliever for ${emp.name}.');
       return;
     }
-    final isWithout = (emp.absenceReason ?? '').toLowerCase().contains('without');
     if (isWithout &&
         ((emp.nameWithoutId ?? '').trim().isEmpty ||
             (emp.mobileWithoutId ?? '').trim().isEmpty)) {
@@ -989,8 +999,11 @@ class BaAttendanceScreen extends StatelessWidget {
     final selectedType = controller.selectedLeaveTypeFor(emp);
     final subTypes = selectedType?.subTypes ?? const <BaLeaveSubType>[];
     final hasReason = emp.absenceReason != null && emp.absenceReason!.isNotEmpty;
-    final isRelieverWithout =
-        (emp.absenceReason ?? '').toLowerCase().contains('without');
+    final isRelieverWithout = controller.isRelieverWithoutId(emp);
+
+    // Add this logic to identify if time should be hidden
+    final String reason = emp.absenceReason?.toLowerCase() ?? "";
+    final bool hideTime = reason.contains("week off") || reason.contains("planned leave");
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -999,16 +1012,20 @@ class BaAttendanceScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Editable check-in / check-out times for pending rows.
-          Text("⏱ Attendance Time", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(child: _timeField(emp, controller, isCheckIn: true)),
-              const SizedBox(width: 8),
-              Expanded(child: _timeField(emp, controller, isCheckIn: false)),
-            ],
-          ),
-          const SizedBox(height: 12),
+          // Wrap Attendance Time in a conditional check
+          if (!hideTime) ...[
+            Text("⏱ Attendance Time", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(child: _timeField(emp, controller, isCheckIn: true)),
+                const SizedBox(width: 8),
+                Expanded(child: _timeField(emp, controller, isCheckIn: false)),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
+
           // Reason dropdown (data-driven from API leaveTypes).
           Row(children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.brandOrange, shape: BoxShape.circle)), const SizedBox(width: 6), Text("Reason for Absence", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600))]),
           const SizedBox(height: 6),
