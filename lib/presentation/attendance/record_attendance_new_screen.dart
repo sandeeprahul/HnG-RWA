@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/common/constants.dart';
+import 'package:hng_flutter/data/UserLocations.dart';
 import 'package:hng_flutter/presentation/attendance/attendanceNewController.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../checkInOutScreen_TEMP.dart' show LocationSelectionModal;
 import 'ba_attendance_screen.dart';
 import 'staff_list_screen.dart';
 
@@ -23,20 +25,46 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  // Base url for the attendance (RWAMOBILEAPIOMS) endpoints.
+  static const String _omsBaseUrl =
+      'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api';
+
   bool _isLoading = true;
   String? _errorMessage;
 
   String _locationName = "";
   List<AttendanceDay> _attendanceData = [];
 
+  // Location selection state.
+  List<UserLocations> _userLocations = [];
+  List<UserLocations> _filteredLocations = [];
+  UserLocations? _selectedLocation;
+  final TextEditingController _locationSearchController =
+      TextEditingController();
+  bool _isLoadingLocations = false;
+
   @override
   void initState() {
     super.initState();
-    _fetchAttendanceCount();
+    _init();
   }
 
-  Future<void> _fetchAttendanceCount() async {
+  @override
+  void dispose() {
+    _locationSearchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _init() async {
+    await _fetchLocations(autoOpenPicker: true);
+  }
+
+  /// Fetches the locations available to the logged-in user.
+  /// If only one location is returned it is auto-selected, otherwise the
+  /// selection popup is shown (when [autoOpenPicker] is true).
+  Future<void> _fetchLocations({bool autoOpenPicker = false}) async {
     setState(() {
+      _isLoadingLocations = true;
       _isLoading = true;
       _errorMessage = null;
     });
@@ -47,14 +75,149 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       if (userId == null || userId.isEmpty) {
         setState(() {
+          _isLoadingLocations = false;
           _isLoading = false;
           _errorMessage = "User not found. Please login again.";
         });
         return;
       }
 
+      final url = '${Constants.apiHttpsUrl}/Login/GetLocation/$userId';
+      print("URL FETCH LOCATIONS: $url");
+
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data =
+            (jsonDecode(response.body) as Map<String, dynamic>?) ?? {};
+
+        if (data['statusCode']?.toString() == "200" &&
+            data['status']?.toString() == "success") {
+          final List<dynamic> jsonList =
+              (data['locations'] as List<dynamic>?) ?? [];
+
+          final List<UserLocations> locations = jsonList
+              .map((json) =>
+                  UserLocations.fromJson((json as Map<String, dynamic>?) ?? {}))
+              .toList();
+
+          setState(() {
+            _userLocations = locations;
+            _filteredLocations = List<UserLocations>.from(locations);
+            _isLoadingLocations = false;
+          });
+
+          if (locations.isEmpty) {
+            setState(() {
+              _isLoading = false;
+              _errorMessage = "No locations assigned to your account.";
+            });
+            return;
+          }
+
+          // Auto-select if exactly one location, else let the user pick.
+          if (locations.length == 1) {
+            await _onLocationSelected(locations.first);
+          } else if (autoOpenPicker && _selectedLocation == null) {
+            setState(() => _isLoading = false);
+            _showLocationPicker();
+          } else if (_selectedLocation != null) {
+            await _fetchAttendanceCount(_selectedLocation!.locationCode);
+          } else {
+            setState(() => _isLoading = false);
+            _showLocationPicker();
+          }
+        } else {
+          setState(() {
+            _isLoadingLocations = false;
+            _isLoading = false;
+            _errorMessage =
+                "Failed to fetch locations (${data['statusCode'] ?? '-'}).";
+          });
+        }
+      } else {
+        setState(() {
+          _isLoadingLocations = false;
+          _isLoading = false;
+          _errorMessage = "Server error (${response.statusCode}).";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingLocations = false;
+        _isLoading = false;
+        _errorMessage = Constants.networkIssue;
+      });
+    }
+  }
+
+  /// Opens the location selection popup. Can be called any time the user
+  /// wants to switch the active location.
+  void _showLocationPicker() {
+    // Reset the search list each time the picker opens.
+    _locationSearchController.clear();
+    _filteredLocations = List<UserLocations>.from(_userLocations);
+
+    showDialog(
+      context: context,
+      barrierDismissible: _selectedLocation != null,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return LocationSelectionModal(
+              filteredLocations: _filteredLocations,
+              searchController: _locationSearchController,
+              onSearchChanged: (query) {
+                setModalState(() {
+                  _filteredLocations = _userLocations
+                      .where((location) =>
+                          location.locationName
+                              .toLowerCase()
+                              .contains(query.toLowerCase()) ||
+                          location.locationCode
+                              .toLowerCase()
+                              .contains(query.toLowerCase()))
+                      .toList();
+                });
+              },
+              onLocationSelected: (location) {
+                Navigator.of(dialogContext).pop();
+                _onLocationSelected(location);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _onLocationSelected(UserLocations location) async {
+    setState(() {
+      _selectedLocation = location;
+      _locationName = location.locationName;
+    });
+    await _fetchAttendanceCount(location.locationCode);
+  }
+
+  Future<void> _fetchAttendanceCount(String locationCode) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      if (locationCode.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = "Please select a location.";
+        });
+        return;
+      }
+
       final url =
-          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/Login/StoreAttendancecount/$userId';
+          '$_omsBaseUrl/Login/StoreAttendancecount_bylocation/$locationCode';
 
       print("URL FETCH ATTENDANCE: $url");
       final response = await http
@@ -69,7 +232,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               (data['attendanceData'] as List<dynamic>?) ?? [];
 
           setState(() {
-            _locationName = (data['locationName'] ?? "").toString();
+            final respLocation = (data['locationName'] ?? "").toString();
+            // Prefer the API's location name, fall back to the selected one.
+            _locationName = respLocation.isNotEmpty
+                ? respLocation
+                : (_selectedLocation?.locationName ?? _locationName);
             _attendanceData = rawList
                 .map((e) => AttendanceDay.fromJson(
                     (e as Map<String, dynamic>?) ?? {}))
@@ -238,6 +405,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
+                  // Change location button (user can switch any time).
+                  if (_userLocations.length > 1)
+                    GestureDetector(
+                      onTap: _isLoadingLocations ? null : _showLocationPicker,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.place_outlined,
+                                size: 14, color: AppColors.white),
+                            const SizedBox(width: 4),
+                            Text(
+                              "Change",
+                              style: GoogleFonts.dmSans(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -288,7 +484,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: _fetchAttendanceCount,
+                onPressed: () {
+                  if (_selectedLocation != null) {
+                    _fetchAttendanceCount(_selectedLocation!.locationCode);
+                  } else {
+                    _fetchLocations(autoOpenPicker: true);
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.brandOrange,
                 ),
@@ -485,6 +687,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 attendanceDay: day,
                 staffCount: staff,
                 locationName: _locationName,
+                locationCode: _selectedLocation?.locationCode ?? '',
               ));
         } else {
           Get.to(() => HgAttendanceScreen(

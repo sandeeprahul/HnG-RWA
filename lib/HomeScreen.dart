@@ -304,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         var respo = jsonDecode(response.body);
 
-        if (respo['status'] == true) {///true = show popup
+        if (respo['status'] == false) {///true = show popup
           // _showTextAlert(context, respo['desctext']);
           setState(() {
             tasks = respo['data'];

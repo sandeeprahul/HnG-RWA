@@ -1,6 +1,7 @@
 // screen3_ba_attendance.dart
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -17,10 +18,16 @@ import 'success_confirmation.dart';
 
 // ----------------------------- CONTROLLER FOR BA STAFF (API-backed) ---------------------------------
 class BaAttendanceController extends GetxController {
-  BaAttendanceController({required this.attendanceDate, this.initialLocationName});
+  BaAttendanceController({
+    required this.attendanceDate,
+    required this.initialLocationCode,
+    this.initialLocationName,
+  });
 
   // yyyy-MM-dd, supplied by the screen (from the dashboard's selected day).
   final String attendanceDate;
+  // Location code selected on the DashboardScreen.
+  final String initialLocationCode;
   final String? initialLocationName;
 
   static const String _baseUrl =
@@ -52,6 +59,7 @@ class BaAttendanceController extends GetxController {
   void onInit() {
     super.onInit();
     locationName.value = initialLocationName ?? '';
+    locationCode.value = initialLocationCode;
     fetchData();
   }
 
@@ -69,12 +77,22 @@ class BaAttendanceController extends GetxController {
       }
 
       userId = int.tryParse(userCode);
+
+      if (initialLocationCode.isEmpty) {
+        isLoading.value = false;
+        Fluttertoast.showToast(msg: 'Location not selected.');
+        return;
+      }
+
+      // Send LocationCode as a number when possible (API expects an int),
+      // otherwise fall back to the raw string.
       final Map<String, dynamic> payload = {
-        "userId": userId ?? userCode,
+        // "LocationCode": 106,
+        "LocationCode": int.tryParse(initialLocationCode) ?? initialLocationCode,
         "attendanceDate": attendanceDate,
       };
 
-      final url = '$_baseUrl/Login/GetBAAttendancePage';
+      final url = '$_baseUrl/Login/GetBAAttendancePagebylocation';
       print("BA ATTENDANCE FETCH: $url  payload: ${jsonEncode(payload)}");
 
       final response = await http
@@ -264,6 +282,20 @@ class BaAttendanceController extends GetxController {
       // Store only; no refresh so the text field keeps focus while typing.
       if (checkIn != null) employees[index].customCheckIn = checkIn;
       if (checkOut != null) employees[index].customCheckOut = checkOut;
+    }
+  }
+
+  // Sets a time picked from the time picker (stored as 24h "HH:mm") and
+  // refreshes so the field reflects the new value.
+  void setCustomTime(String employeeId, bool isCheckIn, String value) {
+    final index = employees.indexWhere((e) => e.id == employeeId);
+    if (index != -1) {
+      if (isCheckIn) {
+        employees[index].customCheckIn = value;
+      } else {
+        employees[index].customCheckOut = value;
+      }
+      employees.refresh();
     }
   }
 
@@ -781,12 +813,15 @@ class BaAttendanceScreen extends StatelessWidget {
     this.attendanceDay,
     this.staffCount,
     this.locationName,
+    this.locationCode = '',
   });
 
   // Data passed from the dashboard card so it can be used on this screen.
   final AttendanceDay? attendanceDay;
   final StaffCount? staffCount;
   final String? locationName;
+  // Location code selected on the DashboardScreen.
+  final String locationCode;
 
   late final BaAttendanceController controller = _initController();
 
@@ -797,11 +832,12 @@ class BaAttendanceScreen extends StatelessWidget {
     }
     return Get.put(BaAttendanceController(
       attendanceDate: _resolveDate(),
+      initialLocationCode: locationCode,
       initialLocationName: locationName,
     ));
   }
 
-  // yyyy-MM-dd date used for the GetBAAttendancePage request.
+  // yyyy-MM-dd date used for the GetBAAttendancePagebylocation request.
   String _resolveDate() {
     final date = attendanceDay?.date ?? DateTime.now();
     return DateFormat('yyyy-MM-dd').format(date);
@@ -1018,9 +1054,9 @@ class BaAttendanceScreen extends StatelessWidget {
             const SizedBox(height: 6),
             Row(
               children: [
-                Expanded(child: _timeField(emp, controller, isCheckIn: true)),
+                Expanded(child: _timeField(emp, controller, context, isCheckIn: true)),
                 const SizedBox(width: 8),
-                Expanded(child: _timeField(emp, controller, isCheckIn: false)),
+                Expanded(child: _timeField(emp, controller, context, isCheckIn: false)),
               ],
             ),
             const SizedBox(height: 12),
@@ -1142,37 +1178,119 @@ class BaAttendanceScreen extends StatelessWidget {
     );
   }
 
-  // Editable time field for a pending employee. Keyed so it keeps its text
-  // across reactive rebuilds of the card.
-  Widget _timeField(BaEmployee emp, BaAttendanceController controller, {required bool isCheckIn}) {
-    final initial = isCheckIn
+  // Tappable time field that opens a 24-hour time picker. The value is stored
+  // and displayed as 24h "HH:mm".
+  Widget _timeField(BaEmployee emp, BaAttendanceController controller, BuildContext context, {required bool isCheckIn}) {
+    final value = isCheckIn
         ? (emp.customCheckIn ?? emp.checkIn ?? "")
         : (emp.customCheckOut ?? emp.checkOut ?? "");
+    final hasValue = value.trim().isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(isCheckIn ? "CHECK IN" : "CHECK OUT", style: GoogleFonts.dmSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
         const SizedBox(height: 3),
-        TextFormField(
-          key: ValueKey("${emp.id}_${isCheckIn ? 'in' : 'out'}"),
-          initialValue: initial,
-          decoration: InputDecoration(
-            hintText: isCheckIn ? "e.g. 09:30 AM" : "e.g. 06:30 PM",
-            hintStyle: GoogleFonts.dmSans(fontSize: 11, color: AppColors.neutral400),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () => _pickTime(emp, controller, context, isCheckIn: isCheckIn, current: value),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.neutral200),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    hasValue ? value : (isCheckIn ? "Select time" : "Select time"),
+                    style: GoogleFonts.dmSans(
+                      fontSize: 12,
+                      color: hasValue ? AppColors.neutral900 : AppColors.neutral400,
+                      fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.access_time, size: 16, color: AppColors.neutral500),
+              ],
+            ),
           ),
-          style: const TextStyle(fontSize: 12),
-          onChanged: (val) {
-            if (isCheckIn) {
-              controller.updateCustomTimes(emp.id, val, null);
-            } else {
-              controller.updateCustomTimes(emp.id, null, val);
-            }
-          },
         ),
       ],
+    );
+  }
+
+  // Opens an iOS-style (Cupertino) 24-hour time spinner in a bottom sheet and
+  // stores the selected value as "HH:mm".
+  Future<void> _pickTime(BaEmployee emp, BaAttendanceController controller, BuildContext context,
+      {required bool isCheckIn, required String current}) async {
+    final now = DateTime.now();
+    DateTime initial = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    final parts = current.split(':');
+    if (parts.length >= 2) {
+      final h = int.tryParse(parts[0].trim());
+      final m = int.tryParse(parts[1].trim().split(' ').first);
+      if (h != null && m != null && h >= 0 && h < 24 && m >= 0 && m < 60) {
+        initial = DateTime(now.year, now.month, now.day, h, m);
+      }
+    }
+
+    DateTime selected = initial;
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header with Cancel / title / Done
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: const BoxDecoration(
+                    border: Border(bottom: BorderSide(color: AppColors.neutral200)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CupertinoButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: Text("Cancel", style: GoogleFonts.dmSans(fontSize: 14, color: AppColors.neutral500)),
+                      ),
+                      Text(isCheckIn ? "Check In" : "Check Out", style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
+                      CupertinoButton(
+                        onPressed: () {
+                          final formatted =
+                              "${selected.hour.toString().padLeft(2, '0')}:${selected.minute.toString().padLeft(2, '0')}";
+                          controller.setCustomTime(emp.id, isCheckIn, formatted);
+                          Navigator.of(ctx).pop();
+                        },
+                        child: Text("Done", style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.brandOrange)),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 216,
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    use24hFormat: true,
+                    initialDateTime: initial,
+                    onDateTimeChanged: (value) => selected = value,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

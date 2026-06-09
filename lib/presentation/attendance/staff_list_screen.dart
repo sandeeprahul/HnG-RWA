@@ -492,7 +492,7 @@ class HgAttendanceScreen extends StatelessWidget {
           style: GoogleFonts.dmSans(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: isActive ? _getFilterTextColor(filter) : AppColors.neutral600,
+            color: isActive ? Colors.white : AppColors.neutral600,
           ),
         ),
       ),
