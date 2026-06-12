@@ -18,6 +18,11 @@ import 'record_attendance_new_screen.dart';
 
 // ----------------------------- CONTROLLER FOR SCREEN 2 (API-backed) ---------------------------------
 class HgAttendanceController extends GetxController {
+  HgAttendanceController({required this.initialLocationCode});
+
+  // Location code selected on the DashboardScreen.
+  final String initialLocationCode;
+
   // Employees loaded from API.
   final RxList<HgEmployee> employees = <HgEmployee>[].obs;
 
@@ -60,17 +65,17 @@ class HgAttendanceController extends GetxController {
   Future<void> fetchData() async {
     try {
       isLoading.value = true;
+      final locationCode = initialLocationCode;
       final prefs = await SharedPreferences.getInstance();
       final userCode = prefs.getString("userCode");
-
-      if (userCode == null || userCode.isEmpty) {
+      if (locationCode.isEmpty) {
         isLoading.value = false;
-        Fluttertoast.showToast(msg: 'User not found. Please login again.');
+        Fluttertoast.showToast(msg: 'Location not selected.');
         return;
       }
 
       final url =
-          "https://rwaweb.healthandglowonline.co.in/RWA_GROOMING_API/api/Login/GetLeaveTypesAndEmployess/$userCode";
+          "https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/Login/GetLeaveTypesAndEmployessbylocation/$userCode/$locationCode";
       print("HG ATTENDANCE FETCH: $url");
 
       final response =
@@ -202,7 +207,7 @@ class HgAttendanceController extends GetxController {
       isLoading.value = true;
       final prefs = await SharedPreferences.getInstance();
       final userCode = prefs.getString("userCode");
-      final locationCode = prefs.getString("locationCode");
+      final locationCode = initialLocationCode;
 
       // Same JSON forming as EmployeeListScreen: include every employee row.
       // A pending employee with a chosen reason posts that reason; otherwise the
@@ -224,7 +229,7 @@ class HgAttendanceController extends GetxController {
           "empCode": emp.id,
           "date": formattedDate,
           "leaveType": isSelected ? emp.leaveReason! : emp.originalStatus,
-          "locationCode": locationCode ?? '',
+          "locationCode": locationCode,
           "updatedby": userCode ?? '',
         };
       }).toList();
@@ -294,6 +299,18 @@ class HgEmployee {
   final String originalStatus; // raw status string from API ("" when unmarked)
   final String rawDate; // raw date string from API ("dd-MM-yyyy HH:mm:ss")
 
+  // True only when the recorded status is literally "Present".
+  // In/Out times are shown only in this case.
+  bool get isPresentStatus => originalStatus.trim().toLowerCase() == 'present';
+
+  // Empty status means the row still needs marking.
+  bool get isPendingStatus => originalStatus.trim().isEmpty;
+
+  // Text shown in the status badge: "Pending" when unmarked, otherwise the
+  // exact status returned by the API (e.g. "Half Day Worked / Half Day Absent").
+  String get statusLabel =>
+      isPendingStatus ? 'Pending' : originalStatus.trim();
+
   HgEmployee({
     required this.id,
     required this.name,
@@ -318,6 +335,8 @@ class HgEmployee {
     final String designation = (json['designation'] ?? '').toString();
     final String rawDate = (json['date'] ?? '').toString();
     final String statusStr = (json['status'] ?? '').toString().trim();
+    final String inTime = (json['inTime'] ?? '').toString().trim();
+    final String outTime = (json['outTime'] ?? '').toString().trim();
 
     final bool isPending = statusStr.isEmpty;
 
@@ -328,8 +347,8 @@ class HgEmployee {
       avatarInitials: _initials(empName),
       avatarColor: avatarColor,
       status: isPending ? AttendanceStatus.pending : AttendanceStatus.present,
-      checkIn: null,
-      checkOut: null,
+      checkIn: inTime,
+      checkOut: outTime,
       // Pre-fill the dropdown when a reason was already recorded.
       leaveReason: isPending ? null : statusStr,
       originalStatus: statusStr,
@@ -350,12 +369,13 @@ class HgEmployee {
 }
 
 // ----------------------------- SCREEN 2 WIDGET ---------------------------------
-class HgAttendanceScreen extends StatelessWidget {
+class HgAttendanceScreen extends StatefulWidget {
   HgAttendanceScreen({
     super.key,
     this.attendanceDay,
     this.staffCount,
     this.locationName,
+    this.locationCode = '',
   });
 
   // Data passed from the dashboard card so it can be used on this screen.
@@ -363,7 +383,16 @@ class HgAttendanceScreen extends StatelessWidget {
   final StaffCount? staffCount;
   final String? locationName;
 
-  final HgAttendanceController controller = Get.put(HgAttendanceController());
+  // Location code selected on the DashboardScreen.
+  final String locationCode;
+
+  @override
+  State<HgAttendanceScreen> createState() => _HgAttendanceScreenState();
+}
+
+class _HgAttendanceScreenState extends State<HgAttendanceScreen> {
+  late final HgAttendanceController controller =
+      Get.put(HgAttendanceController(initialLocationCode: widget.locationCode));
 
   @override
   Widget build(BuildContext context) {
@@ -380,7 +409,7 @@ class HgAttendanceScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
               child: Row(
                 children: [
-                  
+
                   GestureDetector(
                     onTap: () => Get.back(),
                     child: Container(
@@ -443,8 +472,11 @@ class HgAttendanceScreen extends StatelessWidget {
 
   String _headerSubtitle() {
     final parts = <String>[];
-    final date = attendanceDay?.date;
-    final dayType = attendanceDay?.dayType;
+    if (widget.locationName!=null) {
+      parts.add(widget.locationName??'');
+    }
+    final date = widget.attendanceDay?.date;
+    final dayType = widget.attendanceDay?.dayType;
     if (date != null) {
       final pretty = DateFormat("dd MMM yyyy").format(date);
       parts.add(dayType != null && dayType.isNotEmpty
@@ -559,9 +591,15 @@ class HgAttendanceScreen extends StatelessWidget {
   }
 
   Widget _buildEmployeeCard(HgEmployee emp, HgAttendanceController controller) {
-    final isPresent = emp.status == AttendanceStatus.present;
-    final isPending = emp.status == AttendanceStatus.pending;
-    final borderColor = isPresent ? AppColors.presentGreen.withOpacity(0.3) : (isPending ? AppColors.brandOrange.withOpacity(0.35) : AppColors.neutral200);
+    final isPending = emp.isPendingStatus;
+    final isPresent = emp.isPresentStatus; // literally "Present"
+    // Any other non-empty status (e.g. "Half Day Worked / Half Day Absent")
+    // shows only the status badge — no In/Out times and no reason dropdown.
+    final borderColor = isPresent
+        ? AppColors.presentGreen.withOpacity(0.3)
+        : (isPending
+            ? AppColors.brandOrange.withOpacity(0.35)
+            : AppColors.neutral200);
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 2),
@@ -572,6 +610,7 @@ class HgAttendanceScreen extends StatelessWidget {
         boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 2, offset: Offset(0, 1))],
       ),
       child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Top row: avatar, info, status badge
           Padding(
@@ -609,22 +648,23 @@ class HgAttendanceScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: isPresent ? AppColors.presentBg : (isPending ? AppColors.brandOrangeLight : AppColors.absentBg),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          emp.statusLabel,
+                          style: GoogleFonts.dmSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: isPresent ? AppColors.presentGreen : (isPending ? AppColors.brandOrange : AppColors.absentRed),
+                          ),
+                        ),
+                      ),
                     ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: isPresent ? AppColors.presentBg : (isPending ? AppColors.brandOrangeLight : AppColors.absentBg),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    emp.status == AttendanceStatus.present ? "Present" : (emp.status == AttendanceStatus.pending ? "Pending" : "Absent"),
-                    style: GoogleFonts.dmSans(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: isPresent ? AppColors.presentGreen : (isPending ? AppColors.brandOrange : AppColors.absentRed),
-                    ),
                   ),
                 ),
               ],
@@ -632,6 +672,9 @@ class HgAttendanceScreen extends StatelessWidget {
           ),
           // Check-in row for present employees
 
+
+
+          //
           if (isPresent)
             Container(
               padding: const EdgeInsets.fromLTRB(12, 6, 12, 14),
@@ -709,17 +752,17 @@ class HgAttendanceScreen extends StatelessWidget {
       decoration: BoxDecoration(color: AppColors.white, border: Border(top: BorderSide(color: AppColors.neutral200))),
       child: Row(
         children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: controller.saveDraft,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                decoration: BoxDecoration(color: AppColors.neutral100, borderRadius: BorderRadius.circular(12)),
-                child: Center(child: Text("Save Draft", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.neutral600))),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
+          // Expanded(
+          //   child: GestureDetector(
+          //     onTap: controller.saveDraft,
+          //     child: Container(
+          //       padding: const EdgeInsets.symmetric(vertical: 13),
+          //       decoration: BoxDecoration(color: AppColors.neutral100, borderRadius: BorderRadius.circular(12)),
+          //       child: Center(child: Text("Save Draft", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.neutral600))),
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(width: 10),
           Expanded(
             flex: 2,
             child: GestureDetector(

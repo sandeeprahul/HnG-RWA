@@ -14,8 +14,6 @@ import 'attendanceNewController.dart';
 import 'record_attendance_new_screen.dart';
 import 'success_confirmation.dart';
 
-
-
 // ----------------------------- CONTROLLER FOR BA STAFF (API-backed) ---------------------------------
 class BaAttendanceController extends GetxController {
   BaAttendanceController({
@@ -26,6 +24,7 @@ class BaAttendanceController extends GetxController {
 
   // yyyy-MM-dd, supplied by the screen (from the dashboard's selected day).
   final String attendanceDate;
+
   // Location code selected on the DashboardScreen.
   final String initialLocationCode;
   final String? initialLocationName;
@@ -88,7 +87,8 @@ class BaAttendanceController extends GetxController {
       // otherwise fall back to the raw string.
       final Map<String, dynamic> payload = {
         // "LocationCode": 106,
-        "LocationCode": int.tryParse(initialLocationCode) ?? initialLocationCode,
+        "LocationCode":
+            int.tryParse(initialLocationCode) ?? initialLocationCode,
         "attendanceDate": attendanceDate,
       };
 
@@ -127,8 +127,8 @@ class BaAttendanceController extends GetxController {
           final parsed = <BaEmployee>[];
           for (var i = 0; i < rawEmps.length; i++) {
             final e = (rawEmps[i] as Map<String, dynamic>?) ?? {};
-            parsed.add(
-                BaEmployee.fromApi(e, _avatarPalette[i % _avatarPalette.length]));
+            parsed.add(BaEmployee.fromApi(
+                e, _avatarPalette[i % _avatarPalette.length]));
           }
           employees.assignAll(parsed);
         } else {
@@ -173,8 +173,8 @@ class BaAttendanceController extends GetxController {
           final List<dynamic> raw =
               (data['relieverEmployees'] as List<dynamic>?) ?? [];
           emp.relieverOptions = raw
-              .map((e) =>
-                  BaRelieverEmployee.fromJson((e as Map<String, dynamic>?) ?? {}))
+              .map((e) => BaRelieverEmployee.fromJson(
+                  (e as Map<String, dynamic>?) ?? {}))
               .toList();
         } else {
           Fluttertoast.showToast(
@@ -199,18 +199,26 @@ class BaAttendanceController extends GetxController {
       case AttendanceFilter.all:
         return employees;
       case AttendanceFilter.present:
-        return employees.where((e) => e.status == AttendanceStatus.present).toList();
+        return employees
+            .where((e) => e.status == AttendanceStatus.present)
+            .toList();
       case AttendanceFilter.absent:
-        return employees.where((e) => e.status == AttendanceStatus.absent).toList();
+        return employees
+            .where((e) => e.status == AttendanceStatus.absent)
+            .toList();
       case AttendanceFilter.pending:
-        return employees.where((e) => e.status == AttendanceStatus.pending).toList();
+        return employees
+            .where((e) => e.status == AttendanceStatus.pending)
+            .toList();
     }
   }
 
   int get presentCount =>
       employees.where((e) => e.status == AttendanceStatus.present).length;
+
   int get pendingCount =>
       employees.where((e) => e.status == AttendanceStatus.pending).length;
+
   int get absentCount =>
       employees.where((e) => e.status == AttendanceStatus.absent).length;
 
@@ -325,7 +333,6 @@ class BaAttendanceController extends GetxController {
   String? nullIfEmpty(String? v) =>
       (v == null || v.trim().isEmpty) ? null : v.trim();
 
-
   // ----------------------------- PER-EMPLOYEE SUBMIT (POST) ---------------------------------
   Future<void> submitEmployee(BaEmployee emp) async {
     // Validation
@@ -353,14 +360,14 @@ class BaAttendanceController extends GetxController {
     if (isWithout &&
         ((emp.nameWithoutId ?? '').trim().isEmpty ||
             (emp.mobileWithoutId ?? '').trim().isEmpty)) {
-      Fluttertoast.showToast(msg: 'Please add reliever details for ${emp.name}.');
+      Fluttertoast.showToast(
+          msg: 'Please add reliever details for ${emp.name}.');
       return;
     }
 
     // String? nullIfEmpty(String? v) =>
     //     (v == null || v.trim().isEmpty) ? null : v.trim();
 // Optimized to convert any dynamic object to a trimmed string or return null if empty
-
 
     String emptyIfNull(dynamic value) => value?.toString() ?? '';
 
@@ -370,9 +377,11 @@ class BaAttendanceController extends GetxController {
       "userId": nullOrValue(userId),
       "employeeCode": nullOrValue(emp.id),
       "attendanceDate": nullOrValue(attendanceDate),
-      "reasonId": nullOrValue(emp.leaveTypeId), // Replaced empty string fallback with null
+      "reasonId": nullOrValue(emp.leaveTypeId),
+      // Replaced empty string fallback with null
       "reason": nullOrValue(emp.absenceReason),
-      "subTypeReasonId": nullOrValue(emp.subTypeId), // Replaced empty string fallback with null
+      "subTypeReasonId": nullOrValue(emp.subTypeId),
+      // Replaced empty string fallback with null
       "subTypeReason": nullOrValue(emp.missedReason),
       "relieverEmpId": nullOrValue(relieverCode),
       "nameWithoutId": nullOrValue(emp.nameWithoutId),
@@ -475,7 +484,8 @@ class BaAttendanceController extends GetxController {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _RelieverWithoutIdPopup(employee: emp, controller: this),
+      builder: (context) =>
+          _RelieverWithoutIdPopup(employee: emp, controller: this),
     );
   }
 
@@ -490,6 +500,7 @@ class BaAttendanceController extends GetxController {
 class _RelieverWithoutIdPopup extends StatefulWidget {
   final BaEmployee employee;
   final BaAttendanceController controller;
+
   const _RelieverWithoutIdPopup(
       {required this.employee, required this.controller});
 
@@ -504,12 +515,18 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
   late List<String> _sources;
   String? _selectedSource;
 
+  // Reliever check-in / check-out (24h "HH:mm"), sent as inTime / outTime.
+  String? _checkIn;
+  String? _checkOut;
+
   @override
   void initState() {
     super.initState();
     final emp = widget.employee;
     _nameCtrl = TextEditingController(text: emp.nameWithoutId ?? '');
     _mobileCtrl = TextEditingController(text: emp.mobileWithoutId ?? '');
+    _checkIn = emp.customCheckIn;
+    _checkOut = emp.customCheckOut;
     // Source options come from the selected leave type's sub types.
     final type = widget.controller.selectedLeaveTypeFor(emp);
     _sources = (type?.subTypes ?? const <BaLeaveSubType>[])
@@ -518,10 +535,10 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
     if (_sources.isEmpty) {
       _sources = const ["Brand – GT Counter", "Brand – Reliever Pool"];
     }
-    _selectedSource = (emp.sourceWithoutId != null &&
-            _sources.contains(emp.sourceWithoutId))
-        ? emp.sourceWithoutId
-        : null;
+    _selectedSource =
+        (emp.sourceWithoutId != null && _sources.contains(emp.sourceWithoutId))
+            ? emp.sourceWithoutId
+            : null;
   }
 
   @override
@@ -538,16 +555,115 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
       Fluttertoast.showToast(msg: 'Please fill all reliever details.');
       return;
     }
+    if ((_checkIn ?? '').isEmpty || (_checkOut ?? '').isEmpty) {
+      Fluttertoast.showToast(msg: 'Please select check-in and check-out time.');
+      return;
+    }
+    widget.controller.updateRelieverWithoutId(
+        widget.employee.id, name, mobile, _selectedSource);
+    // Persist the captured times so they are sent as inTime / outTime.
     widget.controller
-        .updateRelieverWithoutId(widget.employee.id, name, mobile, _selectedSource);
+        .updateCustomTimes(widget.employee.id, _checkIn, _checkOut);
     Get.back();
     Fluttertoast.showToast(msg: 'Reliever details saved.');
+  }
+
+  // Opens an iOS-style 24-hour time spinner and stores the value as "HH:mm".
+  Future<void> _pickTime(bool isCheckIn) async {
+    final now = DateTime.now();
+    final current = (isCheckIn ? _checkIn : _checkOut) ?? '';
+    DateTime initial =
+        DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    final parts = current.split(':');
+    if (parts.length >= 2) {
+      final h = int.tryParse(parts[0].trim());
+      final m = int.tryParse(parts[1].trim().split(' ').first);
+      if (h != null && m != null && h >= 0 && h < 24 && m >= 0 && m < 60) {
+        initial = DateTime(now.year, now.month, now.day, h, m);
+      }
+    }
+
+    DateTime selected = initial;
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: const BoxDecoration(
+                    border:
+                        Border(bottom: BorderSide(color: AppColors.neutral200)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CupertinoButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: Text("Cancel",
+                            style: GoogleFonts.dmSans(
+                                fontSize: 14, color: AppColors.neutral500)),
+                      ),
+                      Text(isCheckIn ? "Check In" : "Check Out",
+                          style: GoogleFonts.dmSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.neutral900)),
+                      CupertinoButton(
+                        onPressed: () {
+                          final formatted =
+                              "${selected.hour.toString().padLeft(2, '0')}:${selected.minute.toString().padLeft(2, '0')}";
+                          setState(() {
+                            if (isCheckIn) {
+                              _checkIn = formatted;
+                            } else {
+                              _checkOut = formatted;
+                            }
+                          });
+                          Navigator.of(ctx).pop();
+                        },
+                        child: Text("Done",
+                            style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.brandOrange)),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 216,
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    use24hFormat: true,
+                    initialDateTime: initial,
+                    onDateTimeChanged: (value) => selected = value,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         decoration: const BoxDecoration(
           color: AppColors.white,
@@ -557,24 +673,60 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.neutral300, borderRadius: BorderRadius.circular(2))),
+            Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                    color: AppColors.neutral300,
+                    borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text("Reliever Details", style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
+            Text("Reliever Details",
+                style: GoogleFonts.dmSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.neutral900)),
             const SizedBox(height: 4),
-            Text("Enter details of the reliever who reported without a system ID", style: GoogleFonts.dmSans(fontSize: 12, color: AppColors.neutral500), textAlign: TextAlign.center),
+            Text(
+                "Enter details of the reliever who reported without a system ID",
+                style: GoogleFonts.dmSans(
+                    fontSize: 12, color: AppColors.neutral500),
+                textAlign: TextAlign.center),
             const SizedBox(height: 16),
             _field("Full Name *", "e.g. Kavya Reddy", _nameCtrl),
             const SizedBox(height: 12),
-            _field("Mobile Number *", "10-digit mobile number", _mobileCtrl, keyboardType: TextInputType.phone),
+            _field("Mobile Number *", "10-digit mobile number", _mobileCtrl,
+                keyboardType: TextInputType.phone),
             const SizedBox(height: 12),
             _sourceDropdown(),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                    child: _timeField(
+                        "Check In *", _checkIn, () => _pickTime(true))),
+                const SizedBox(width: 10),
+                Expanded(
+                    child: _timeField(
+                        "Check Out *", _checkOut, () => _pickTime(false))),
+              ],
+            ),
             const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
                   child: GestureDetector(
                     onTap: () => Get.back(),
-                    child: Container(padding: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: AppColors.neutral100, borderRadius: BorderRadius.circular(12)), child: Center(child: Text("Cancel", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.neutral600)))),
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                            color: AppColors.neutral100,
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Center(
+                            child: Text("Cancel",
+                                style: GoogleFonts.dmSans(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.neutral600)))),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -582,7 +734,21 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
                   flex: 2,
                   child: GestureDetector(
                     onTap: _save,
-                    child: Container(padding: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: AppColors.brandOrange, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(color: Color(0x59F47B20), blurRadius: 12)]), child: Center(child: Text("Confirm & Save", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.white)))),
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                            color: AppColors.brandOrange,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: const [
+                              BoxShadow(
+                                  color: Color(0x59F47B20), blurRadius: 12)
+                            ]),
+                        child: Center(
+                            child: Text("Confirm & Save",
+                                style: GoogleFonts.dmSans(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.white)))),
                   ),
                 ),
               ],
@@ -598,18 +764,27 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+        Text(label,
+            style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.neutral600)),
         const SizedBox(height: 6),
         TextField(
           controller: ctrl,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.dmSans(fontSize: 12, color: AppColors.neutral400),
+            hintStyle:
+                GoogleFonts.dmSans(fontSize: 12, color: AppColors.neutral400),
             filled: true,
             fillColor: AppColors.neutral50,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.neutral200)),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.neutral200)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.neutral200)),
           ),
         ),
       ],
@@ -620,18 +795,74 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Source *", style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+        Text("Source *",
+            style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.neutral600)),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          decoration: BoxDecoration(border: Border.all(color: AppColors.neutral200), borderRadius: BorderRadius.circular(8), color: AppColors.neutral50),
+          decoration: BoxDecoration(
+              border: Border.all(color: AppColors.neutral200),
+              borderRadius: BorderRadius.circular(8),
+              color: AppColors.neutral50),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _selectedSource,
-              hint: const Text("— Choose source —", style: TextStyle(fontSize: 12)),
+              hint: const Text("— Choose source —",
+                  style: TextStyle(fontSize: 12)),
               isExpanded: true,
-              items: _sources.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 12)))).toList(),
+              items: _sources
+                  .map((e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e, style: const TextStyle(fontSize: 12))))
+                  .toList(),
               onChanged: (value) => setState(() => _selectedSource = value),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Tappable field that opens the 24-hour time picker for the reliever.
+  Widget _timeField(String label, String? value, VoidCallback onTap) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.neutral600)),
+        const SizedBox(height: 6),
+        InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.neutral50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.neutral200),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.access_time,
+                    size: 16, color: AppColors.neutral400),
+                const SizedBox(width: 6),
+                Text(
+                  (value == null || value.isEmpty) ? "--:--" : value,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: (value == null || value.isEmpty)
+                        ? AppColors.neutral400
+                        : AppColors.neutral900,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -642,11 +873,13 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
 
 // ----------------------------- MODELS ---------------------------------
 enum AttendanceStatus { present, pending, absent }
+
 enum AttendanceFilter { all, present, absent, pending }
 
 class BaLeaveSubType {
   final int id;
   final String name;
+
   BaLeaveSubType({required this.id, required this.name});
 
   factory BaLeaveSubType.fromJson(Map<String, dynamic> json) => BaLeaveSubType(
@@ -659,6 +892,7 @@ class BaLeaveType {
   final int id;
   final String name;
   final List<BaLeaveSubType> subTypes;
+
   BaLeaveType({required this.id, required this.name, required this.subTypes});
 
   factory BaLeaveType.fromJson(Map<String, dynamic> json) {
@@ -679,6 +913,7 @@ class BaRelieverEmployee {
   final String employeeName;
   final String brandName;
   final String displayName;
+
   BaRelieverEmployee({
     required this.employeeCode,
     required this.employeeName,
@@ -779,6 +1014,13 @@ class BaEmployee {
         status = AttendanceStatus.pending;
     }
 
+    // A 12:00 AM in-time means the BA never really checked in, so it must be
+    // treated as absent regardless of the status returned by the API.
+    final String normalizedIn = inTime.replaceAll(' ', '').toUpperCase();
+    if (normalizedIn == '12:00AM') {
+      status = AttendanceStatus.absent;
+    }
+
     return BaEmployee(
       id: code,
       name: empName,
@@ -820,6 +1062,7 @@ class BaAttendanceScreen extends StatelessWidget {
   final AttendanceDay? attendanceDay;
   final StaffCount? staffCount;
   final String? locationName;
+
   // Location code selected on the DashboardScreen.
   final String locationCode;
 
@@ -856,10 +1099,34 @@ class BaAttendanceScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
               child: Row(
                 children: [
-                  GestureDetector(onTap: () => Get.back(), child: Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.white.withOpacity(0.2), shape: BoxShape.circle), child: const Center(child: Text("←", style: TextStyle(fontSize: 16, color: AppColors.white))))),
+                  GestureDetector(
+                      onTap: () => Get.back(),
+                      child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                              color: AppColors.white.withOpacity(0.2),
+                              shape: BoxShape.circle),
+                          child: const Center(
+                              child: Text("←",
+                                  style: TextStyle(
+                                      fontSize: 16, color: AppColors.white))))),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("BA Staff Attendance", style: GoogleFonts.dmSans(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.white)), const SizedBox(height: 2), Obx(() => Text(_headerSubtitle(), style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.white.withOpacity(0.8))))]),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("BA Staff Attendance",
+                              style: GoogleFonts.dmSans(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.white)),
+                          const SizedBox(height: 2),
+                          Obx(() => Text(_headerSubtitle(),
+                              style: GoogleFonts.dmSans(
+                                  fontSize: 11,
+                                  color: AppColors.white.withOpacity(0.8))))
+                        ]),
                   ),
                 ],
               ),
@@ -868,21 +1135,30 @@ class BaAttendanceScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator(color: AppColors.brandOrange));
+                  return const Center(
+                      child: CircularProgressIndicator(
+                          color: AppColors.brandOrange));
                 }
                 return Column(
                   children: [
                     _buildFilterBar(controller),
-                    const SizedBox(height: 6,),
+                    const SizedBox(
+                      height: 6,
+                    ),
                     Expanded(
                       child: controller.filteredEmployees.isEmpty
-                          ? Center(child: Text("No employees found.", style: GoogleFonts.dmSans(fontSize: 13, color: AppColors.neutral500)))
+                          ? Center(
+                              child: Text("No employees found.",
+                                  style: GoogleFonts.dmSans(
+                                      fontSize: 13,
+                                      color: AppColors.neutral500)))
                           : ListView.builder(
                               padding: const EdgeInsets.only(bottom: 80),
                               itemCount: controller.filteredEmployees.length,
                               itemBuilder: (context, index) {
                                 final emp = controller.filteredEmployees[index];
-                                return _buildEmployeeCard(emp, controller, context);
+                                return _buildEmployeeCard(
+                                    emp, controller, context);
                               },
                             ),
                     ),
@@ -899,7 +1175,8 @@ class BaAttendanceScreen extends StatelessWidget {
 
   String _headerSubtitle() {
     final parts = <String>[];
-    if (controller.locationName.value.isNotEmpty) parts.add(controller.locationName.value);
+    if (controller.locationName.value.isNotEmpty)
+      parts.add(controller.locationName.value);
     final date = attendanceDay?.date;
     if (date != null) {
       final dayType = attendanceDay?.dayType;
@@ -920,20 +1197,25 @@ class BaAttendanceScreen extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _filterChip("All (${controller.employees.length})", AttendanceFilter.all, controller),
+            _filterChip("All (${controller.employees.length})",
+                AttendanceFilter.all, controller),
             const SizedBox(width: 8),
-            _filterChip("Present (${controller.presentCount})", AttendanceFilter.present, controller),
+            _filterChip("Present (${controller.presentCount})",
+                AttendanceFilter.present, controller),
             const SizedBox(width: 8),
-            _filterChip("Absent (${controller.absentCount})", AttendanceFilter.absent, controller),
+            _filterChip("Absent (${controller.absentCount})",
+                AttendanceFilter.absent, controller),
             const SizedBox(width: 8),
-            _filterChip("Pending (${controller.pendingCount})", AttendanceFilter.pending, controller),
+            _filterChip("Pending (${controller.pendingCount})",
+                AttendanceFilter.pending, controller),
           ],
         ),
       ),
     );
   }
 
-  Widget _filterChip(String label, AttendanceFilter filter, BaAttendanceController controller) {
+  Widget _filterChip(String label, AttendanceFilter filter,
+      BaAttendanceController controller) {
     final isActive = controller.currentFilter.value == filter;
     return GestureDetector(
       onTap: () => controller.setFilter(filter),
@@ -941,10 +1223,18 @@ class BaAttendanceScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
           color: isActive ? _getFilterActiveColor(filter) : AppColors.white,
-          border: Border.all(color: isActive ? _getFilterActiveColor(filter) : AppColors.neutral200, width: 1.5),
+          border: Border.all(
+              color: isActive
+                  ? _getFilterActiveColor(filter)
+                  : AppColors.neutral200,
+              width: 1.5),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(label, style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w600, color: isActive ? Colors.white : AppColors.neutral600)),
+        child: Text(label,
+            style: GoogleFonts.dmSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isActive ? Colors.white : AppColors.neutral600)),
         // child: Text(label, style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w600, color: isActive ? _getFilterTextColor(filter) : AppColors.neutral600)),
       ),
     );
@@ -952,27 +1242,36 @@ class BaAttendanceScreen extends StatelessWidget {
 
   Color _getFilterActiveColor(AttendanceFilter filter) {
     switch (filter) {
-      case AttendanceFilter.all: return AppColors.neutral800;
-      case AttendanceFilter.present: return AppColors.presentGreen;
-      case AttendanceFilter.absent: return AppColors.absentRed;
-      case AttendanceFilter.pending: return AppColors.brandOrange;
+      case AttendanceFilter.all:
+        return AppColors.neutral800;
+      case AttendanceFilter.present:
+        return AppColors.presentGreen;
+      case AttendanceFilter.absent:
+        return AppColors.absentRed;
+      case AttendanceFilter.pending:
+        return AppColors.brandOrange;
     }
   }
 
   Color _getFilterTextColor(AttendanceFilter filter) {
     switch (filter) {
-      case AttendanceFilter.all: return AppColors.white;
-      case AttendanceFilter.present: return AppColors.presentGreen;
-      case AttendanceFilter.absent: return AppColors.absentRed;
-      case AttendanceFilter.pending: return AppColors.brandOrange;
+      case AttendanceFilter.all:
+        return AppColors.white;
+      case AttendanceFilter.present:
+        return AppColors.presentGreen;
+      case AttendanceFilter.absent:
+        return AppColors.absentRed;
+      case AttendanceFilter.pending:
+        return AppColors.brandOrange;
     }
   }
 
-  Widget _buildEmployeeCard(BaEmployee emp, BaAttendanceController controller, BuildContext context) {
+  Widget _buildEmployeeCard(
+      BaEmployee emp, BaAttendanceController controller, BuildContext context) {
     final isPresent = emp.status == AttendanceStatus.present;
     final isPending = emp.status == AttendanceStatus.pending;
 
-    // Senior Developer Note: Prioritize the reliever status check. 
+    // Senior Developer Note: Prioritize the reliever status check.
     // If reliever is "N", we show a red border.
     final Color borderColor = emp.reliever == "N"
         ? AppColors.absentRed.withOpacity(0.3)
@@ -984,7 +1283,13 @@ class BaAttendanceScreen extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-      decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: borderColor, width: 1.5), boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 2)]),
+      decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor, width: 1.5),
+          boxShadow: const [
+            BoxShadow(color: Color(0x08000000), blurRadius: 2)
+          ]),
       child: Column(
         children: [
           // Top row
@@ -992,20 +1297,75 @@ class BaAttendanceScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
             child: Row(
               children: [
-                Container(width: 38, height: 38, decoration: BoxDecoration(gradient: LinearGradient(colors: [emp.avatarColor, emp.avatarColor.withBlue(emp.avatarColor.blue - 20)]), shape: BoxShape.circle), child: Center(child: Text(emp.avatarInitials, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.white)))),
+                Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [
+                          emp.avatarColor,
+                          emp.avatarColor.withBlue(emp.avatarColor.blue - 20)
+                        ]),
+                        shape: BoxShape.circle),
+                    child: Center(
+                        child: Text(emp.avatarInitials,
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.white)))),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(emp.name, style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.neutral800)),
-                    const SizedBox(height: 2),
-                    Row(children: [
-                      Text("${emp.role} · ${emp.brand}", style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.neutral500)),
-                      const SizedBox(width: 6),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: AppColors.neutral100, borderRadius: BorderRadius.circular(6), border: Border.all(color: AppColors.neutral200)), child: Text(emp.id, style: GoogleFonts.dmMono(fontSize: 10, fontWeight: FontWeight.w500, color: AppColors.neutral500))),
-                    ]),
-                  ]),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(emp.name,
+                            style: GoogleFonts.dmSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.neutral800)),
+                        const SizedBox(height: 2),
+                        Row(children: [
+                          Text("${emp.role} · ${emp.brand}",
+                              style: GoogleFonts.dmSans(
+                                  fontSize: 11, color: AppColors.neutral500)),
+                          const SizedBox(width: 6),
+                          Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                  color: AppColors.neutral100,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border:
+                                      Border.all(color: AppColors.neutral200)),
+                              child: Text(emp.id,
+                                  style: GoogleFonts.dmMono(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.neutral500))),
+                        ]),
+                      ]),
                 ),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: isPresent ? AppColors.presentBg : (isPending ? AppColors.brandOrangeLight : AppColors.absentBg), borderRadius: BorderRadius.circular(20)), child: Text(isPresent ? "Present" : (isPending ? "Pending" : "Absent"), style: GoogleFonts.dmSans(fontSize: 10, fontWeight: FontWeight.w700, color: isPresent ? AppColors.presentGreen : (isPending ? AppColors.brandOrange : AppColors.absentRed)))),
+                Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                        color: isPresent
+                            ? AppColors.presentBg
+                            : (isPending
+                                ? AppColors.brandOrangeLight
+                                : AppColors.absentBg),
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Text(
+                        isPresent
+                            ? "Present"
+                            : (isPending ? "Pending" : "Absent"),
+                        style: GoogleFonts.dmSans(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: isPresent
+                                ? AppColors.presentGreen
+                                : (isPending
+                                    ? AppColors.brandOrange
+                                    : AppColors.absentRed)))),
               ],
             ),
           ),
@@ -1013,15 +1373,38 @@ class BaAttendanceScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
               decoration: BoxDecoration(
-                border: const Border(top: BorderSide(color: AppColors.neutral100)),
+                border:
+                    const Border(top: BorderSide(color: AppColors.neutral100)),
                 color: const Color(0xFFFEF0E6).withOpacity(0.4),
               ),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
                 child: Row(children: [
-                  Row(children: [const Text("🟢", style: TextStyle(fontSize: 10)), const SizedBox(width: 4), const Text("In: ", style: TextStyle(fontSize: 11, color: AppColors.neutral600)), Text(emp.checkIn ?? "--", style: GoogleFonts.dmMono(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.neutral800))]),
+                  Row(children: [
+                    const Text("🟢", style: TextStyle(fontSize: 10)),
+                    const SizedBox(width: 4),
+                    const Text("In: ",
+                        style: TextStyle(
+                            fontSize: 11, color: AppColors.neutral600)),
+                    Text(emp.checkIn ?? "--",
+                        style: GoogleFonts.dmMono(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.neutral800))
+                  ]),
                   const SizedBox(width: 16),
-                  Row(children: [const Text("🔴", style: TextStyle(fontSize: 10)), const SizedBox(width: 4), const Text("Out: ", style: TextStyle(fontSize: 11, color: AppColors.neutral600)), Text(emp.checkOut ?? "--", style: GoogleFonts.dmMono(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.neutral800))]),
+                  Row(children: [
+                    const Text("🔴", style: TextStyle(fontSize: 10)),
+                    const SizedBox(width: 4),
+                    const Text("Out: ",
+                        style: TextStyle(
+                            fontSize: 11, color: AppColors.neutral600)),
+                    Text(emp.checkOut ?? "--",
+                        style: GoogleFonts.dmMono(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.neutral800))
+                  ]),
                 ]),
               ),
             ),
@@ -1031,52 +1414,84 @@ class BaAttendanceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPendingSection(BaEmployee emp, BaAttendanceController controller, BuildContext context) {
+  Widget _buildPendingSection(
+      BaEmployee emp, BaAttendanceController controller, BuildContext context) {
     final selectedType = controller.selectedLeaveTypeFor(emp);
     final subTypes = selectedType?.subTypes ?? const <BaLeaveSubType>[];
-    final hasReason = emp.absenceReason != null && emp.absenceReason!.isNotEmpty;
+    final hasReason =
+        emp.absenceReason != null && emp.absenceReason!.isNotEmpty;
     final isRelieverWithout = controller.isRelieverWithoutId(emp);
 
     // Add this logic to identify if time should be hidden
     final String reason = emp.absenceReason?.toLowerCase() ?? "";
-    final bool hideTime = reason.contains("week off") || reason.contains("planned leave");
+    final bool hideTime =
+        reason.contains("week off") || reason.contains("planned leave");
 
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(border: const Border(top: BorderSide(color: AppColors.neutral100)), color: const Color(0xFFFEF0E6).withOpacity(0.4)),
+      decoration: BoxDecoration(
+          border: const Border(top: BorderSide(color: AppColors.neutral100)),
+          color: const Color(0xFFFEF0E6).withOpacity(0.4)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Editable check-in / check-out times for pending rows.
           // Wrap Attendance Time in a conditional check
           if (!hideTime) ...[
-            Text("⏱ Attendance Time", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+            Text("⏱ Attendance Time",
+                style: GoogleFonts.dmSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.neutral600)),
             const SizedBox(height: 6),
             Row(
               children: [
-                Expanded(child: _timeField(emp, controller, context, isCheckIn: true)),
+                Expanded(
+                    child:
+                        _timeField(emp, controller, context, isCheckIn: true)),
                 const SizedBox(width: 8),
-                Expanded(child: _timeField(emp, controller, context, isCheckIn: false)),
+                Expanded(
+                    child:
+                        _timeField(emp, controller, context, isCheckIn: false)),
               ],
             ),
             const SizedBox(height: 12),
           ],
 
           // Reason dropdown (data-driven from API leaveTypes).
-          Row(children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.brandOrange, shape: BoxShape.circle)), const SizedBox(width: 6), Text("Reason for Absence", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600))]),
+          Row(children: [
+            Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                    color: AppColors.brandOrange, shape: BoxShape.circle)),
+            const SizedBox(width: 6),
+            Text("Reason for Absence",
+                style: GoogleFonts.dmSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.neutral600))
+          ]),
           const SizedBox(height: 6),
           Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.neutral200)),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.neutral200)),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: hasReason ? emp.absenceReason : null,
-                hint: const Text("— Choose reason —", style: TextStyle(fontSize: 12)),
+                hint: const Text("— Choose reason —",
+                    style: TextStyle(fontSize: 12)),
                 isExpanded: true,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 items: controller.leaveTypes
-                    .map((t) => DropdownMenuItem(value: t.name, child: Text(t.name, style: const TextStyle(fontSize: 12))))
+                    .map((t) => DropdownMenuItem(
+                        value: t.name,
+                        child:
+                            Text(t.name, style: const TextStyle(fontSize: 12))))
                     .toList(),
-                onChanged: (value) => controller.updateAbsenceReason(emp.id, value),
+                onChanged: (value) =>
+                    controller.updateAbsenceReason(emp.id, value),
               ),
             ),
           ),
@@ -1088,21 +1503,32 @@ class BaAttendanceScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("📋 Select Detail", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+                  Text("📋 Select Detail",
+                      style: GoogleFonts.dmSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.neutral600)),
                   const SizedBox(height: 6),
                   Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.neutral200)),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.neutral200)),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<int>(
                         value: emp.subTypeId,
-                        hint: const Text("— Choose —", style: TextStyle(fontSize: 12)),
+                        hint: const Text("— Choose —",
+                            style: TextStyle(fontSize: 12)),
                         isExpanded: true,
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         items: subTypes
-                            .map((s) => DropdownMenuItem(value: s.id, child: Text(s.name, style: const TextStyle(fontSize: 12))))
+                            .map((s) => DropdownMenuItem(
+                                value: s.id,
+                                child: Text(s.name,
+                                    style: const TextStyle(fontSize: 12))))
                             .toList(),
                         onChanged: (value) {
-                          final sub = subTypes.firstWhereOrNull((s) => s.id == value);
+                          final sub =
+                              subTypes.firstWhereOrNull((s) => s.id == value);
                           controller.updateSubType(emp.id, sub);
                         },
                       ),
@@ -1118,26 +1544,46 @@ class BaAttendanceScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("🔁 Select Reliever Employee", style: GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.neutral600)),
+                  Text("🔁 Select Reliever Employee",
+                      style: GoogleFonts.dmSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.neutral600)),
                   const SizedBox(height: 6),
                   if (emp.relieverLoading)
-                    const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.brandOrange)))
+                    const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.brandOrange)))
                   else if (emp.relieverOptions.isEmpty)
-                    Text("No relievers available.", style: GoogleFonts.dmSans(fontSize: 11, color: AppColors.neutral500))
+                    Text("No relievers available.",
+                        style: GoogleFonts.dmSans(
+                            fontSize: 11, color: AppColors.neutral500))
                   else
                     Container(
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.neutral200)),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.neutral200)),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: emp.relieverEmployeeCode,
-                          hint: const Text("— Choose reliever —", style: TextStyle(fontSize: 12)),
+                          hint: const Text("— Choose reliever —",
+                              style: TextStyle(fontSize: 12)),
                           isExpanded: true,
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           items: emp.relieverOptions
-                              .map((r) => DropdownMenuItem(value: r.employeeCode, child: Text(r.displayName, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)))
+                              .map((r) => DropdownMenuItem(
+                                  value: r.employeeCode,
+                                  child: Text(r.displayName,
+                                      style: const TextStyle(fontSize: 12),
+                                      overflow: TextOverflow.ellipsis)))
                               .toList(),
                           onChanged: (value) {
-                            final r = emp.relieverOptions.firstWhereOrNull((x) => x.employeeCode == value);
+                            final r = emp.relieverOptions.firstWhereOrNull(
+                                (x) => x.employeeCode == value);
                             controller.updateReliever(emp.id, r);
                           },
                         ),
@@ -1151,8 +1597,25 @@ class BaAttendanceScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: GestureDetector(
-                onTap: () => controller.showRelieverWithoutIdPopup(context, emp),
-                child: Container(padding: const EdgeInsets.symmetric(vertical: 10), decoration: BoxDecoration(color: AppColors.brandOrangeLight, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.brandOrange.withOpacity(0.3))), child: Center(child: Text((emp.nameWithoutId != null && emp.nameWithoutId!.isNotEmpty) ? "✓ ${emp.nameWithoutId} · ${emp.sourceWithoutId ?? ''}" : "+ Add Reliever Details", style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.brandOrange)))),
+                onTap: () =>
+                    controller.showRelieverWithoutIdPopup(context, emp),
+                child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                        color: AppColors.brandOrangeLight,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: AppColors.brandOrange.withOpacity(0.3))),
+                    child: Center(
+                        child: Text(
+                            (emp.nameWithoutId != null &&
+                                    emp.nameWithoutId!.isNotEmpty)
+                                ? "✓ ${emp.nameWithoutId} · ${emp.sourceWithoutId ?? ''}"
+                                : "+ Add Reliever Details",
+                            style: GoogleFonts.dmSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.brandOrange)))),
               ),
             ),
           // Per-row submit button.
@@ -1163,13 +1626,23 @@ class BaAttendanceScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 11),
               decoration: BoxDecoration(
-                color: emp.submitting ? AppColors.neutral300 : AppColors.brandBlueDeep,
+                color: emp.submitting
+                    ? AppColors.neutral300
+                    : AppColors.brandBlueDeep,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
                 child: emp.submitting
-                    ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white))
-                    : Text("Submit", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.white)),
+                    ? const SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: AppColors.white))
+                    : Text("Submit",
+                        style: GoogleFonts.dmSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.white)),
               ),
             ),
           ),
@@ -1180,7 +1653,9 @@ class BaAttendanceScreen extends StatelessWidget {
 
   // Tappable time field that opens a 24-hour time picker. The value is stored
   // and displayed as 24h "HH:mm".
-  Widget _timeField(BaEmployee emp, BaAttendanceController controller, BuildContext context, {required bool isCheckIn}) {
+  Widget _timeField(
+      BaEmployee emp, BaAttendanceController controller, BuildContext context,
+      {required bool isCheckIn}) {
     final value = isCheckIn
         ? (emp.customCheckIn ?? emp.checkIn ?? "")
         : (emp.customCheckOut ?? emp.checkOut ?? "");
@@ -1188,11 +1663,16 @@ class BaAttendanceScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(isCheckIn ? "CHECK IN" : "CHECK OUT", style: GoogleFonts.dmSans(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.neutral500)),
+        Text(isCheckIn ? "CHECK IN" : "CHECK OUT",
+            style: GoogleFonts.dmSans(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: AppColors.neutral500)),
         const SizedBox(height: 3),
         InkWell(
           borderRadius: BorderRadius.circular(8),
-          onTap: () => _pickTime(emp, controller, context, isCheckIn: isCheckIn, current: value),
+          onTap: () => _pickTime(emp, controller, context,
+              isCheckIn: isCheckIn, current: value),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             decoration: BoxDecoration(
@@ -1203,15 +1683,20 @@ class BaAttendanceScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    hasValue ? value : (isCheckIn ? "Select time" : "Select time"),
+                    hasValue
+                        ? value
+                        : (isCheckIn ? "Select time" : "Select time"),
                     style: GoogleFonts.dmSans(
                       fontSize: 12,
-                      color: hasValue ? AppColors.neutral900 : AppColors.neutral400,
+                      color: hasValue
+                          ? AppColors.neutral900
+                          : AppColors.neutral400,
                       fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
                 ),
-                const Icon(Icons.access_time, size: 16, color: AppColors.neutral500),
+                const Icon(Icons.access_time,
+                    size: 16, color: AppColors.neutral500),
               ],
             ),
           ),
@@ -1222,10 +1707,12 @@ class BaAttendanceScreen extends StatelessWidget {
 
   // Opens an iOS-style (Cupertino) 24-hour time spinner in a bottom sheet and
   // stores the selected value as "HH:mm".
-  Future<void> _pickTime(BaEmployee emp, BaAttendanceController controller, BuildContext context,
+  Future<void> _pickTime(
+      BaEmployee emp, BaAttendanceController controller, BuildContext context,
       {required bool isCheckIn, required String current}) async {
     final now = DateTime.now();
-    DateTime initial = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    DateTime initial =
+        DateTime(now.year, now.month, now.day, now.hour, now.minute);
     final parts = current.split(':');
     if (parts.length >= 2) {
       final h = int.tryParse(parts[0].trim());
@@ -1253,26 +1740,39 @@ class BaAttendanceScreen extends StatelessWidget {
               children: [
                 // Header with Cancel / title / Done
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: const BoxDecoration(
-                    border: Border(bottom: BorderSide(color: AppColors.neutral200)),
+                    border:
+                        Border(bottom: BorderSide(color: AppColors.neutral200)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       CupertinoButton(
                         onPressed: () => Navigator.of(ctx).pop(),
-                        child: Text("Cancel", style: GoogleFonts.dmSans(fontSize: 14, color: AppColors.neutral500)),
+                        child: Text("Cancel",
+                            style: GoogleFonts.dmSans(
+                                fontSize: 14, color: AppColors.neutral500)),
                       ),
-                      Text(isCheckIn ? "Check In" : "Check Out", style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.neutral900)),
+                      Text(isCheckIn ? "Check In" : "Check Out",
+                          style: GoogleFonts.dmSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.neutral900)),
                       CupertinoButton(
                         onPressed: () {
                           final formatted =
                               "${selected.hour.toString().padLeft(2, '0')}:${selected.minute.toString().padLeft(2, '0')}";
-                          controller.setCustomTime(emp.id, isCheckIn, formatted);
+                          controller.setCustomTime(
+                              emp.id, isCheckIn, formatted);
                           Navigator.of(ctx).pop();
                         },
-                        child: Text("Done", style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.brandOrange)),
+                        child: Text("Done",
+                            style: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.brandOrange)),
                       ),
                     ],
                   ),
@@ -1297,12 +1797,47 @@ class BaAttendanceScreen extends StatelessWidget {
   Widget _buildBottomBar(BaAttendanceController controller) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: const BoxDecoration(color: AppColors.white, border: Border(top: BorderSide(color: AppColors.neutral200))),
+      decoration: const BoxDecoration(
+          color: AppColors.white,
+          border: Border(top: BorderSide(color: AppColors.neutral200))),
       child: Row(
         children: [
-          Expanded(child: GestureDetector(onTap: controller.saveDraft, child: Container(padding: const EdgeInsets.symmetric(vertical: 13), decoration: BoxDecoration(color: AppColors.neutral100, borderRadius: BorderRadius.circular(12)), child: Center(child: Text("Save Draft", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.neutral600)))))),
+          Expanded(
+              child: GestureDetector(
+                  onTap: controller.saveDraft,
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      decoration: BoxDecoration(
+                          color: AppColors.neutral100,
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Center(
+                          child: Text("Save Draft",
+                              style: GoogleFonts.dmSans(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.neutral600)))))),
           const SizedBox(width: 10),
-          Expanded(flex: 2, child: GestureDetector(onTap: controller.submitAttendance, child: Container(padding: const EdgeInsets.symmetric(vertical: 13), decoration: BoxDecoration(color: AppColors.brandBlueDeep, borderRadius: BorderRadius.circular(12), boxShadow: const [BoxShadow(color: Color(0x4D2563EB), blurRadius: 12, offset: Offset(0, 4))]), child: Center(child: Text("Submit Attendance", style: GoogleFonts.dmSans(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.white))))),
+          Expanded(
+            flex: 2,
+            child: GestureDetector(
+                onTap: controller.submitAttendance,
+                child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    decoration: BoxDecoration(
+                        color: AppColors.brandBlueDeep,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                              color: Color(0x4D2563EB),
+                              blurRadius: 12,
+                              offset: Offset(0, 4))
+                        ]),
+                    child: Center(
+                        child: Text("Submit Attendance",
+                            style: GoogleFonts.dmSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.white))))),
           ),
         ],
       ),

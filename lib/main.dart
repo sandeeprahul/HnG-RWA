@@ -61,14 +61,17 @@ Future<void> main() async {
   Get.put(
       CameraPageControllerForLowerVersions()); // Register the controller once
   // Get.put(CameraPageController()); // Register the controller once
-  runApp(GetMaterialApp(
+  runApp(ProviderScope(
+    child: GetMaterialApp(
       theme: lightTheme,
       getPages: AppPages.pages,
       // initialBinding: loginBinding(),
       debugShowCheckedModeBanner: false,
       // home: const OrderListScreen())
       // home: const DashboardV2Page()));
-      home: const GifScreen()));
+      home: const GifScreen(),
+    ),
+  ));
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -254,17 +257,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
-        child: Scaffold(
-            resizeToAvoidBottomInset: true,
-            body: SafeArea(
-                child: loading
-                    ? const CircularProgressIndicator()
-                    : loggedIIn
-                        // ? const HomePage()
-                        ? const HomeScreen()
-                        // : PageRetail()
-                        : const LoginScreen())));
+    // ProviderScope now lives at the app root (in runApp), so it must NOT be
+    // re-declared here — a nested scope creates a separate provider container
+    // and breaks state shared with pushed routes.
+    return Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+            child: loading
+                ? const CircularProgressIndicator()
+                : loggedIIn
+                    // ? const HomePage()
+                    ? const HomeScreen()
+                    // : PageRetail()
+                    : const LoginScreen()));
   }
 
   @override

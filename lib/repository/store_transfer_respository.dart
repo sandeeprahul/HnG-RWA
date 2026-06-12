@@ -9,15 +9,13 @@ import '../data/opeartions/store_transfer_entity.dart';
 import '../data/opeartions/weekoff_entity.dart';
 
 class StoreTransferRepository {
-
   Future<StoreTransferData?> getStoreTransferData(String employeeCode) async {
     try {
-
-
       String url =
           "${Constants.apiHttpsUrl}/Login/TemporaryTransfer/$employeeCode";
 
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
+      final response =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
       print(url);
 
       var responseData = json.decode(response.body);
@@ -34,86 +32,24 @@ class StoreTransferRepository {
     }
   }
 
-
-  Future<void> transferEmployee(
-      List<WeekoffEntity> selectedDates, String empCode) async
-  {
-     var url = Uri.https(
-        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-        '/RWA_GROOMING_API/api/Login/weekoff',
-    );
-
+  Future<String> sendUpdatedLocation(
+      String empCode, Map<String, Object> params) async {
     try {
-      //date
-
-      final requestBody = selectedDates.map((date) {
-        return [ {
-          "empCode": date.empCode,
-          "date": '${date.date.year}-${date.date.month}-${date.date.day}', // Convert DateTime to String format
-          "leaveType": date.leaveType,
-        }];
-      }).toList();
-      var params =[];
-      for(int i = 0;i<selectedDates.length;i++){
-        final details = selectedDates[i];
-        params.add({
-          "empCode": empCode,
-          "date": '${details.date.year}-${details.date.month}-${details.date.day}', // Convert DateTime to String format
-          "leaveType": details.leaveType,
-        });
-      }
-      print(params);
-
-      var response = await http.post(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(params),
-      ).timeout(const Duration(seconds: 5));
-
-      if (response.statusCode == 200) {
-        var respo = jsonDecode(response.body);
-        print(respo);
-
-        // "statusCode": "201",
-        if (respo['statusCode'] == "200") {
-          print(respo['statusCode']);
-          print(respo['message']);
-        } else if (respo['statusCode'] == "201") {
-          print(respo['statusCode']);
-          print(respo['message']);
-        }
-      } else if (response.statusCode == 201) {
-        print(response.statusCode);
-      } else {
-        print(response.statusCode);
-      }
-    } catch (e) {
-      print(e);
-      rethrow;
-    }
-  }
-
-  Future<String> sendUpdatedLocation( String empCode, Map<String, Object> params) async {
-
-
-
-    try
-    {
-       var url = Uri.https(
-      'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
-      '/RWA_GROOMING_API/api/Login/TrasnferUpdate',
+      var url = Uri.https(
+        'RWAWEB.HEALTHANDGLOWONLINE.CO.IN',
+        '/RWA_GROOMING_API/api/Login/TrasnferUpdate',
       );
       print(url);
 
-      var response = await http.post(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(params),
-      ).timeout(const Duration(seconds: 5));
+      var response = await http
+          .post(
+            url,
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(params),
+          )
+          .timeout(const Duration(seconds: 59));
 
       if (response.statusCode == 200) {
         var respo = jsonDecode(response.body);
@@ -130,16 +66,12 @@ class StoreTransferRepository {
       } else if (response.statusCode == 201) {
         print(response.statusCode);
         return "201";
-
       } else {
         return "404";
 
         print(response.statusCode);
       }
-    }
-    catch (e)
-    {
-
+    } catch (e) {
       print(e);
       // rethrow;
       // return "404";
@@ -147,7 +79,5 @@ class StoreTransferRepository {
       throw "404";
     }
     throw "";
-
   }
-
 }

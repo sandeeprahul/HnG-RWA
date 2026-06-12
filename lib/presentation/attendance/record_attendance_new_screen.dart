@@ -694,6 +694,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 attendanceDay: day,
                 staffCount: staff,
                 locationName: _locationName,
+                locationCode: _selectedLocation?.locationCode ?? '',
               ));
         }
       },

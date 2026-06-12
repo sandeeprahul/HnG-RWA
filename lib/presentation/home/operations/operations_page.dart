@@ -374,9 +374,13 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
 
   Future<void> sendTOStoreTransferPage(bool isPermanant) async {
     final prefs = await SharedPreferences.getInstance();
+    final userCode = prefs.getString('userCode');
 
-    var userCode = await prefs.getString('userCode');
-    ref.read(employeeCodeProviderStoreTransfer.notifier).state = userCode!;
+    // The widget may have been disposed while awaiting. Guard before using
+    // `ref` or `context` to avoid "Cannot use ref after the widget was disposed".
+    if (!mounted) return;
+
+    ref.read(employeeCodeProviderStoreTransfer.notifier).state = userCode ?? '';
 
     Navigator.push(
       context,
@@ -399,7 +403,7 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
 
       print("URL OPERATIONS-> $url");
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 300));
 
       if (response.statusCode == 200) {
         final List<dynamic> parsedResponse = json.decode(response.body);

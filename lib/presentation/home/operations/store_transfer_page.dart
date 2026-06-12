@@ -53,14 +53,17 @@ class _StoreTransferPageState extends ConsumerState<StoreTransferPage> {
                       return CustomScrollView(
                         slivers: [
                           SliverAppBar(
-                            collapsedHeight: 200,
-                            pinned: true,
+                            expandedHeight: 56,
+                            // Scrolls away with the list (not pinned), so the
+                            // header animates/collapses along with scrolling.
+                            pinned: false,
+                            floating: false,
                             // title: Text('Week-Off apply'),
                             backgroundColor: Colors.orange,
 
-                            centerTitle: false,
+                            centerTitle: true,
                             flexibleSpace: FlexibleSpaceBar(
-                              background: Hero(
+                          /*    background: Hero(
                                   tag: widget.isPermanent
                                       ? 'transfer'
                                       : 'transfer2',
@@ -68,17 +71,18 @@ class _StoreTransferPageState extends ConsumerState<StoreTransferPage> {
                                     Icons.transfer_within_a_station,
                                     color: Colors.white,
                                     size: 56,
-                                  )),
-                              collapseMode: CollapseMode.parallax,
-                              titlePadding: const EdgeInsetsDirectional.only(
+                                  )),*/
+                              // collapseMode: CollapseMode.parallax,
+                           /*   titlePadding: const EdgeInsetsDirectional.only(
                                 start: 20,
                                 bottom: 16.0,
                                 // top: 10
-                              ),
+                              ),*/
                               title: Text(
                                 widget.isPermanent
                                     ? 'Permanent Store Transfer'
                                     : 'Temporary Store Transfer',
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
                           ),
@@ -104,7 +108,8 @@ class _StoreTransferPageState extends ConsumerState<StoreTransferPage> {
                         slivers: [
                           SliverAppBar(
                             collapsedHeight: 200,
-                            pinned: true,
+                            pinned: false,
+                            floating: true,
                             // title: Text('Week-Off apply'),
                             backgroundColor: Colors.orange,
 
@@ -275,7 +280,6 @@ class _StoreTransferPageState extends ConsumerState<StoreTransferPage> {
 
   @override
   void dispose() {
-    ref.invalidate(storeTransferProvider);
     super.dispose();
   }
 }

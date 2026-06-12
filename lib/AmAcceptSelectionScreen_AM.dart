@@ -1432,7 +1432,7 @@ class _AmAcceptSelectionScreen_AMState
           "${Constants.apiHttpsUrlTest}/AreaManager/HeaderQuestion/${widget.activeCheckList.amChecklistAssignId}/${widget.mLpdChecklist.sectionId}/$userID";
 
       final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 3));
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 59));
 
       var responseData = json.decode(response.body);
       print(url);
