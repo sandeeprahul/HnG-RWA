@@ -353,261 +353,267 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Scaffold(
-            // appBar: AppBar(),
-            body: Stack(
-          children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                          height: 50,
-                          width: 100,
-                          child: SvgPicture.network(
-                              'https://ik.imagekit.io/hng/desktop-assets/svgs/logo.svg')),
-                      const Icon(
-                        Icons.notifications,
-                        size: 20,
-                      ),
-                    ],
+   return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // Set status bar color
+        statusBarIconBrightness: Brightness.light, // For white icons (time, battery)
+        statusBarBrightness: Brightness.dark, // For iOS white icons
+      ),      child: Scaffold(
+        body: SafeArea(
+          child: Scaffold(
+              // appBar: AppBar(),
+              body: Stack(
+            children: [
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15, right: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                            height: 50,
+                            width: 100,
+                            child: SvgPicture.network(
+                                'https://ik.imagekit.io/hng/desktop-assets/svgs/logo.svg')),
+                        const Icon(
+                          Icons.notifications,
+                          size: 20,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                    child: PageView(
-                  // physics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (int page) async {
-                    if (page == 0) {
-                      setState(() {
-                        isSelected = 0;
-                      });
-                    } else if (page == 1) {
-                      setState(() {
-                        isSelected = 1;
-                      });
-                    } else if (page == 2) {
-                      setState(() {
-                        isSelected = 2;
-                      });
-                    } else if (page == 3) {
-                      setState(() {
-                        isSelected = 3;
-                      });
-                    }
-                  },
-                  controller: _pageController,
-                  scrollDirection: Axis.horizontal,
-                  children: const [
-                    PageHome(),
-                    PageSurvey(),
-                    PageRetail(),
-                    PageProfile(),
-                  ],
-                )),
-
-                ///bottom nav widget
-                bottomNavigationWidget(),
-              ],
-            ),
-            Visibility(
-              visible: comp,
-              child: Container(
-                padding: const EdgeInsets.only(bottom: 65, right: 10),
-                margin: const EdgeInsets.only(),
-                width: double.infinity,
-                color: Colors.black.withOpacity(0.5),
-                child: Column(
-                  children: [
-                    const Spacer(),
-                    Visibility(
-                      visible: comp,
-                      child: SizedBox(
-                        // height:comp?200:0 ,
-                        child: Column(
-                          children: [
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 10, top: 5, bottom: 5),
-                                  margin: const EdgeInsets.only(right: 10),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: const Text(
-                                    'We care',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                                FloatingActionButton(
-                                  backgroundColor: Colors.green,
-                                  child: const Icon(Icons.airplane_ticket),
-                                  onPressed: () {
-                                    setState(() {
-                                      comp = false;
-                                    });
-                                    // showAuditSummaryDialog(context);
-                                    Get.to(const WeCareScreen());
-                                  },
-                                ),
-                                // IconButton(onPressed: (){}, icon: Icon(Icons.airplane_ticket),),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: FloatingActionButton(
-                        // backgroundColor: Colors.grey,
-                        child: Icon(comp ? Icons.close : Icons.add),
-                        onPressed: () {
-                          setState(() {
-                            if (comp) {
-                              comp = false;
-                            } else {
-                              comp = true;
-                            }
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 65, right: 10),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: FloatingActionButton(
-                  // backgroundColor: Colors.grey,
-                  child: Icon(comp ? Icons.close : Icons.add),
-                  onPressed: () {
-                    setState(() {
-                      if (comp) {
-                        comp = false;
-                      } else {
-                        comp = true;
+                  Expanded(
+                      child: PageView(
+                    // physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (int page) async {
+                      if (page == 0) {
+                        setState(() {
+                          isSelected = 0;
+                        });
+                      } else if (page == 1) {
+                        setState(() {
+                          isSelected = 1;
+                        });
+                      } else if (page == 2) {
+                        setState(() {
+                          isSelected = 2;
+                        });
+                      } else if (page == 3) {
+                        setState(() {
+                          isSelected = 3;
+                        });
                       }
-                    });
-                  },
-                ),
+                    },
+                    controller: _pageController,
+                    scrollDirection: Axis.horizontal,
+                    children: const [
+                      PageHome(),
+                      PageSurvey(),
+                      PageRetail(),
+                      PageProfile(),
+                    ],
+                  )),
+
+                  ///bottom nav widget
+                  bottomNavigationWidget(),
+                ],
               ),
-            ),
-            Visibility(
-                visible: loading,
-                child: Center(
-                    child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5)),
-                        padding: const EdgeInsets.all(20),
-                        height: 115,
-                        width: 150,
-                        child: const Column(
-                          children: [
-                            CircularProgressIndicator(),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text('Please wait..'),
-                            )
-                          ],
-                        )))),
-            Visibility(
-                visible: showPendingTask,
+              Visibility(
+                visible: comp,
                 child: Container(
-                  padding: const EdgeInsets.all(30),
-                  height: double.infinity,
+                  padding: const EdgeInsets.only(bottom: 65, right: 10),
+                  margin: const EdgeInsets.only(),
                   width: double.infinity,
-                  color: Colors.black.withOpacity(0.2),
-                  child: Stack(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Column(
                     children: [
-                      BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: double.infinity,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color: Colors.white,
-                        ),
-                        child: InkWell(
-                          onTap: () {},
-                          child: Stack(
+                      const Spacer(),
+                      Visibility(
+                        visible: comp,
+                        child: SizedBox(
+                          // height:comp?200:0 ,
+                          child: Column(
                             children: [
-                              Container(
-                                // color: Colors.white,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: Colors.white,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 26),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.center,
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue[800],
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(20),
-                                          topRight: Radius.circular(20),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Pending Tasks',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    const Text(
-                                      'Please complete these pending tasks:',
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10, top: 5, bottom: 5),
+                                    margin: const EdgeInsets.only(right: 10),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8)),
+                                    child: const Text(
+                                      'We care',
                                       style: TextStyle(fontSize: 16),
                                     ),
-                                    const SizedBox(height: 16),
-                                    ...tasks
-                                        .map((task) => _buildTaskItem(task))
-                                        .toList(),
-                                  ],
-                                ),
+                                  ),
+                                  FloatingActionButton(
+                                    backgroundColor: Colors.green,
+                                    child: const Icon(Icons.airplane_ticket),
+                                    onPressed: () {
+                                      setState(() {
+                                        comp = false;
+                                      });
+                                      // showAuditSummaryDialog(context);
+                                      Get.to(const WeCareScreen());
+                                    },
+                                  ),
+                                  // IconButton(onPressed: (){}, icon: Icon(Icons.airplane_ticket),),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 15,
                               ),
                             ],
                           ),
                         ),
                       ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: FloatingActionButton(
+                          // backgroundColor: Colors.grey,
+                          child: Icon(comp ? Icons.close : Icons.add),
+                          onPressed: () {
+                            setState(() {
+                              if (comp) {
+                                comp = false;
+                              } else {
+                                comp = true;
+                              }
+                            });
+                          },
+                        ),
+                      ),
                     ],
                   ),
-                ))
-          ],
-        )),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 65, right: 10),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: FloatingActionButton(
+                    // backgroundColor: Colors.grey,
+                    child: Icon(comp ? Icons.close : Icons.add),
+                    onPressed: () {
+                      setState(() {
+                        if (comp) {
+                          comp = false;
+                        } else {
+                          comp = true;
+                        }
+                      });
+                    },
+                  ),
+                ),
+              ),
+              Visibility(
+                  visible: loading,
+                  child: Center(
+                      child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5)),
+                          padding: const EdgeInsets.all(20),
+                          height: 115,
+                          width: 150,
+                          child: const Column(
+                            children: [
+                              CircularProgressIndicator(),
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('Please wait..'),
+                              )
+                            ],
+                          )))),
+              Visibility(
+                  visible: showPendingTask,
+                  child: Container(
+                    padding: const EdgeInsets.all(30),
+                    height: double.infinity,
+                    width: double.infinity,
+                    color: Colors.black.withOpacity(0.2),
+                    child: Stack(
+                      children: [
+                        BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: double.infinity,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.white,
+                          ),
+                          child: InkWell(
+                            onTap: () {},
+                            child: Stack(
+                              children: [
+                                Container(
+                                  // color: Colors.white,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    color: Colors.white,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 26),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.center,
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[800],
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(20),
+                                            topRight: Radius.circular(20),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Pending Tasks',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      const Text(
+                                        'Please complete these pending tasks:',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ...tasks
+                                          .map((task) => _buildTaskItem(task))
+                                          .toList(),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ))
+            ],
+          )),
+        ),
       ),
     );
   }

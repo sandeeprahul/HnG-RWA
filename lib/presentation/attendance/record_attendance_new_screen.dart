@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/common/constants.dart';
@@ -201,10 +202,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     await _fetchAttendanceCount(location.locationCode);
   }
 
+  String? _bannerMessage; // Add this variable
   Future<void> _fetchAttendanceCount(String locationCode) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _bannerMessage = null; // Reset message on new fetch
     });
 
     try {
@@ -232,6 +235,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               (data['attendanceData'] as List<dynamic>?) ?? [];
 
           setState(() {
+            _bannerMessage = data['message'];
             final respLocation = (data['locationName'] ?? "").toString();
             // Prefer the API's location name, fall back to the selected one.
             _locationName = respLocation.isNotEmpty
@@ -344,106 +348,113 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFFE8ECF0),
-      body: SafeArea(
-        child: Column(
-          children: [
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: AppColors.brandOrange, // Set status bar color
+        statusBarIconBrightness: Brightness.light, // For white icons (time, battery)
+        statusBarBrightness: Brightness.dark, // For iOS white icons
+      ),
+      child: Scaffold(
+        // extendBodyBehindAppBar: true,
+        backgroundColor: const Color(0xFFE8ECF0),
+        body: SafeArea(
+          child: Column(
+            children: [
 
-            // Main Header (Orange)
-            Container(
-              color: AppColors.brandOrange,
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-              child: Row(
-                children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Get.back(),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "←",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Record Attendance",
-                          style: GoogleFonts.dmSans(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                            color: AppColors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _headerSubtitle(),
-                          style: GoogleFonts.dmSans(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.white.withOpacity(0.8),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Change location button (user can switch any time).
-                  if (_userLocations.length > 1)
+              // Main Header (Orange)
+              Container(
+                color: AppColors.brandOrange,
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                child: Row(
+                  children: [
+                    // Back button
                     GestureDetector(
-                      onTap: _isLoadingLocations ? null : _showLocationPicker,
+                      onTap: () => Get.back(),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
                           color: AppColors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
+                          shape: BoxShape.circle,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.place_outlined,
-                                size: 14, color: AppColors.white),
-                            const SizedBox(width: 4),
-                            Text(
-                              "Change",
-                              style: GoogleFonts.dmSans(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.white,
-                              ),
+                        child: const Center(
+                          child: Text(
+                            "←",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.white,
+                              fontWeight: FontWeight.w600,
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Record Attendance",
+                            style: GoogleFonts.dmSans(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.3,
+                              color: AppColors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _headerSubtitle(),
+                            style: GoogleFonts.dmSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.white.withOpacity(0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Change location button (user can switch any time).
+                    if (_userLocations.length > 1)
+                      GestureDetector(
+                        onTap: _isLoadingLocations ? null : _showLocationPicker,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.place_outlined,
+                                  size: 14, color: AppColors.white),
+                              const SizedBox(width: 4),
+                              Text(
+                                "Change",
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            // Scrollable Content
-            Expanded(
-              child: _buildBody(),
-            ),
-            // Bottom Navigation Bar
-            // _buildBottomNavBar(),
-          ],
+              // Scrollable Content
+              Expanded(
+                child: _buildBody(),
+              ),
+              // Bottom Navigation Bar
+              // _buildBottomNavBar(),
+            ],
+          ),
         ),
       ),
     );
@@ -525,7 +536,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          _buildInfoBanner(),
+          // _buildInfoBanner(),
+          if (!_isLoading && _errorMessage == null) _buildInfoBanner(),
           const SizedBox(height: 8),
           // Build a section per available day (handles missing TODAY/YESTERDAY).
           ..._attendanceData.expand((day) => _buildDaySection(day)),
@@ -582,7 +594,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // Info Banner Widget
-  Widget _buildInfoBanner() {
+  Widget _buildInfoBannerOLD() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -623,6 +635,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     text: ". You can view and update yesterday's records anytime.",
                   ),
                 ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoBanner() {
+    if (_bannerMessage == null || _bannerMessage!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue.shade100),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, size: 18, color: Colors.blue.shade700),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'You can view and update today’s attendance anytime before 11 PM',
+              style: GoogleFonts.outfit(
+                fontSize: 13,
+                color: Colors.blue.shade800,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
