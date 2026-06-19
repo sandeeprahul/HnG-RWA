@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../checkInOutScreen_TEMP.dart' show LocationSelectionModal;
 import 'ba_attendance_screen.dart';
 import 'staff_list_screen.dart';
-
 
 // ----------------------------- DASHBOARD SCREEN (Screen 1) ---------------------------------
 class DashboardScreen extends StatefulWidget {
@@ -86,9 +84,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final url = '${Constants.apiHttpsUrl}/Login/GetLocation/$userId';
       print("URL FETCH LOCATIONS: $url");
 
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 15));
+      final response =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data =
@@ -223,9 +220,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           '$_omsBaseUrl/Login/StoreAttendancecount_bylocation/$locationCode';
 
       print("URL FETCH ATTENDANCE: $url");
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 15));
+      final response =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -242,8 +238,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? respLocation
                 : (_selectedLocation?.locationName ?? _locationName);
             _attendanceData = rawList
-                .map((e) => AttendanceDay.fromJson(
-                    (e as Map<String, dynamic>?) ?? {}))
+                .map((e) =>
+                    AttendanceDay.fromJson((e as Map<String, dynamic>?) ?? {}))
                 .toList();
             _isLoading = false;
           });
@@ -301,11 +297,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return dateStr;
   }
 
-
   /// 3. Helper to find a specific day type from your parsed data list
   AttendanceDay? _findDay(String dayType) {
     try {
-      return _attendanceData.firstWhere((element) => element.dayType == dayType);
+      return _attendanceData
+          .firstWhere((element) => element.dayType == dayType);
     } catch (_) {
       return null; // Returns null cleanly if dayType is not found
     }
@@ -326,6 +322,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   AttendanceDay? get _firstDay {
     return _attendanceData.isNotEmpty ? _attendanceData.first : null;
   }
+
   // Section label e.g. "Today · 07 Jun" or fallback to dayType.
   String _sectionLabel(AttendanceDay day) {
     final String typeLabel = _prettyDayType(day.dayType);
@@ -350,8 +347,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: AppColors.brandOrange, // Set status bar color
-        statusBarIconBrightness: Brightness.light, // For white icons (time, battery)
+        statusBarColor: AppColors.brandOrange,
+        // Set status bar color
+        statusBarIconBrightness: Brightness.light,
+        // For white icons (time, battery)
         statusBarBrightness: Brightness.dark, // For iOS white icons
       ),
       child: Scaffold(
@@ -360,7 +359,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: SafeArea(
           child: Column(
             children: [
-
               // Main Header (Orange)
               Container(
                 color: AppColors.brandOrange,
@@ -565,7 +563,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         dateType: dateType,
         total: hg.total,
         presentCount: hg.present,
-        secondaryCount: hg.absent,
+        // secondaryCount: hg.absent,
+        secondaryCount:hg.pending,
+        absentCount: hg.absent,
         secondaryLabel: secondaryLabel,
         actionText: actionText,
         iconEmoji: "🏪",
@@ -580,7 +580,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         dateType: dateType,
         total: ba.total,
         presentCount: ba.present,
-        secondaryCount: ba.absent,
+        // secondaryCount: ba.absent,
+        secondaryCount:  ba.pending,
+        absentCount: ba.absent,
+
         secondaryLabel: secondaryLabel,
         actionText: actionText,
         iconEmoji: "💄",
@@ -632,7 +635,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const TextSpan(
-                    text: ". You can view and update yesterday's records anytime.",
+                    text:
+                        ". You can view and update yesterday's records anytime.",
                   ),
                 ],
               ),
@@ -718,29 +722,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String subtitle,
     required AttendanceDay day,
     required StaffCount staff,
+    required int absentCount,
   }) {
     Color borderColor = (cardType == CardType.hg)
         ? AppColors.brandBlue.withOpacity(0.2)
         : AppColors.brandOrange.withOpacity(0.2);
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         // staffType 2 = BA Staff -> BaAttendanceScreen
         // staffType 1 = H&G Staff -> HgAttendanceScreen
         if (cardType == CardType.ba) {
-          Get.to(() => BaAttendanceScreen(
+          await  Get.to(() => BaAttendanceScreen(
                 attendanceDay: day,
                 staffCount: staff,
                 locationName: _locationName,
                 locationCode: _selectedLocation?.locationCode ?? '',
               ));
         } else {
-          Get.to(() => HgAttendanceScreen(
+          await    Get.to(() => HgAttendanceScreen(
                 attendanceDay: day,
                 staffCount: staff,
                 locationName: _locationName,
                 locationCode: _selectedLocation?.locationCode ?? '',
               ));
+        }
+
+        // This line runs ONLY after coming back from BaAttendanceScreen or HgAttendanceScreen
+        if (_selectedLocation != null) {
+          print("Refreshing attendance counts after return...");
+          await _fetchAttendanceCount(_selectedLocation!.locationCode);
         }
       },
       child: Container(
@@ -778,7 +789,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           : AppColors.brandOrangeLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Center(child: Text(iconEmoji, style: const TextStyle(fontSize: 14))),
+                    child: Center(
+                        child: Text(iconEmoji,
+                            style: const TextStyle(fontSize: 14))),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -823,6 +836,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildStatCell("$total", "Total", isSecondary: false),
                   _buildStatCell("$presentCount", "Present",
                       color: AppColors.presentGreen),
+                  _buildStatCell("$absentCount", "Absent",
+                      color: AppColors.absentRed),
                   _buildStatCell("$secondaryCount", secondaryLabel,
                       color: dateType == DateType.yesterday
                           ? AppColors.absentRed
@@ -842,7 +857,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: cardType == CardType.hg
                           ? AppColors.brandBlue
@@ -868,7 +884,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // Helper for stat cell
-  Widget _buildStatCell(String number, String label, {Color? color, bool isSecondary = false}) {
+  Widget _buildStatCell(String number, String label,
+      {Color? color, bool isSecondary = false}) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -923,7 +940,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildNavItem(String icon, String label, bool isActive, {bool hasIconBg = false}) {
+  Widget _buildNavItem(String icon, String label, bool isActive,
+      {bool hasIconBg = false}) {
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -953,7 +971,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       icon,
                       style: TextStyle(
                         fontSize: 18,
-                        color: isActive ? AppColors.brandOrange : AppColors.neutral400,
+                        color: isActive
+                            ? AppColors.brandOrange
+                            : AppColors.neutral400,
                       ),
                     ),
                   ),
@@ -963,7 +983,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon,
                   style: TextStyle(
                     fontSize: 20,
-                    color: isActive ? AppColors.brandOrange : AppColors.neutral400,
+                    color:
+                        isActive ? AppColors.brandOrange : AppColors.neutral400,
                   ),
                 ),
               const SizedBox(height: 3),
@@ -972,7 +993,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: GoogleFonts.dmSans(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: isActive ? AppColors.brandOrange : AppColors.neutral400,
+                  color:
+                      isActive ? AppColors.brandOrange : AppColors.neutral400,
                 ),
               ),
             ],
@@ -985,6 +1007,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 // Enums for type safety
 enum CardType { hg, ba }
+
 enum DateType { yesterday, today }
 
 // ----------------------------- API MODELS (null-safe) ---------------------------------
@@ -1035,6 +1058,7 @@ class StaffCount {
   final int total;
   final int present;
   final int absent;
+  final int pending; // 1. Add this field
 
   StaffCount({
     required this.staffType,
@@ -1042,6 +1066,7 @@ class StaffCount {
     required this.total,
     required this.present,
     required this.absent,
+    required this.pending, // 2. Add to constructor
   });
 
   factory StaffCount.empty() => StaffCount(
@@ -1050,6 +1075,7 @@ class StaffCount {
         total: 0,
         present: 0,
         absent: 0,
+        pending: 0, // 3. Update empty state
       );
 
   factory StaffCount.fromJson(Map<String, dynamic> json) {
@@ -1059,6 +1085,7 @@ class StaffCount {
       total: _toInt(json['total']),
       present: _toInt(json['present']),
       absent: _toInt(json['absent']),
+      pending: _toInt(json['pending']), // 4. Parse from JSON
     );
   }
 

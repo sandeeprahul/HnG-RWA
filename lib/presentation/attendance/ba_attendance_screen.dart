@@ -364,6 +364,17 @@ class BaAttendanceController extends GetxController {
           msg: 'Please add reliever details for ${emp.name}.');
       return;
     }
+    final reason = emp.absenceReason?.toLowerCase() ?? '';
+    final isWeekOffOrPlannedLeave = reason.contains('week off') ||
+        reason.contains('planned leave') ||
+        emp.leaveTypeId == 3 ||
+        emp.leaveTypeId == 4;
+    if (!isWeekOffOrPlannedLeave && (emp.customCheckIn ?? '').isEmpty) {
+      Fluttertoast.showToast(msg: 'Please select check-in time.');
+      return;
+    }
+
+
 
     // String? nullIfEmpty(String? v) =>
     //     (v == null || v.trim().isEmpty) ? null : v.trim();
@@ -377,7 +388,7 @@ class BaAttendanceController extends GetxController {
       "userId": nullOrValue(userId),
       "employeeCode": nullOrValue(emp.id),
       "attendanceDate": nullOrValue(attendanceDate),
-      "reasonId": nullOrValue(emp.leaveTypeId),
+      "reasonId": nullOrValue(emp.leaveTypeId), 
       // Replaced empty string fallback with null
       "reason": nullOrValue(emp.absenceReason),
       "subTypeReasonId": nullOrValue(emp.subTypeId),
@@ -389,6 +400,7 @@ class BaAttendanceController extends GetxController {
       "sourceWithoutId": nullOrValue(emp.sourceWithoutId),
       "inTime": nullOrValue(emp.customCheckIn),
       "outTime": nullOrValue(emp.customCheckOut),
+      "location_code": nullOrValue(initialLocationCode),
     };
 
     // final Map<String, dynamic> payload = {
@@ -555,8 +567,13 @@ class _RelieverWithoutIdPopupState extends State<_RelieverWithoutIdPopup> {
       Fluttertoast.showToast(msg: 'Please fill all reliever details.');
       return;
     }
-    if ((_checkIn ?? '').isEmpty || (_checkOut ?? '').isEmpty) {
-      Fluttertoast.showToast(msg: 'Please select check-in and check-out time.');
+    final reason = widget.employee.absenceReason?.toLowerCase() ?? '';
+    final isWeekOffOrPlannedLeave = reason.contains('week off') ||
+        reason.contains('planned leave') ||
+        widget.employee.leaveTypeId == 3 ||
+        widget.employee.leaveTypeId == 4;
+    if (!isWeekOffOrPlannedLeave && (_checkIn ?? '').isEmpty) {
+      Fluttertoast.showToast(msg: 'Please select check-in time.');
       return;
     }
     widget.controller.updateRelieverWithoutId(
