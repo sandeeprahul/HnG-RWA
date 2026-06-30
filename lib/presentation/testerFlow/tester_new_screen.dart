@@ -1,13 +1,110 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/presentation/testerFlow/scanner_screen.dart';
 import 'package:hng_flutter/presentation/testerFlow/tester_models.dart';
+import 'package:hng_flutter/widgets/location_search_dialog.dart';
+import 'package:http/http.dart' as http;
 
-class TesterNewScreen extends StatelessWidget {
-  TesterNewScreen({super.key});
+import 'child_products_screen.dart';
 
-  final TesterController controller = Get.put(TesterController());
+class TesterNewScreen extends StatefulWidget {
+  const TesterNewScreen({super.key});
+
+  @override
+  State<TesterNewScreen> createState() => _TesterNewScreenState();
+}
+
+class _TesterNewScreenState extends State<TesterNewScreen> {
+  late TesterController controller;
+  final TextEditingController _eanController = TextEditingController();
+  bool _isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.find<TesterController>();
+  }
+
+  @override
+  void dispose() {
+    _eanController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchAndNavigate(String code) async {
+    final locationCode = controller.storeCode.value;
+    final userCode = controller.userCode.value;
+
+    if (locationCode.isEmpty) {
+      Get.snackbar('No Location', 'Please select a store location first.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white);
+      return;
+    }
+
+    setState(() => _isSearching = true);
+
+    try {
+      final url = Uri.parse(
+          'https://rwaweb.healthandglowonline.co.in/Tester_sku/api/store-soh/search?location_code=$locationCode&sku=$code');
+      final response = await http.get(url).timeout(const Duration(seconds: 30),
+          onTimeout: () {
+        throw TimeoutException('Request timed out. Please try again.');
+      });
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == true && data['data'] != null && (data['data'] as List).isNotEmpty) {
+          final product = data['data'][0] as Map<String, dynamic>;
+          Get.to(() => ChildProductsScreen(
+                scannedSku: code,
+                productData: product,
+              ));
+        } else {
+          Get.snackbar('Not Found', data['message'] ?? 'Product not found.',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white);
+        }
+      } else {
+        Get.snackbar('Error', 'Server error: ${response.statusCode}',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
+      }
+    } on TimeoutException {
+      Get.snackbar('Timeout', 'Request timed out. Check your connection.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+    } finally {
+      if (mounted) setState(() => _isSearching = false);
+    }
+  }
+
+  Future<void> _showLocationDialog() async {
+    final userCode = controller.userCode.value;
+    final selectedLocation = await showDialog(
+      context: context,
+      builder: (context) => LocationSearchDialog(userId: userCode),
+    );
+    if (selectedLocation != null) {
+      await controller.updateLocation(
+        selectedLocation['locationCode'] ?? '',
+        selectedLocation['locationName'] ?? '',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +113,8 @@ class TesterNewScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // App Header (gradient)
+            // Header
             Container(
-              // color: Colors.deepOrange,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF1E3A5F), Color(0xFF2D5A87)],
@@ -32,11 +128,7 @@ class TesterNewScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      // Menu icon (three lines)
-                      BackButton(
-                        color: Colors.white,
-                      ),
-                      // const SizedBox(width: 12),
+                      BackButton(color: Colors.white),
                       Text(
                         "Tester Availability",
                         style: GoogleFonts.inter(
@@ -46,43 +138,71 @@ class TesterNewScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: const BoxDecoration(
-                        color: Color(0xFF00A8A8), shape: BoxShape.circle),
-                    child: const Center(
-                        child: Text("JS",
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white))),
-                  ),
+                  Obx(() {
+                    final initials = controller.userCode.value.isNotEmpty
+                        ? controller.userCode.value
+                            .substring(0, controller.userCode.value.length.clamp(0, 2))
+                            .toUpperCase()
+                        : '?';
+                    return Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(
+                          color: Color(0xFF00A8A8), shape: BoxShape.circle),
+                      child: Center(
+                          child: Text(initials,
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white))),
+                    );
+                  }),
                 ],
               ),
             ),
-            // Home Content
+            // Body
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    // Store badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                          color: const Color(0xFFE0F2FE),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Obx(() => Text(
-                          "📍 Store: ${controller.storeCode.value}",
-                          style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF0369A1)))),
+                    // Location chip — tappable to change
+                    GestureDetector(
+                      onTap: _showLocationDialog,
+                      child: Obx(() => Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFE0F2FE),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                    color: const Color(0xFF0369A1)
+                                        .withOpacity(0.3))),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.location_on,
+                                    color: Color(0xFF0369A1), size: 18),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    controller.locationName.value.isNotEmpty
+                                        ? '${controller.locationName.value} (${controller.storeCode.value})'
+                                        : 'Tap to select store location',
+                                    style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color(0xFF0369A1)),
+                                  ),
+                                ),
+                                const Icon(Icons.edit,
+                                    color: Color(0xFF0369A1), size: 16),
+                              ],
+                            ),
+                          )),
                     ),
                     const SizedBox(height: 20),
-                    // Scan Button (navigates to Scanner)
+                    // Scan Button
                     GestureDetector(
                       onTap: () => Get.to(() => const ScannerScreen()),
                       child: Container(
@@ -114,15 +234,24 @@ class TesterNewScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Manual input
+                    // Manual EAN entry
                     Row(
                       children: [
                         Expanded(
                           child: TextField(
+                            controller: _eanController,
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (val) {
+                              if (val.trim().isNotEmpty) {
+                                _fetchAndNavigate(val.trim());
+                              }
+                            },
                             decoration: InputDecoration(
-                              hintText: "Enter EAN Code",
+                              hintText: "Enter EAN / SKU Code",
                               hintStyle: GoogleFonts.inter(
-                                  fontSize: 14, color: const Color(0xFF94A3B8)),
+                                  fontSize: 14,
+                                  color: const Color(0xFF94A3B8)),
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
@@ -140,28 +269,39 @@ class TesterNewScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          onPressed: () {
-                            // Manual entry logic – for now, navigate to scanner or show snackbar
-                            Get.snackbar("Manual Entry", "Feature coming soon",
-                                snackPosition: SnackPosition.BOTTOM);
-                          },
+                          onPressed: _isSearching
+                              ? null
+                              : () {
+                                  final val = _eanController.text.trim();
+                                  if (val.isNotEmpty) {
+                                    _fetchAndNavigate(val);
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1E3A5F),
+                            disabledBackgroundColor:
+                                const Color(0xFF1E3A5F).withOpacity(0.5),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
                           ),
-                          child: Text("Go",
-                              style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white)),
+                          child: _isSearching
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white))
+                              : Text("Go",
+                                  style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white)),
                         ),
                       ],
                     ),
                     const SizedBox(height: 30),
-                    // Recent scans section
+                    // Recent Scans
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -174,48 +314,58 @@ class TesterNewScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Obx(() => SizedBox(
-                          height: 60,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: controller.recentScans.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(width: 10),
-                            itemBuilder: (context, index) {
-                              final item = controller.recentScans[index];
-                              return Container(
-                                width: 100,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                          color: Color(0x14000000),
-                                          blurRadius: 8)
-                                    ]),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(item.sku,
-                                        style: GoogleFonts.inter(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: const Color(0xFF1E3A5F))),
-                                    const SizedBox(height: 3),
-                                    Text(item.name,
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.inter(
-                                            fontSize: 10,
-                                            color: const Color(0xFF64748B))),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        )),
+                    Obx(() => controller.recentScans.isEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: Text('No scans yet today.',
+                                style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: const Color(0xFF94A3B8))),
+                          )
+                        : SizedBox(
+                            height: 60,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: controller.recentScans.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 10),
+                              itemBuilder: (context, index) {
+                                final item = controller.recentScans[index];
+                                return Container(
+                                  width: 110,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                            color: Color(0x14000000),
+                                            blurRadius: 8)
+                                      ]),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(item.sku,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color:
+                                                  const Color(0xFF1E3A5F))),
+                                      const SizedBox(height: 3),
+                                      Text(item.name,
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 10,
+                                              color:
+                                                  const Color(0xFF64748B))),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          )),
                     const SizedBox(height: 20),
-                    // Stats row
                   ],
                 ),
               ),
@@ -248,7 +398,8 @@ class TesterNewScreen extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text("Today's Scans",
                           style: GoogleFonts.inter(
-                              fontSize: 10, color: const Color(0xFF64748B))),
+                              fontSize: 10,
+                              color: const Color(0xFF64748B))),
                     ],
                   ),
                 ),
@@ -273,7 +424,8 @@ class TesterNewScreen extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text("Products Updated",
                           style: GoogleFonts.inter(
-                              fontSize: 10, color: const Color(0xFF64748B))),
+                              fontSize: 10,
+                              color: const Color(0xFF64748B))),
                     ],
                   ),
                 ),

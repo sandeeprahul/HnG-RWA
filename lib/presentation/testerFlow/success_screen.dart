@@ -145,7 +145,7 @@ class SuccessScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       // Return to home screen
-                      Get.offAll(() =>  TesterNewScreen());
+                      Get.offAll(() => const TesterNewScreen());
                     },
                     child: Text("Return to Home", style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
                   ),

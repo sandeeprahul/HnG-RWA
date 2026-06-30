@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Product {
   final String sku;
@@ -39,16 +40,34 @@ class ScanHistoryItem {
 }
 
 class TesterController extends GetxController {
-  var storeCode = "105060".obs;
-  var todayScans = 15.obs;
-  var productsUpdated = 42.obs;
-  var recentScans = <ScanHistoryItem>[
-    ScanHistoryItem(sku: "506150", name: "Rose Powder", timestamp: DateTime.now().subtract(const Duration(minutes: 5))),
-    ScanHistoryItem(sku: "573829", name: "Lip Stack", timestamp: DateTime.now().subtract(const Duration(minutes: 12))),
-    ScanHistoryItem(sku: "574104", name: "Compact", timestamp: DateTime.now().subtract(const Duration(hours: 1))),
-  ].obs;
+  var storeCode = ''.obs;
+  var locationName = ''.obs;
+  var userCode = ''.obs;
+  var todayScans = 0.obs;
+  var productsUpdated = 0.obs;
+  var recentScans = <ScanHistoryItem>[].obs;
 
-  // Called after successful scan – will be used in Scanner screen
+  @override
+  void onInit() {
+    super.onInit();
+    _loadFromPrefs();
+  }
+
+  Future<void> _loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    storeCode.value = prefs.getString('locationCode') ?? '';
+    locationName.value = prefs.getString('location_name') ?? '';
+    userCode.value = prefs.getString('userCode') ?? '';
+  }
+
+  Future<void> updateLocation(String code, String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    storeCode.value = code;
+    locationName.value = name;
+    await prefs.setString('locationCode', code);
+    await prefs.setString('location_name', name);
+  }
+
   void addScan(String sku, String name) {
     recentScans.insert(0, ScanHistoryItem(sku: sku, name: name, timestamp: DateTime.now()));
     todayScans.value++;

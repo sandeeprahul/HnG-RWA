@@ -1,15 +1,22 @@
 // child_products_screen.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/presentation/testerFlow/tester_new_screen.dart';
+import 'package:http/http.dart' as http;
 import 'success_screen.dart';
 import 'tester_models.dart';
 
 class ChildProductsScreen extends StatefulWidget {
   final String scannedSku;
+  final Map<String, dynamic>? productData;
 
-  const ChildProductsScreen({super.key, required this.scannedSku});
+  const ChildProductsScreen({
+    super.key,
+    required this.scannedSku,
+    this.productData,
+  });
 
   @override
   State<ChildProductsScreen> createState() => _ChildProductsScreenState();
@@ -21,7 +28,10 @@ class _ChildProductsScreenState extends State<ChildProductsScreen> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(ChildProductsController(widget.scannedSku));
+    controller = Get.put(
+      ChildProductsController(widget.scannedSku, widget.productData),
+      tag: widget.scannedSku,
+    );
   }
 
   @override
@@ -31,7 +41,7 @@ class _ChildProductsScreenState extends State<ChildProductsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with gradient (matches the design)
+            // Header with gradient
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -44,105 +54,237 @@ class _ChildProductsScreenState extends State<ChildProductsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Back button
                   GestureDetector(
                     onTap: () => Get.back(),
                     child: Row(
                       children: [
-                        const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                        const Icon(Icons.arrow_back,
+                            color: Colors.white, size: 20),
                         const SizedBox(width: 4),
-                        Text("Back", style: GoogleFonts.inter(fontSize: 14, color: Colors.white)),
+                        Text("Back",
+                            style: GoogleFonts.inter(
+                                fontSize: 14, color: Colors.white)),
                       ],
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "Child Products",
-                    style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                    "Tester Confirmation",
+                    style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white),
                   ),
                   const SizedBox(height: 8),
-                  // Parent card (semi-transparent)
+                  // Parent product card — real data from API
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Obx(() => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Parent SKU: ${controller.parentSku.value}",
-                            style: GoogleFonts.inter(fontSize: 11, color: Colors.white.withOpacity(0.8))),
-                        const SizedBox(height: 4),
-                        Text(controller.parentName.value,
-                            style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
-                        const SizedBox(height: 2),
-                        Text(controller.parentMeta.value,
-                            style: GoogleFonts.inter(fontSize: 11, color: Colors.white.withOpacity(0.7))),
-                      ],
-                    )),
+                    child: Obx(() => Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Product image from API
+                            if (controller.productImageUrl.value.isNotEmpty)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  controller.productImageUrl.value,
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => const SizedBox(
+                                    width: 60,
+                                    height: 60,
+                                    child: Icon(Icons.broken_image,
+                                        color: Colors.white54, size: 40),
+                                  ),
+                                ),
+                              ),
+                            if (controller.productImageUrl.value.isNotEmpty)
+                              const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "SKU: ${controller.parentSku.value}",
+                                    style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color:
+                                            Colors.white.withOpacity(0.8)),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    controller.parentName.value,
+                                    style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  // Availability badge
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: controller.availability
+                                                      .value ==
+                                                  'Available'
+                                              ? Colors.green.withOpacity(0.8)
+                                              : Colors.red.withOpacity(0.8),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          controller.availability.value,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      if (controller.rangeStatus.value.isNotEmpty)
+                                        Text(
+                                          controller.rangeStatus.value,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 10,
+                                              color: Colors.white
+                                                  .withOpacity(0.7)),
+                                        ),
+                                    ],
+                                  ),
+                                  if (controller.daysOfSale.value.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 2),
+                                      child: Text(
+                                        'Stock: ${controller.daysOfSale.value} days',
+                                        style: GoogleFonts.inter(
+                                            fontSize: 10,
+                                            color: Colors.white
+                                                .withOpacity(0.7)),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )),
                   ),
+                  // Promotion banner from API
+                  Obx(() => controller.promotion.value.isNotEmpty &&
+                          controller.promotion.value != 'null'
+                      ? Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.yellow.shade700,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.local_offer,
+                                  size: 14, color: Colors.white),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  controller.promotion.value,
+                                  style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox()),
                 ],
               ),
             ),
             // Selection bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: const BoxDecoration(
                 color: Color(0xFFF1F5F9),
-                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+                border:
+                    Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
               ),
               child: Obx(() => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("${controller.selectedCount.value} of ${controller.childProducts.length} selected",
-                      style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF475569))),
-                  GestureDetector(
-                    onTap: controller.toggleSelectAll,
-                    child: Text(
-                      controller.isAllSelected.value ? "Deselect All" : "☑ Select All",
-                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: const Color(0xFF00A8A8)),
-                    ),
-                  ),
-                ],
-              )),
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                          "${controller.selectedCount.value} of ${controller.childProducts.length} selected",
+                          style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: const Color(0xFF475569))),
+                      GestureDetector(
+                        onTap: controller.toggleSelectAll,
+                        child: Text(
+                          controller.isAllSelected.value
+                              ? "Deselect All"
+                              : "☑ Select All",
+                          style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF00A8A8)),
+                        ),
+                      ),
+                    ],
+                  )),
             ),
             // Child products list
             Expanded(
               child: Obx(() => ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: controller.childProducts.length,
-                itemBuilder: (context, index) {
-                  final child = controller.childProducts[index];
-                  return _buildChildCard(child, index, controller);
-                },
-              )),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: controller.childProducts.length,
+                    itemBuilder: (context, index) {
+                      final child = controller.childProducts[index];
+                      return _buildChildCard(child, index, controller);
+                    },
+                  )),
             ),
             // Bottom action bar
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+                border:
+                    Border(top: BorderSide(color: Color(0xFFE2E8F0))),
               ),
               child: Column(
                 children: [
                   ElevatedButton(
-                    onPressed: () => controller.confirmAvailability(context),
+                    onPressed: () =>
+                        controller.confirmAvailability(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00A8A8),
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 52),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
-                      shadowColor: const Color(0xFF00A8A8).withOpacity(0.3),
                     ),
-                    child: Text("✓ Confirm All Available", style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600)),
+                    child: Text("✓ Confirm Tester Available",
+                        style: GoogleFonts.inter(
+                            fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 12),
                   GestureDetector(
-                    onTap: () => Get.offAll(() =>  TesterNewScreen()), // Navigate back to home/scanner
-                    child: Text("Scan Another Product", style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
+                    onTap: () => Get.offAll(() => const TesterNewScreen()),
+                    child: Text("Scan Another Product",
+                        style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: const Color(0xFF64748B))),
                   ),
                 ],
               ),
@@ -153,7 +295,8 @@ class _ChildProductsScreenState extends State<ChildProductsScreen> {
     );
   }
 
-  Widget _buildChildCard(ChildProduct child, int index, ChildProductsController controller) {
+  Widget _buildChildCard(
+      ChildProduct child, int index, ChildProductsController controller) {
     Color statusColor;
     String statusText;
     switch (child.status) {
@@ -176,19 +319,27 @@ class _ChildProductsScreenState extends State<ChildProductsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2))],
+        boxShadow: const [
+          BoxShadow(
+              color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2))
+        ],
       ),
       child: Row(
         children: [
-          // Checkbox
           GestureDetector(
             onTap: () => controller.toggleSelection(index),
             child: Container(
               width: 22,
               height: 22,
               decoration: BoxDecoration(
-                color: child.isSelected ? const Color(0xFF00A8A8) : Colors.white,
-                border: Border.all(color: child.isSelected ? const Color(0xFF00A8A8) : const Color(0xFFCBD5E1), width: 2),
+                color: child.isSelected
+                    ? const Color(0xFF00A8A8)
+                    : Colors.white,
+                border: Border.all(
+                    color: child.isSelected
+                        ? const Color(0xFF00A8A8)
+                        : const Color(0xFFCBD5E1),
+                    width: 2),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: child.isSelected
@@ -197,26 +348,34 @@ class _ChildProductsScreenState extends State<ChildProductsScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          // Product info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(child.sku, style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF64748B))),
+                Text(child.sku,
+                    style: GoogleFonts.inter(
+                        fontSize: 12, color: const Color(0xFF64748B))),
                 const SizedBox(height: 2),
-                Text(child.name, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: const Color(0xFF1E293B))),
+                Text(child.name,
+                    style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF1E293B))),
               ],
             ),
           ),
-          // Status badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: statusColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(statusText,
-                style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: statusColor)),
+                style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: statusColor)),
           ),
         ],
       ),
@@ -227,64 +386,48 @@ class _ChildProductsScreenState extends State<ChildProductsScreen> {
 // ----------------------------- CONTROLLER FOR CHILD PRODUCTS ---------------------------------
 class ChildProductsController extends GetxController {
   final String scannedSku;
-  final parentSku = "506150".obs;
-  final parentName = "LAK ROSE POWDER".obs;
-  final parentMeta = "LAKME | COSMETICS".obs;
+  final Map<String, dynamic>? productData;
 
-  final RxList<ChildProduct> childProducts = <ChildProduct>[
-    ChildProduct(sku: "301114", name: "Soft Pink", status: AvailabilityStatus.pending),
-    ChildProduct(sku: "301115", name: "Rose Blush", status: AvailabilityStatus.pending),
-    ChildProduct(sku: "301116", name: "Coral Dream", status: AvailabilityStatus.pending),
-    // Additional mock child products (if needed)
-    ChildProduct(sku: "301117", name: "Peachy Keen", status: AvailabilityStatus.pending),
-    ChildProduct(sku: "301118", name: "Berry Crush", status: AvailabilityStatus.pending),
-  ].obs;
+  final parentSku = ''.obs;
+  final parentName = ''.obs;
+  final productImageUrl = ''.obs;
+  final availability = ''.obs;
+  final rangeStatus = ''.obs;
+  final daysOfSale = ''.obs;
+  final promotion = ''.obs;
 
+  final RxList<ChildProduct> childProducts = <ChildProduct>[].obs;
   RxInt selectedCount = 0.obs;
   RxBool isAllSelected = false.obs;
 
-  ChildProductsController(this.scannedSku) {
-    // In a real app, you'd fetch parent and child data from API using scannedSku
-    // For now, we map based on scannedSku (mock)
-    _loadDataForSku(scannedSku);
-    _updateSelectionStatus();
+  ChildProductsController(this.scannedSku, this.productData) {
+    _loadFromProductData();
   }
 
-  void _loadDataForSku(String sku) {
-    // Mock mapping: in production, call API
-    if (sku == "506150") {
-      parentSku.value = "506150";
-      parentName.value = "LAK ROSE POWDER";
-      parentMeta.value = "LAKME | COSMETICS";
-      childProducts.assignAll([
-        ChildProduct(sku: "301114", name: "Soft Pink", status: AvailabilityStatus.pending),
-        ChildProduct(sku: "301115", name: "Rose Blush", status: AvailabilityStatus.pending),
-        ChildProduct(sku: "301116", name: "Coral Dream", status: AvailabilityStatus.pending),
-        ChildProduct(sku: "301117", name: "Peachy Keen", status: AvailabilityStatus.pending),
-        ChildProduct(sku: "301118", name: "Berry Crush", status: AvailabilityStatus.pending),
-      ]);
-    } else if (sku == "573829") {
-      parentSku.value = "573829";
-      parentName.value = "LIP STACK";
-      parentMeta.value = "NYX | LIPSTICK";
-      childProducts.assignAll([
-        ChildProduct(sku: "401001", name: "Red Velvet", status: AvailabilityStatus.pending),
-        ChildProduct(sku: "401002", name: "Nude Beige", status: AvailabilityStatus.pending),
-      ]);
+  void _loadFromProductData() {
+    final data = productData;
+    if (data != null) {
+      parentSku.value = data['SKU_CODE']?.toString() ?? scannedSku;
+      parentName.value = data['SKU_NAME']?.toString() ?? 'Unknown Product';
+      productImageUrl.value = data['productImageUrl']?.toString() ?? '';
+      availability.value = data['AVAILABLE'] == 'Y' ? 'Available' : 'Unavailable';
+      rangeStatus.value = data['BRAND_NAME']?.toString() ?? '';
+      daysOfSale.value = data['daysOfSale']?.toString() ?? '';
+      promotion.value = data['EXEC_CAT_NAME']?.toString() ?? '';
     } else {
-      // Default generic
-      parentSku.value = sku;
-      parentName.value = "GENERIC PRODUCT";
-      parentMeta.value = "BRAND | CATEGORY";
-      childProducts.assignAll([
-        ChildProduct(sku: "999001", name: "Variant 1", status: AvailabilityStatus.pending),
-        ChildProduct(sku: "999002", name: "Variant 2", status: AvailabilityStatus.pending),
-      ]);
+      parentSku.value = scannedSku;
+      parentName.value = 'Unknown Product';
     }
-    // Initially, all selected
-    for (var child in childProducts) {
-      child.isSelected = true;
-    }
+
+    // Seed child list with the scanned product itself as the item to confirm
+    childProducts.assignAll([
+      ChildProduct(
+        sku: parentSku.value,
+        name: parentName.value,
+        status: AvailabilityStatus.pending,
+        isSelected: true,
+      ),
+    ]);
     _updateSelectionStatus();
   }
 
@@ -295,43 +438,106 @@ class ChildProductsController extends GetxController {
   }
 
   void toggleSelectAll() {
-    bool newSelectState = !isAllSelected.value;
+    final newState = !isAllSelected.value;
     for (var child in childProducts) {
-      child.isSelected = newSelectState;
+      child.isSelected = newState;
     }
     childProducts.refresh();
     _updateSelectionStatus();
   }
 
   void _updateSelectionStatus() {
-    int selected = childProducts.where((c) => c.isSelected).length;
+    final selected = childProducts.where((c) => c.isSelected).length;
     selectedCount.value = selected;
-    isAllSelected.value = selected == childProducts.length && childProducts.isNotEmpty;
+    isAllSelected.value =
+        selected == childProducts.length && childProducts.isNotEmpty;
   }
 
-  void confirmAvailability(BuildContext context) {
-    // Mark selected products as available (or update their status)
-    for (var child in childProducts) {
-      if (child.isSelected) {
-        child.status = AvailabilityStatus.available;
-      } else {
-        // Unselected remain as they were (e.g., pending/unavailable) – in real use, you might mark as unavailable
-        if (child.status == AvailabilityStatus.pending) {
-          child.status = AvailabilityStatus.unavailable;
+  Future<void> confirmAvailability(BuildContext context) async {
+    final TesterController testerController = Get.find<TesterController>();
+    final locationCode = testerController.storeCode.value;
+    final userCode = testerController.userCode.value;
+
+    List<ChildProduct> selected =
+        childProducts.where((c) => c.isSelected).toList();
+
+    if (selected.isEmpty) {
+      Get.snackbar('No Selection', 'Please select at least one product.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white);
+      return;
+    }
+
+    // Show loading dialog
+    Get.dialog(
+      const Center(
+          child: CircularProgressIndicator(
+        color: Color(0xFF00A8A8),
+      )),
+      barrierDismissible: false,
+    );
+
+    try {
+      bool allSuccess = true;
+      String errorMessage = '';
+
+      for (var child in selected) {
+        final response = await http
+            .post(
+          Uri.parse(
+              'https://rwaweb.healthandglowonline.co.in/Tester_sku/api/store-soh/update'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({
+            "location_code": locationCode,
+            "sku_code": child.sku,
+            "available": "Y",
+            "remarks": "Confirmed via App",
+            "created_by": userCode,
+            "available_option": ">75% consumption"
+          }),
+        )
+            .timeout(const Duration(seconds: 20));
+
+        if (response.statusCode == 200) {
+          final resData = json.decode(response.body);
+          print("store-soh/update : response: $resData");
+          if (resData['status'] != true) {
+            allSuccess = false;
+            errorMessage = resData['message'] ?? 'Update failed for ${child.sku}';
+            break;
+          }
+        } else {
+          allSuccess = false;
+          errorMessage = 'Server error: ${response.statusCode}';
+          break;
         }
       }
+
+      Get.back(); // Close loading dialog
+
+      if (allSuccess) {
+        for (var child in selected) {
+          child.status = AvailabilityStatus.available;
+        }
+        testerController.productsUpdated.value += selected.length;
+        testerController.addScan(parentSku.value, parentName.value);
+
+        Get.to(() => SuccessScreen(
+              updatedProducts: selected,
+            ));
+      } else {
+        Get.snackbar('Update Failed', errorMessage,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
+      }
+    } catch (e) {
+      Get.back(); // Close loading dialog
+      Get.snackbar('Error', 'An error occurred: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
     }
-    // Update the global controller stats (Home screen)
-    final TesterController testerController = Get.find<TesterController>();
-    testerController.productsUpdated.value += selectedCount.value;
-    testerController.addScan(parentSku.value, parentName.value);
-
-    // Navigate to success screen with updated products list
-    // Get.to(() => SuccessScreen(updatedProducts: childProducts.where((c) => c.isSelected).toList()));
-
-    Get.to(() => SuccessScreen(
-      updatedProducts: childProducts.where((c) => c.isSelected).toList().cast<ChildProduct>(),
-    ));
   }
 }
-

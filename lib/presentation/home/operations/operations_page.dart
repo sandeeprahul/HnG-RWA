@@ -342,9 +342,8 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
           // Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryOptionsScreen()));
           // Get.to(const DeliveryOptionsScreen());
           Get.to(
-                () =>  TesterNewScreen(),
-                // () => const TesterScreen(),
-            binding: TestterBinding(), // This automatically initializes ProductController & ScanController
+                () => const TesterNewScreen(),
+            binding: TestterBinding(),
           );
         },
         child: const Column(

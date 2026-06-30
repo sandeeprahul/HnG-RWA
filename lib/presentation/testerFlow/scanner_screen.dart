@@ -1,13 +1,15 @@
 // scanner_screen.dart
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'child_products_screen.dart';
-import 'success_screen.dart';
+import 'tester_models.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -79,12 +81,70 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
         _scannedValue = scannedValue;
         _showSuccess = true;
       });
-      // Dummy load - show success for 1.5 seconds then navigate
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
-          Get.to(() => ChildProductsScreen(scannedSku: scannedValue));
+          _fetchProductAndNavigate(scannedValue);
         }
       });
+    }
+  }
+
+  Future<void> _fetchProductAndNavigate(String code) async {
+    final testerController = Get.find<TesterController>();
+    final locationCode = testerController.storeCode.value;
+    final userCode = testerController.userCode.value;
+
+    if (locationCode.isEmpty) {
+      Get.back();
+      Get.snackbar('No Location', 'Please select a store location first.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white);
+      return;
+    }
+
+    try {
+      final url = Uri.parse(
+          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/Coupon/Newproductenquiry/$code/$locationCode/$userCode');
+      final response = await http.get(url).timeout(const Duration(seconds: 30),
+          onTimeout: () {
+        throw TimeoutException('Request timed out.');
+      });
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'Success') {
+          final product = data['product'][0] as Map<String, dynamic>;
+          Get.to(() => ChildProductsScreen(
+                scannedSku: code,
+                productData: product,
+              ));
+        } else {
+          Get.back();
+          Get.snackbar('Not Found', data['status'] ?? 'Product not found.',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white);
+        }
+      } else {
+        Get.back();
+        Get.snackbar('Error', 'Server error: ${response.statusCode}',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
+      }
+    } on TimeoutException {
+      Get.back();
+      Get.snackbar('Timeout', 'Request timed out. Check your connection.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+    } catch (e) {
+      Get.back();
+      Get.snackbar('Error', 'An error occurred: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
     }
   }
 
@@ -177,10 +237,7 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
             left: 0,
             right: 0,
             child: InkWell(
-              onTap: (){
-                Get.to(() => ChildProductsScreen(scannedSku: 'sdsddddd'));
-
-              },
+              onTap: () {},
               child: Text(
                 'Position barcode within frame',
                 textAlign: TextAlign.center,
