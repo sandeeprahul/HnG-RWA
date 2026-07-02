@@ -18,7 +18,8 @@ class ScannerScreen extends StatefulWidget {
   State<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserver {
+class _ScannerScreenState extends State<ScannerScreen>
+    with WidgetsBindingObserver {
   MobileScannerController? _controller;
   bool _isTorchOn = false;
   bool _isPermissionGranted = false;
@@ -48,9 +49,18 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
     if (status.isGranted) {
       setState(() => _isPermissionGranted = true);
       _controller = MobileScannerController(
+        autoStart: false, // Critical fix
         detectionSpeed: DetectionSpeed.normal,
         formats: [BarcodeFormat.ean13, BarcodeFormat.ean8, BarcodeFormat.upcA],
       );
+      // Wait for a small frame delay to ensure the controller is instantiated
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          await _controller?.start();
+        } catch (e) {
+          debugPrint("Scanner start error: $e");
+        }
+      });
       // Auto-stop after 10 seconds of no scan to save battery
       _autoStopTimer = Timer(const Duration(seconds: 15), () {
         if (_isScanning && mounted) {
@@ -63,8 +73,11 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
       setState(() {});
     } else {
       // Permission denied – show error
-      Get.snackbar('Camera Permission', 'Camera access is required to scan barcodes.',
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar(
+          'Camera Permission', 'Camera access is required to scan barcodes.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
       Future.delayed(const Duration(seconds: 2), () => Get.back());
     }
   }
@@ -90,62 +103,11 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
   }
 
   Future<void> _fetchProductAndNavigate(String code) async {
+    if (!Get.isRegistered<TesterController>()) {
+      Get.put(TesterController());
+    }
     final testerController = Get.find<TesterController>();
-    final locationCode = testerController.storeCode.value;
-    final userCode = testerController.userCode.value;
-
-    if (locationCode.isEmpty) {
-      Get.back();
-      Get.snackbar('No Location', 'Please select a store location first.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white);
-      return;
-    }
-
-    try {
-      final url = Uri.parse(
-          'https://rwaweb.healthandglowonline.co.in/RWAMOBILEAPIOMS/api/Coupon/Newproductenquiry/$code/$locationCode/$userCode');
-      final response = await http.get(url).timeout(const Duration(seconds: 30),
-          onTimeout: () {
-        throw TimeoutException('Request timed out.');
-      });
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == 'Success') {
-          final product = data['product'][0] as Map<String, dynamic>;
-          Get.to(() => ChildProductsScreen(
-                scannedSku: code,
-                productData: product,
-              ));
-        } else {
-          Get.back();
-          Get.snackbar('Not Found', data['status'] ?? 'Product not found.',
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.red,
-              colorText: Colors.white);
-        }
-      } else {
-        Get.back();
-        Get.snackbar('Error', 'Server error: ${response.statusCode}',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white);
-      }
-    } on TimeoutException {
-      Get.back();
-      Get.snackbar('Timeout', 'Request timed out. Check your connection.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
-    } catch (e) {
-      Get.back();
-      Get.snackbar('Error', 'An error occurred: $e',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
-    }
+    await testerController.fetchProductAndNavigate(code, isScanner: true);
   }
 
   void _toggleTorch() {
@@ -176,11 +138,13 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
             children: [
               const Icon(Icons.camera_alt, size: 48, color: Colors.grey),
               const SizedBox(height: 16),
-              Text('Camera permission required', style: TextStyle(color: Colors.grey[600])),
+              Text('Camera permission required',
+                  style: TextStyle(color: Colors.grey[600])),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _checkPermissionAndInitialize,
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00A8A8)),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00A8A8)),
                 child: const Text('Grant Permission'),
               ),
             ],
@@ -209,7 +173,9 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
               child: Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle),
                 child: const Icon(Icons.close, color: Colors.white, size: 20),
               ),
             ),
@@ -222,7 +188,9 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
               child: Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(color: Colors.black.withOpacity(0.5), shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle),
                 child: Icon(
                   _isTorchOn ? Icons.flash_on : Icons.flash_off,
                   color: Colors.white,
@@ -241,7 +209,13 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
               child: Text(
                 'Position barcode within frame',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500, shadows: const [Shadow(blurRadius: 4, color: Colors.black54)]),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    shadows: const [
+                      Shadow(blurRadius: 4, color: Colors.black54)
+                    ]),
               ),
             ),
           ),
@@ -252,7 +226,8 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
             child: Text(
               'Supports EAN-13, EAN-8, UPC-A',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
+              style:
+                  TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
             ),
           ),
           if (!_isScanning && !_showSuccess)
@@ -265,7 +240,8 @@ class _ScannerScreenState extends State<ScannerScreen> with WidgetsBindingObserv
                     children: [
                       const CircularProgressIndicator(color: Color(0xFF00A8A8)),
                       const SizedBox(height: 16),
-                      Text('Processing scan...', style: TextStyle(color: Colors.white)),
+                      Text('Processing scan...',
+                          style: TextStyle(color: Colors.white)),
                     ],
                   ),
                 ),
@@ -354,24 +330,40 @@ class ScannerOverlayPainter extends CustomPainter {
     // Draw dark overlay outside the scan area
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, rect.top), paint);
     canvas.drawRect(Rect.fromLTWH(0, rect.top, rect.left, rect.height), paint);
-    canvas.drawRect(Rect.fromLTWH(rect.right, rect.top, size.width - rect.right, rect.height), paint);
-    canvas.drawRect(Rect.fromLTWH(0, rect.bottom, size.width, size.height - rect.bottom), paint);
+    canvas.drawRect(
+        Rect.fromLTWH(
+            rect.right, rect.top, size.width - rect.right, rect.height),
+        paint);
+    canvas.drawRect(
+        Rect.fromLTWH(0, rect.bottom, size.width, size.height - rect.bottom),
+        paint);
 
     // Draw the corners
-    final cornerPaint = Paint()..color = const Color(0xFF00A8A8)..strokeWidth = 3..style = PaintingStyle.stroke;
+    final cornerPaint = Paint()
+      ..color = const Color(0xFF00A8A8)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
     const cornerLength = 30.0;
     // Top-left
-    canvas.drawLine(Offset(rect.left, rect.top), Offset(rect.left + cornerLength, rect.top), cornerPaint);
-    canvas.drawLine(Offset(rect.left, rect.top), Offset(rect.left, rect.top + cornerLength), cornerPaint);
+    canvas.drawLine(Offset(rect.left, rect.top),
+        Offset(rect.left + cornerLength, rect.top), cornerPaint);
+    canvas.drawLine(Offset(rect.left, rect.top),
+        Offset(rect.left, rect.top + cornerLength), cornerPaint);
     // Top-right
-    canvas.drawLine(Offset(rect.right, rect.top), Offset(rect.right - cornerLength, rect.top), cornerPaint);
-    canvas.drawLine(Offset(rect.right, rect.top), Offset(rect.right, rect.top + cornerLength), cornerPaint);
+    canvas.drawLine(Offset(rect.right, rect.top),
+        Offset(rect.right - cornerLength, rect.top), cornerPaint);
+    canvas.drawLine(Offset(rect.right, rect.top),
+        Offset(rect.right, rect.top + cornerLength), cornerPaint);
     // Bottom-left
-    canvas.drawLine(Offset(rect.left, rect.bottom), Offset(rect.left + cornerLength, rect.bottom), cornerPaint);
-    canvas.drawLine(Offset(rect.left, rect.bottom), Offset(rect.left, rect.bottom - cornerLength), cornerPaint);
+    canvas.drawLine(Offset(rect.left, rect.bottom),
+        Offset(rect.left + cornerLength, rect.bottom), cornerPaint);
+    canvas.drawLine(Offset(rect.left, rect.bottom),
+        Offset(rect.left, rect.bottom - cornerLength), cornerPaint);
     // Bottom-right
-    canvas.drawLine(Offset(rect.right, rect.bottom), Offset(rect.right - cornerLength, rect.bottom), cornerPaint);
-    canvas.drawLine(Offset(rect.right, rect.bottom), Offset(rect.right, rect.bottom - cornerLength), cornerPaint);
+    canvas.drawLine(Offset(rect.right, rect.bottom),
+        Offset(rect.right - cornerLength, rect.bottom), cornerPaint);
+    canvas.drawLine(Offset(rect.right, rect.bottom),
+        Offset(rect.right, rect.bottom - cornerLength), cornerPaint);
   }
 
   @override

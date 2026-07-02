@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hng_flutter/presentation/attendance/attendanceNewController.dart';
+import 'package:hng_flutter/presentation/attendance/record_attendance_new_screen.dart';
 import 'package:hng_flutter/presentation/home/operations/employees_leave_apply_page.dart';
 import 'package:hng_flutter/widgets/custom_elevated_button.dart';
 import 'package:hng_flutter/widgets/image_preview.dart';
@@ -226,10 +228,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             } else if (task['targetScreen'] == 'attendance') {
               // Get.back();
 
-              Get.to(const AttendenceScreen())?.then((_) {
-                print("Back from attendance to MainScreen");
-                getPendingTasks();
-              });
+              // Get.to(const AttendenceScreen())?.then((_) {
+              //   print("Back from attendance to MainScreen");
+              //   getPendingTasks();
+              // });
+              Get.lazyPut<AttendanceNewController>(() => AttendanceNewController());
+              // DashboardScreen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DashboardScreen(
+                  ),
+                ),
+              );
             } else if (task['targetScreen'] == 'leaveForm') {
               // Get.back();
 

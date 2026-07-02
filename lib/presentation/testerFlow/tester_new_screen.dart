@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/presentation/testerFlow/scanner_screen.dart';
@@ -36,60 +37,9 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
   }
 
   Future<void> _fetchAndNavigate(String code) async {
-    final locationCode = controller.storeCode.value;
-    final userCode = controller.userCode.value;
-
-    if (locationCode.isEmpty) {
-      Get.snackbar('No Location', 'Please select a store location first.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white);
-      return;
-    }
-
-    setState(() => _isSearching = true);
-
-    try {
-      final url = Uri.parse(
-          'https://rwaweb.healthandglowonline.co.in/Tester_sku/api/store-soh/search?location_code=$locationCode&sku=$code');
-      final response = await http.get(url).timeout(const Duration(seconds: 30),
-          onTimeout: () {
-        throw TimeoutException('Request timed out. Please try again.');
-      });
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == true && data['data'] != null && (data['data'] as List).isNotEmpty) {
-          final product = data['data'][0] as Map<String, dynamic>;
-          Get.to(() => ChildProductsScreen(
-                scannedSku: code,
-                productData: product,
-              ));
-        } else {
-          Get.snackbar('Not Found', data['message'] ?? 'Product not found.',
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.red,
-              colorText: Colors.white);
-        }
-      } else {
-        Get.snackbar('Error', 'Server error: ${response.statusCode}',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white);
-      }
-    } on TimeoutException {
-      Get.snackbar('Timeout', 'Request timed out. Check your connection.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
-    } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
-    } finally {
-      if (mounted) setState(() => _isSearching = false);
-    }
+    await controller.fetchProductAndNavigate(code, setLoading: (loading) {
+      if (mounted) setState(() => _isSearching = loading);
+    });
   }
 
   Future<void> _showLocationDialog() async {
@@ -108,9 +58,16 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent, // Make status bar transparent to show gradient
+          statusBarIconBrightness: Brightness.light, // White icons
+          statusBarBrightness: Brightness.dark, // For iOS
+        ),
+        child:Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
             // Header
@@ -122,7 +79,7 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                   end: Alignment.bottomRight,
                 ),
               ),
-              padding: const EdgeInsets.fromLTRB(10, 12, 16, 12),
+              padding: const EdgeInsets.fromLTRB(10, 56, 16, 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -138,25 +95,26 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                       ),
                     ],
                   ),
-                  Obx(() {
-                    final initials = controller.userCode.value.isNotEmpty
-                        ? controller.userCode.value
-                            .substring(0, controller.userCode.value.length.clamp(0, 2))
-                            .toUpperCase()
-                        : '?';
-                    return Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFF00A8A8), shape: BoxShape.circle),
-                      child: Center(
-                          child: Text(initials,
-                              style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white))),
-                    );
-                  }),
+                  // Obx(() {
+                  //   final initials = controller.userCode.value.isNotEmpty
+                  //       ? controller.userCode.value
+                  //           .substring(
+                  //               0, controller.userCode.value.length.clamp(0, 2))
+                  //           .toUpperCase()
+                  //       : '?';
+                  //   return Container(
+                  //     width: 32,
+                  //     height: 32,
+                  //     decoration: const BoxDecoration(
+                  //         color: Color(0xFF00A8A8), shape: BoxShape.circle),
+                  //     child: Center(
+                  //         child: Text(initials,
+                  //             style: const TextStyle(
+                  //                 fontSize: 11,
+                  //                 fontWeight: FontWeight.w600,
+                  //                 color: Colors.white))),
+                  //   );
+                  // }),
                 ],
               ),
             ),
@@ -250,8 +208,7 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                             decoration: InputDecoration(
                               hintText: "Enter EAN / SKU Code",
                               hintStyle: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: const Color(0xFF94A3B8)),
+                                  fontSize: 14, color: const Color(0xFF94A3B8)),
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
@@ -349,16 +306,14 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                                           style: GoogleFonts.inter(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w600,
-                                              color:
-                                                  const Color(0xFF1E3A5F))),
+                                              color: const Color(0xFF1E3A5F))),
                                       const SizedBox(height: 3),
                                       Text(item.name,
                                           textAlign: TextAlign.center,
                                           overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.inter(
                                               fontSize: 10,
-                                              color:
-                                                  const Color(0xFF64748B))),
+                                              color: const Color(0xFF64748B))),
                                     ],
                                   ),
                                 );
@@ -398,8 +353,7 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                       const SizedBox(height: 2),
                       Text("Today's Scans",
                           style: GoogleFonts.inter(
-                              fontSize: 10,
-                              color: const Color(0xFF64748B))),
+                              fontSize: 10, color: const Color(0xFF64748B))),
                     ],
                   ),
                 ),
@@ -424,8 +378,7 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                       const SizedBox(height: 2),
                       Text("Products Updated",
                           style: GoogleFonts.inter(
-                              fontSize: 10,
-                              color: const Color(0xFF64748B))),
+                              fontSize: 10, color: const Color(0xFF64748B))),
                     ],
                   ),
                 ),
@@ -434,6 +387,6 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
