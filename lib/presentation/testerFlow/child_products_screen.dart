@@ -479,55 +479,53 @@ class ChildProductsController extends GetxController {
     );
 
     try {
-      bool allSuccess = true;
-      String errorMessage = '';
+      final List<Map<String, String>> skuDetails = selected.map((child) {
+        return {
+          "sku_code": child.sku,
+          "available": "Y",
+          "remarks": "Confirmed via App",
+          "available_option": ">75% consumption"
+        };
+      }).toList();
 
-      for (var child in selected) {
-        final response = await http
-            .post(
-          Uri.parse(
-              'https://rwaweb.healthandglowonline.co.in/Tester_sku/api/store-soh/update'),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            "location_code": locationCode,
-            "sku_code": child.sku,
-            "available": "Y",
-            "remarks": "Confirmed via App",
-            "created_by": userCode,
-            "available_option": ">75% consumption"
-          }),
-        )
-            .timeout(const Duration(seconds: 20));
-
-        if (response.statusCode == 200) {
-          final resData = json.decode(response.body);
-          print("store-soh/update : response: $resData");
-          if (resData['status'] != true) {
-            allSuccess = false;
-            errorMessage = resData['message'] ?? 'Update failed for ${child.sku}';
-            break;
-          }
-        } else {
-          allSuccess = false;
-          errorMessage = 'Server error: ${response.statusCode}';
-          break;
-        }
-      }
+      final response = await http
+          .post(
+            Uri.parse(
+                'https://rwaweb.healthandglowonline.co.in/Tester_sku/api/store-soh/update'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({
+              "location_code": locationCode,
+              "created_by": userCode,
+              "sku_details": skuDetails
+            }),
+          )
+          .timeout(const Duration(seconds: 30));
 
       Get.back(); // Close loading dialog
 
-      if (allSuccess) {
-        for (var child in selected) {
-          child.status = AvailabilityStatus.available;
-        }
-        testerController.productsUpdated.value += selected.length;
-        testerController.addScan(parentSku.value, parentName.value);
+      if (response.statusCode == 200) {
+        final resData = json.decode(response.body);
+        print("store-soh/update : response: $resData");
 
-        Get.to(() => SuccessScreen(
-              updatedProducts: selected,
-            ));
+        if (resData['status'] == true) {
+          for (var child in selected) {
+            child.status = AvailabilityStatus.available;
+          }
+          testerController.productsUpdated.value += selected.length;
+          testerController.addScan(parentSku.value, parentName.value);
+
+          Get.to(() => SuccessScreen(
+                updatedProducts: selected,
+              ));
+        } else {
+          Get.snackbar('Update Failed',
+              resData['message'] ?? 'Unable to update tester availability.',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white);
+        }
       } else {
-        Get.snackbar('Update Failed', errorMessage,
+        Get.snackbar('Error', 'Server error: ${response.statusCode}',
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.red,
             colorText: Colors.white);
