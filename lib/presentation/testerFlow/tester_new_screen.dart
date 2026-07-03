@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -8,9 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/presentation/testerFlow/scanner_screen.dart';
 import 'package:hng_flutter/presentation/testerFlow/tester_models.dart';
 import 'package:hng_flutter/widgets/location_search_dialog.dart';
-import 'package:http/http.dart' as http;
-
-import 'child_products_screen.dart';
 
 class TesterNewScreen extends StatefulWidget {
   const TesterNewScreen({super.key});
@@ -27,7 +21,13 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<TesterController>()) {
+      Get.put(TesterController());
+    }
     controller = Get.find<TesterController>();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _ensureLocationSelected();
+    });
   }
 
   @override
@@ -37,12 +37,15 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
   }
 
   Future<void> _fetchAndNavigate(String code) async {
-    await controller.fetchProductAndNavigate(code, setLoading: (loading) {
+    final locationCode = controller.storeCode.value;
+    await controller.fetchProductAndNavigate(code, locationCode, setLoading: (loading) {
       if (mounted) setState(() => _isSearching = loading);
     });
   }
 
   Future<void> _showLocationDialog() async {
+    await controller.loadUserCode();
+    if (!mounted) return;
     final userCode = controller.userCode.value;
     final selectedLocation = await showDialog(
       context: context,
@@ -54,6 +57,18 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
         selectedLocation['locationName'] ?? '',
       );
     }
+  }
+
+  Future<bool> _ensureLocationSelected() async {
+    await controller.loadFromPrefs();
+    if (mounted && controller.storeCode.value.isEmpty) {
+      // Attendance-style handling: auto-select if exactly one location is returned.
+      if (await controller.fetchAndAutoSelectLocation()) {
+        return true;
+      }
+      await _showLocationDialog();
+    }
+    return controller.storeCode.value.isNotEmpty;
   }
 
   @override
@@ -85,7 +100,7 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                 children: [
                   Row(
                     children: [
-                      BackButton(color: Colors.white),
+                      const BackButton(color: Colors.white),
                       Text(
                         "Tester Availability",
                         style: GoogleFonts.inter(
@@ -162,7 +177,11 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                     const SizedBox(height: 20),
                     // Scan Button
                     GestureDetector(
-                      onTap: () => Get.to(() => const ScannerScreen()),
+                      onTap: () async {
+                        if (await _ensureLocationSelected()) {
+                          Get.to(() => const ScannerScreen());
+                        }
+                      },
                       child: Container(
                         width: 140,
                         height: 140,
@@ -200,9 +219,11 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                             controller: _eanController,
                             keyboardType: TextInputType.number,
                             textInputAction: TextInputAction.search,
-                            onSubmitted: (val) {
+                            onSubmitted: (val) async {
                               if (val.trim().isNotEmpty) {
-                                _fetchAndNavigate(val.trim());
+                                if (await _ensureLocationSelected()) {
+                                  _fetchAndNavigate(val.trim());
+                                }
                               }
                             },
                             decoration: InputDecoration(
@@ -228,10 +249,12 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                         ElevatedButton(
                           onPressed: _isSearching
                               ? null
-                              : () {
+                              : () async {
                                   final val = _eanController.text.trim();
                                   if (val.isNotEmpty) {
-                                    _fetchAndNavigate(val);
+                                    if (await _ensureLocationSelected()) {
+                                      _fetchAndNavigate(val);
+                                    }
                                   }
                                 },
                           style: ElevatedButton.styleFrom(

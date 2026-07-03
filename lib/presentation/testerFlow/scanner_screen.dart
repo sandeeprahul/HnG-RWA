@@ -24,6 +24,7 @@ class _ScannerScreenState extends State<ScannerScreen>
   bool _isTorchOn = false;
   bool _isPermissionGranted = false;
   bool _isScanning = true;
+  bool _isPaused = false;
   bool _showSuccess = false;
   String _scannedValue = '';
   Timer? _autoStopTimer;
@@ -38,10 +39,35 @@ class _ScannerScreenState extends State<ScannerScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _controller?.start();
+      if (!_isPaused && _isScanning && mounted) {
+        _controller?.start();
+      }
     } else if (state == AppLifecycleState.paused) {
       _controller?.stop();
     }
+  }
+
+  Future<void> _resumeScanning() async {
+    if (_controller == null) return;
+    setState(() {
+      _isPaused = false;
+      _isScanning = true;
+    });
+    try {
+      await _controller?.start();
+    } catch (e) {
+      debugPrint('Resume scanner error: $e');
+    }
+    // Restart auto-stop timer
+    _autoStopTimer?.cancel();
+    _autoStopTimer = Timer(const Duration(seconds: 15), () {
+      if (_isScanning && mounted) {
+        _controller?.stop();
+        _isScanning = false;
+        _isPaused = true;
+        setState(() {});
+      }
+    });
   }
 
   Future<void> _checkPermissionAndInitialize() async {
@@ -49,28 +75,29 @@ class _ScannerScreenState extends State<ScannerScreen>
     if (status.isGranted) {
       setState(() => _isPermissionGranted = true);
       _controller = MobileScannerController(
-        autoStart: false, // Critical fix
+        autoStart: false,
         detectionSpeed: DetectionSpeed.normal,
         formats: [BarcodeFormat.ean13, BarcodeFormat.ean8, BarcodeFormat.upcA],
       );
-      // Wait for a small frame delay to ensure the controller is instantiated
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        try {
-          await _controller?.start();
-        } catch (e) {
-          debugPrint("Scanner start error: $e");
-        }
-      });
-      // Auto-stop after 10 seconds of no scan to save battery
+      // Auto-stop after 15 seconds of no scan to save battery
       _autoStopTimer = Timer(const Duration(seconds: 15), () {
         if (_isScanning && mounted) {
           _controller?.stop();
           _isScanning = false;
+          _isPaused = true;
           setState(() {});
         }
       });
-      _controller?.start();
-      setState(() {});
+      // Start once after the current frame
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (mounted && _controller != null) {
+          try {
+            await _controller?.start();
+          } catch (e) {
+            debugPrint("Scanner start error: $e");
+          }
+        }
+      });
     } else {
       // Permission denied – show error
       Get.snackbar(
@@ -88,6 +115,7 @@ class _ScannerScreenState extends State<ScannerScreen>
     final scannedValue = barcode.rawValue;
     if (scannedValue != null && scannedValue.isNotEmpty) {
       _isScanning = false;
+      _autoStopTimer?.cancel();
       _controller?.stop();
       HapticFeedback.lightImpact();
       setState(() {
@@ -107,7 +135,17 @@ class _ScannerScreenState extends State<ScannerScreen>
       Get.put(TesterController());
     }
     final testerController = Get.find<TesterController>();
-    await testerController.fetchProductAndNavigate(code, isScanner: true);
+    await testerController.loadFromPrefs();
+    final locationCode = testerController.storeCode.value;
+    if (locationCode.isEmpty) {
+      Get.back();
+      Get.snackbar('No Location', 'Please select a store location first.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white);
+      return;
+    }
+    await testerController.fetchProductAndNavigate(code, locationCode, isScanner: true);
   }
 
   void _toggleTorch() {
@@ -116,7 +154,12 @@ class _ScannerScreenState extends State<ScannerScreen>
   }
 
   void _closeScanner() {
-    _controller?.dispose();
+    _autoStopTimer?.cancel();
+    try {
+      _controller?.stop();
+    } catch (e) {
+      debugPrint('Scanner stop error: $e');
+    }
     Get.back();
   }
 
@@ -153,7 +196,19 @@ class _ScannerScreenState extends State<ScannerScreen>
       );
     }
 
-    return Scaffold(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          _autoStopTimer?.cancel();
+          try {
+            _controller?.stop();
+          } catch (e) {
+            debugPrint('Scanner pop stop error: $e');
+          }
+        }
+      },
+      child: Scaffold(
       body: Stack(
         children: [
           // Camera preview
@@ -230,7 +285,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                   TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
             ),
           ),
-          if (!_isScanning && !_showSuccess)
+          if (_isPaused && !_showSuccess)
             Positioned.fill(
               child: Container(
                 color: Colors.black54,
@@ -238,16 +293,29 @@ class _ScannerScreenState extends State<ScannerScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(color: Color(0xFF00A8A8)),
+                      const Icon(Icons.pause_circle_filled,
+                          color: Colors.white, size: 64),
                       const SizedBox(height: 16),
-                      Text('Processing scan...',
+                      Text('Scanner paused to save battery',
                           style: TextStyle(color: Colors.white)),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: _resumeScanning,
+                        icon: const Icon(Icons.play_arrow, color: Colors.white),
+                        label: const Text('Resume Scanning',
+                            style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00A8A8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-          // Success overlay - dummy load
+          // Success overlay - API loading
           if (_showSuccess)
             Positioned.fill(
               child: Container(
@@ -305,6 +373,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             ),
         ],
       ),
+    ),
     );
   }
 

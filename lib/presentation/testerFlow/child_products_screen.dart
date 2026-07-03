@@ -467,9 +467,22 @@ class ChildProductsController extends GetxController {
   }
 
   Future<void> confirmAvailability(BuildContext context) async {
-    final TesterController testerController = Get.find<TesterController>();
+    if (!Get.isRegistered<TesterController>()) {
+      Get.put(TesterController());
+    }
+    final testerController = Get.find<TesterController>();
+    await testerController.loadFromPrefs();
+    await testerController.loadUserCode();
     final locationCode = testerController.storeCode.value;
     final userCode = testerController.userCode.value;
+
+    if (locationCode.isEmpty) {
+      Get.snackbar('No Location', 'Please select a store location first.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white);
+      return;
+    }
 
     List<ChildProduct> selected =
         childProducts.where((c) => c.isSelected).toList();
@@ -515,6 +528,9 @@ class ChildProductsController extends GetxController {
           .timeout(const Duration(seconds: 30));
 
       Get.back(); // Close loading dialog
+      final resDataaa = json.decode(response.body);
+
+      print("store-soh/update : response: $resDataaa");
 
       if (response.statusCode == 200) {
         final resData = json.decode(response.body);

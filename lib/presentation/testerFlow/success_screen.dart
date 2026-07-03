@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/presentation/testerFlow/tester_models.dart';
 
-import '../../tester_product_controller.dart';
 import 'scanner_screen.dart';
 import 'tester_new_screen.dart';
+import '../../../tester_flow_binding.dart';
 
 class SuccessScreen extends StatelessWidget {
   final List<ChildProduct> updatedProducts;
@@ -129,7 +129,7 @@ class SuccessScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       // Navigate to scanner to scan next product
-                      Get.offAll(() => const ScannerScreen());
+                      Get.to(() => const ScannerScreen());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1E3A5F),
@@ -145,7 +145,10 @@ class SuccessScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       // Return to home screen
-                      Get.offAll(() => const TesterNewScreen());
+                      Get.offAll(
+                        () => const TesterNewScreen(),
+                        binding: TestterBinding(),
+                      );
                     },
                     child: Text("Return to Home", style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
                   ),
