@@ -95,9 +95,11 @@ class SuccessScreen extends StatelessWidget {
                               children: [
                                 const Icon(Icons.check_circle, color: Color(0xFF22C55E), size: 16),
                                 const SizedBox(width: 8),
-                                Text(
-                                  "${product.sku} - ${product.name}",
-                                  style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF334155)),
+                                Expanded(
+                                  child: Text(
+                                    "${product.sku} - ${product.name}",
+                                    style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF334155)),
+                                  ),
                                 ),
                               ],
                             ),
@@ -129,7 +131,11 @@ class SuccessScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       // Navigate to scanner to scan next product
-                      Get.to(() => const ScannerScreen());
+                      // Get.to(() => const ScannerScreen());
+                      Get.off(
+                            () => const TesterNewScreen(),
+                        binding: TestterBinding(),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1E3A5F),
@@ -145,7 +151,7 @@ class SuccessScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       // Return to home screen
-                      Get.offAll(
+                      Get.off(
                         () => const TesterNewScreen(),
                         binding: TestterBinding(),
                       );

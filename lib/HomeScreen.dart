@@ -64,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
+      print("App resumed");
       // When app resumes, navigate to home and clear stack
       // Get.offAllNamed('/home'); // Replace with your home route
       await getPendingTasks();

@@ -148,6 +148,8 @@ class TesterController extends GetxController {
             const Duration(seconds: 30), onTimeout: () {
           throw TimeoutException('Enquiry request timed out.');
         });
+        final forlog = json.decode(enquiryResponse.body);
+        print("Enquiry Response: $forlog");
 
         if (enquiryResponse.statusCode == 200) {
           final enquiryData = json.decode(enquiryResponse.body);
@@ -188,6 +190,8 @@ class TesterController extends GetxController {
           const Duration(seconds: 30), onTimeout: () {
         throw TimeoutException('Search request timed out.');
       });
+      final forlogSearch = json.decode(searchResponse.body);
+      print("Search Response: $forlogSearch");
 
       if (searchResponse.statusCode == 200) {
         final searchData = json.decode(searchResponse.body);
