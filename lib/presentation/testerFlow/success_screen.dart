@@ -4,10 +4,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hng_flutter/presentation/testerFlow/tester_models.dart';
 
-import 'scanner_screen.dart';
-import 'tester_new_screen.dart';
-import '../../../tester_flow_binding.dart';
-
 class SuccessScreen extends StatelessWidget {
   final List<ChildProduct> updatedProducts;
 
@@ -25,7 +21,8 @@ class SuccessScreen extends StatelessWidget {
             // Main content
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                 child: Column(
                   children: [
                     // Animated success icon
@@ -48,14 +45,16 @@ class SuccessScreen extends StatelessWidget {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF22C55E).withOpacity(0.3),
+                                  color:
+                                      const Color(0xFF22C55E).withOpacity(0.3),
                                   blurRadius: 30,
                                   offset: const Offset(0, 10),
                                 ),
                               ],
                             ),
                             child: const Center(
-                              child: Icon(Icons.check, size: 50, color: Colors.white),
+                              child: Icon(Icons.check,
+                                  size: 50, color: Colors.white),
                             ),
                           ),
                         );
@@ -64,12 +63,16 @@ class SuccessScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     Text(
                       "Success!",
-                      style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF1E293B)),
+                      style: GoogleFonts.outfit(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF1E293B)),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       "Tester availability updated",
-                      style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF64748B)),
+                      style: GoogleFonts.outfit(
+                          fontSize: 14, color: const Color(0xFF64748B)),
                     ),
                     const SizedBox(height: 24),
                     // Summary card
@@ -79,37 +82,51 @@ class SuccessScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 2))],
+                        boxShadow: const [
+                          BoxShadow(
+                              color: Color(0x0A000000),
+                              blurRadius: 10,
+                              offset: Offset(0, 2))
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "UPDATED PRODUCTS",
-                            style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF64748B), letterSpacing: 0.5),
+                            style: GoogleFonts.outfit(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF64748B),
+                                letterSpacing: 0.5),
                           ),
                           const SizedBox(height: 10),
                           ...updatedProducts.map((product) => Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.check_circle, color: Color(0xFF22C55E), size: 16),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    "${product.sku} - ${product.name}",
-                                    style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF334155)),
-                                  ),
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.check_circle,
+                                        color: Color(0xFF22C55E), size: 16),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        "${product.sku} - ${product.name}",
+                                        style: GoogleFonts.outfit(
+                                            fontSize: 13,
+                                            color: const Color(0xFF334155)),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          )),
+                              )),
                           if (updatedProducts.isEmpty)
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Text(
                                 "No products were updated",
-                                style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B)),
+                                style: GoogleFonts.outfit(
+                                    fontSize: 13,
+                                    color: const Color(0xFF64748B)),
                               ),
                             ),
                         ],
@@ -130,33 +147,31 @@ class SuccessScreen extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      // Navigate to scanner to scan next product
-                      // Get.to(() => const ScannerScreen());
-                      Get.off(
-                            () => const TesterNewScreen(),
-                        binding: TestterBinding(),
-                      );
+                      // Pop back to TesterNewScreen
+                      Get.back(); // Pop SuccessScreen
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1E3A5F),
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 52),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                       shadowColor: const Color(0xFF1E3A5F).withOpacity(0.3),
                     ),
-                    child: Text("📷 Scan Next Product", style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600)),
+                    child: Text("📷 Scan Next Product",
+                        style: GoogleFonts.outfit(
+                            fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 12),
                   GestureDetector(
                     onTap: () {
-                      // Return to home screen
-                      Get.off(
-                        () => const TesterNewScreen(),
-                        binding: TestterBinding(),
-                      );
+                      // Pop back to TesterNewScreen
+                      Get.back(); // Pop SuccessScreen
                     },
-                    child: Text("Return to Home", style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
+                    child: Text("Return to Home",
+                        style: GoogleFonts.outfit(
+                            fontSize: 13, color: const Color(0xFF64748B))),
                   ),
                 ],
               ),

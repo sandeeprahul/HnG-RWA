@@ -233,13 +233,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               //   print("Back from attendance to MainScreen");
               //   getPendingTasks();
               // });
-              Get.lazyPut<AttendanceNewController>(() => AttendanceNewController());
+              Get.lazyPut<AttendanceNewController>(
+                  () => AttendanceNewController());
               // DashboardScreen
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const DashboardScreen(
-                  ),
+                  builder: (context) => const DashboardScreen(),
                 ),
               );
             } else if (task['targetScreen'] == 'leaveForm') {
@@ -316,7 +316,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         var respo = jsonDecode(response.body);
 
-        if (respo['status'] == true) {///true = show popup
+        if (respo['status'] == true) {
+          ///true = show popup
           // _showTextAlert(context, respo['desctext']);
           setState(() {
             tasks = respo['data'];
@@ -365,12 +366,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-   return AnnotatedRegion<SystemUiOverlayStyle>(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent, // Set status bar color
-        statusBarIconBrightness: Brightness.light, // For white icons (time, battery)
+        statusBarIconBrightness:
+            Brightness.light, // For white icons (time, battery)
         statusBarBrightness: Brightness.dark, // For iOS white icons
-      ),      child: Scaffold(
+      ),
+      child: Scaffold(
         body: SafeArea(
           child: Scaffold(
               // appBar: AppBar(),

@@ -29,6 +29,7 @@ import '../../dashboard_page.dart';
 import '../../ecom_child_products_screen.dart';
 import '../../order_management_screen.dart';
 import '../../testerFlow/tester_new_screen.dart';
+import '../../testerFlow/store_dashboard_screen.dart';
 import '../../week_off_employee_list_page.dart';
 import 'employees_leave_apply_page.dart';
 
@@ -108,16 +109,17 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
                     child: InkWell(
                       onTap: () {
                         if (audit.auditId == 101) {
-                          Get.lazyPut<AttendanceNewController>(() => AttendanceNewController());
+                          Get.lazyPut<AttendanceNewController>(
+                              () => AttendanceNewController());
                           // DashboardScreen
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const DashboardScreen(
-                                // formattedAuditName: formattedAuditName,
-                              ),
+                                  // formattedAuditName: formattedAuditName,
+                                  ),
                             ),
-                          );/*     Navigator.push(
+                          ); /*     Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => EmployeeListScreen(
@@ -338,11 +340,8 @@ class _PageSurveyState extends ConsumerState<PageSurvey> {
       ),
       child: InkWell(
         onTap: () {
-          // Define navigation for H&G OMS here
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryOptionsScreen()));
-          // Get.to(const DeliveryOptionsScreen());
           Get.to(
-                () => const TesterNewScreen(),
+            () => const StoreDashboardScreen(),
             binding: TestterBinding(),
           );
         },

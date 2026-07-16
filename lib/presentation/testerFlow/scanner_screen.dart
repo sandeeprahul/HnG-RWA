@@ -57,20 +57,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
       Get.put(TesterController());
     }
     final testerController = Get.find<TesterController>();
-    await testerController.loadFromPrefs();
-    final locationCode = testerController.storeCode.value;
     
-    if (locationCode.isEmpty) {
-      Get.back(); // Pop the ScannerScreen
-      Get.snackbar('No Location', 'Please select a store location first.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white);
-      return;
-    }
-    
-    // Call the tester flow navigation logic which handles product fetching and navigation
-    await testerController.fetchProductAndNavigate(code, locationCode, isScanner: true);
+    // The controller now handles the entire lifecycle:
+    // 1. Validates location (pops if empty)
+    // 2. Fetches product
+    // 3. Navigates to details via Get.off (replacing this screen)
+    // 4. Pops back to dashboard on error
+    await testerController.fetchProductAndNavigate(
+      code, 
+      testerController.storeCode.value,
+      isScanner: true
+    );
   }
 
   @override

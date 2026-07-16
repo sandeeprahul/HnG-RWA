@@ -30,7 +30,8 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title, style: GoogleFonts.outfit(color: Colors.white)),
+        title:
+            Text(widget.title, style: GoogleFonts.outfit(color: Colors.white)),
         backgroundColor: Colors.orange,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
@@ -50,20 +51,20 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
             },
           ),
           // Camera Facing Toggle
-          ValueListenableBuilder(
-            valueListenable: cameraController, // Fixed identifier
-            builder: (context, state, child) {
-              return IconButton(
-                color: Colors.white,
-                iconSize: 32.0,
-                onPressed: () => cameraController.switchCamera(),
-                icon: Icon(
-                  state == CameraFacing.front ? Icons.camera_front : Icons.camera_rear,
-                  color: Colors.white,
-                ),
-              );
-            },
-          ),
+          // ValueListenableBuilder(
+          //   valueListenable: cameraController, // Fixed identifier
+          //   builder: (context, state, child) {
+          //     return IconButton(
+          //       color: Colors.white,
+          //       iconSize: 32.0,
+          //       onPressed: () => cameraController.switchCamera(),
+          //       icon: Icon(
+          //         state == CameraFacing.front ? Icons.camera_front : Icons.camera_rear,
+          //         color: Colors.white,
+          //       ),
+          //     );
+          //   },
+          // ),
         ],
       ),
       body: Stack(
@@ -105,7 +106,8 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
             right: 0,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(20),
@@ -122,6 +124,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     );
   }
 }
+
 class ScanningAnimation extends StatefulWidget {
   final BoxConstraints constraints;
   const ScanningAnimation({super.key, required this.constraints});
@@ -186,7 +189,8 @@ class _ScanningAnimationState extends State<ScanningAnimation>
             animation: _controller,
             builder: (context, child) {
               return Transform.translate(
-                offset: Offset(0, (scanAreaSize * _controller.value) - (scanAreaSize / 2)),
+                offset: Offset(
+                    0, (scanAreaSize * _controller.value) - (scanAreaSize / 2)),
                 child: Container(
                   width: scanAreaSize,
                   height: 2,
@@ -211,7 +215,8 @@ class _ScanningAnimationState extends State<ScanningAnimation>
             width: scanAreaSize,
             height: scanAreaSize,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+              border:
+                  Border.all(color: Colors.white.withOpacity(0.5), width: 2),
               borderRadius: BorderRadius.circular(12),
             ),
           ),
