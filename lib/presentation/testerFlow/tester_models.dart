@@ -43,6 +43,7 @@ class ChildProduct {
   final String sku;
   final String name;
   AvailabilityStatus status;
+  final AvailabilityStatus initialStatus;
   bool isSelected;
   String remarks;
   String
@@ -52,10 +53,11 @@ class ChildProduct {
     required this.sku,
     required this.name,
     this.status = AvailabilityStatus.pending,
+    AvailabilityStatus? initialStatus,
     this.isSelected = false,
     this.remarks = '',
     this.availableOption = '',
-  });
+  }) : initialStatus = initialStatus ?? status;
 }
 
 enum AvailabilityStatus { available, unavailable, pending }

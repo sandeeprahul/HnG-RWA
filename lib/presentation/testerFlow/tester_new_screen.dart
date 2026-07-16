@@ -50,6 +50,7 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
           colorText: Colors.white);
       return;
     }
+    _eanController.clear();
     await controller.fetchProductAndNavigate(code, locationCode,
         isScanner: isScanner, setLoading: (loading) {
       if (mounted) setState(() => _isSearching = loading);
@@ -251,7 +252,6 @@ class _TesterNewScreenState extends State<TesterNewScreen> {
                                           final val =
                                               _eanController.text.trim();
                                           if (val.isNotEmpty) {
-                                            _eanController.clear();
                                             _fetchAndNavigate(val);
                                           }
                                         },

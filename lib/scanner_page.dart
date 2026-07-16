@@ -98,7 +98,16 @@ class _ScannerPageState extends State<ScannerPage> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    ElevatedButton(onPressed: () => scanController.manualEANSubmit(eanController.text.trim()), child: const Text('Go')),
+                    ElevatedButton(
+                      onPressed: () {
+                        final val = eanController.text.trim();
+                        if (val.isNotEmpty) {
+                          scanController.manualEANSubmit(val);
+                          eanController.clear();
+                        }
+                      },
+                      child: const Text('Go'),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),

@@ -198,7 +198,7 @@ class _ProductQuickEnquiryPageState extends State<ProductQuickEnquiryPage> {
                 ),
                 Flexible(
                   child: Text(
-                    "${productData['daysOfSale'] ?? ''} days",
+                    "${productData['daysOfSale'] ?? ''}",
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

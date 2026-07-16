@@ -278,7 +278,7 @@ class _ChildProductsScreenState extends State<ChildProductsScreen>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                              "${controller.availableCount.value} Available, ${controller.pendingCount.value} Pending, ${controller.unavailableCount.value} Not Available",
+                              "${controller.availableCount.value} Available, ${controller.unavailableCount.value} Not Available",
                               style: GoogleFonts.outfit(
                                   fontSize: 13,
                                   color: const Color(0xFF475569))),
@@ -418,9 +418,22 @@ class _ChildProductsScreenState extends State<ChildProductsScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(child.sku,
-                        style: GoogleFonts.outfit(
-                            fontSize: 12, color: const Color(0xFF64748B))),
+                    Row(
+                      children: [
+                        Text(child.sku,
+                            style: GoogleFonts.outfit(
+                                fontSize: 12, color: const Color(0xFF64748B))),
+                        if (child.initialStatus == AvailabilityStatus.pending) ...[
+                          const SizedBox(width: 8),
+                          Text(
+                            "Pending",
+                            style: GoogleFonts.outfit(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFFD97706))),
+                        ],
+                      ],
+                    ),
                     const SizedBox(height: 2),
                     Text(child.name,
                         style: GoogleFonts.outfit(
@@ -460,9 +473,6 @@ class _ChildProductsScreenState extends State<ChildProductsScreen>
                   index,
                   controller),
               const SizedBox(width: 8),
-              _buildStatusOption("Pending", AvailabilityStatus.pending,
-                  const Color(0xFFD97706), index, controller),
-              const SizedBox(width: 8),
               _buildStatusOption("Available", AvailabilityStatus.available,
                   const Color(0xFF16A34A), index, controller),
             ],
@@ -473,7 +483,9 @@ class _ChildProductsScreenState extends State<ChildProductsScreen>
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: child.status == AvailabilityStatus.unavailable
+                    ? const Color(0xFFF1F5F9).withOpacity(0.5)
+                    : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
@@ -482,9 +494,11 @@ class _ChildProductsScreenState extends State<ChildProductsScreen>
                   value: child.availableOption,
                   isExpanded: true,
                   items: _buildDropdownItems(child.availableOption, options),
-                  onChanged: (value) {
-                    controller.updateAvailableOption(index, value ?? '');
-                  },
+                  onChanged: child.status == AvailabilityStatus.unavailable
+                      ? null
+                      : (value) {
+                          controller.updateAvailableOption(index, value ?? '');
+                        },
                 ),
               ),
             ),
@@ -641,11 +655,13 @@ class ChildProductsController extends GetxController {
           parentProduct['productImageUrl']?.toString() ?? '';
 
       // Update availability logic: Y=Available, N=Not available, other=Pending
-      String availabilityValue = parentProduct['AVAILABLE']?.toString() ?? '';
+      String availabilityValue = parentProduct['AVAILABLE']?.toString().toUpperCase() ?? '';
       if (availabilityValue == 'Y') {
         availability.value = 'Available';
       } else if (availabilityValue == 'N') {
-        availability.value = 'Not available';
+        availability.value = 'Not Available';
+      } else if (availabilityValue == 'P') {
+        availability.value = 'Pending';
       } else {
         availability.value = 'Pending';
       }
@@ -656,12 +672,14 @@ class ChildProductsController extends GetxController {
 
       // Load all products as child products with proper status logic
       childProducts.assignAll(list.map((p) {
-        String available = p['AVAILABLE']?.toString() ?? '';
+        String available = p['AVAILABLE']?.toString().toUpperCase() ?? '';
         AvailabilityStatus status;
         if (available == 'Y') {
           status = AvailabilityStatus.available;
         } else if (available == 'N') {
           status = AvailabilityStatus.unavailable;
+        } else if (available == 'P') {
+          status = AvailabilityStatus.pending;
         } else {
           status = AvailabilityStatus.pending;
         }
@@ -678,6 +696,7 @@ class ChildProductsController extends GetxController {
           sku: p['SKU_CODE']?.toString() ?? '',
           name: p['SKU_NAME']?.toString() ?? 'Unknown',
           status: status,
+          initialStatus: status,
           isSelected: status == AvailabilityStatus.available,
           remarks: p['REMARKS']?.toString() ?? '',
           availableOption: opt,
@@ -757,11 +776,13 @@ class ChildProductsController extends GetxController {
         productImageUrl.value =
             parentProduct['productImageUrl']?.toString() ?? '';
 
-        String availabilityValue = parentProduct['AVAILABLE']?.toString() ?? '';
+        String availabilityValue = parentProduct['AVAILABLE']?.toString().toUpperCase() ?? '';
         if (availabilityValue == 'Y') {
           availability.value = 'Available';
         } else if (availabilityValue == 'N') {
-          availability.value = 'Not available';
+          availability.value = 'Not Available';
+        } else if (availabilityValue == 'P') {
+          availability.value = 'Pending';
         } else {
           availability.value = 'Pending';
         }
@@ -771,12 +792,14 @@ class ChildProductsController extends GetxController {
         promotion.value = parentProduct['EXEC_CAT_NAME']?.toString() ?? '';
 
         childProducts.assignAll(list.map((p) {
-          String available = p['AVAILABLE']?.toString() ?? '';
+          String available = p['AVAILABLE']?.toString().toUpperCase() ?? '';
           AvailabilityStatus status;
           if (available == 'Y') {
             status = AvailabilityStatus.available;
           } else if (available == 'N') {
             status = AvailabilityStatus.unavailable;
+          } else if (available == 'P') {
+            status = AvailabilityStatus.pending;
           } else {
             status = AvailabilityStatus.pending;
           }
@@ -793,6 +816,7 @@ class ChildProductsController extends GetxController {
             sku: p['SKU_CODE']?.toString() ?? '',
             name: p['SKU_NAME']?.toString() ?? 'Unknown',
             status: status,
+            initialStatus: status,
             isSelected: status == AvailabilityStatus.available,
             remarks: p['REMARKS']?.toString() ?? '',
             availableOption: opt,
@@ -813,6 +837,9 @@ class ChildProductsController extends GetxController {
   void updateStatus(int index, AvailabilityStatus status) {
     childProducts[index].status = status;
     childProducts[index].isSelected = status == AvailabilityStatus.available;
+    if (status != AvailabilityStatus.available) {
+      childProducts[index].availableOption = "";
+    }
     childProducts.refresh();
     _updateSelectionStatus();
   }
@@ -935,7 +962,9 @@ class ChildProductsController extends GetxController {
                       ? "Marked as unavailable"
                       : "Pending review")
               : child.remarks,
-          "available_option": child.availableOption
+          "available_option": child.status == AvailabilityStatus.available
+              ? child.availableOption
+              : ""
         };
       }).toList();
       final requestPayload = {
